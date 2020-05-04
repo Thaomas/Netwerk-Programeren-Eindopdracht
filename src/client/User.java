@@ -5,17 +5,19 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 import static javafx.application.Application.launch;
 
-public class Client {
+public class User {
 
     private String hostname;
     private int port;
     private boolean isConnected = false;
     private Socket socket;
     private ClientGUI gui;
+    private ArrayList<String> chatLog;
 
     public static void main(String[] args) {
         Client client = new Client();
@@ -23,7 +25,7 @@ public class Client {
         client.connect();
     }
 
-    public Client() {
+    public User() {
         Scanner scanner = new Scanner(System.in);
         while (!isConnected) {
             System.out.println("Enter server ip:");
@@ -32,6 +34,7 @@ public class Client {
             this.port = scanner.nextInt();
             try {
                 this.socket = new Socket(this.hostname, this.port);
+                connect();
                 isConnected = true;
             } catch (UnknownHostException e) {
                 e.printStackTrace();
@@ -40,6 +43,7 @@ public class Client {
                 e.printStackTrace();
             }
         }
+        chatLog = new ArrayList<>();
     }
 
     public void connect() {
@@ -110,3 +114,4 @@ public class Client {
         }
     }
 }
+

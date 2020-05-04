@@ -27,6 +27,6 @@ public class ChatGUI {
     }
 
     private void updateChat(){
-        chat.setText(chat.getText() +);
+        chat.setText(chat.getText());
     }
 }

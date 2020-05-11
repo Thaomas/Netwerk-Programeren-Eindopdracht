@@ -27,7 +27,6 @@ public class ServerClient implements Runnable {
         }
     }
 
-
     public void writeUTF(String text) {
         try {
             this.out.writeUTF(text);

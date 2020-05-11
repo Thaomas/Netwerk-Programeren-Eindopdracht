@@ -11,7 +11,6 @@ import java.util.HashMap;
 
 public class Server {
 
-
     private final int port = 10000;
     private ServerSocket serverSocket;
 
@@ -19,14 +18,12 @@ public class Server {
     //private ArrayList<Thread> clientThreads = new ArrayList<>();
     private HashMap<String, Thread> clientThreads = new HashMap<>();
 
-
     public static void main(String[] args) {
 
         System.out.println("Loading server");
         Server server = new Server();
         server.connect();
     }
-
 
     public void connect() {
 

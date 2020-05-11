@@ -160,8 +160,8 @@ public class Administration extends Application {
 
 
     public void clientGUI() {
-        ClientGUI gui = new ClientGUI(stage);
-        gui.start();
+        ClientGUI gui = new ClientGUI();
+        gui.start(stage);
     }
 
     public static void main(String[] args) {

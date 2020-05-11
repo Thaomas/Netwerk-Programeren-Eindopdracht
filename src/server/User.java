@@ -5,20 +5,24 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
 
-public class ServerClient implements Runnable {
+public class User implements Runnable {
 
     private Socket socket;
     private DataInputStream in;
     private DataOutputStream out;
     private String name;
+    private String password;
     private Server server;
     private boolean isConnected = true;
 
-    public ServerClient(Socket socket, String name, Server server) {
-        this.socket = socket;
+    public User(String name, String password, Server server) {
         this.name = name;
+        this.password = password;
         this.server = server;
+    }
 
+    public void setSocket(Socket socket) {
+        this.socket = socket;
         try {
             this.in = new DataInputStream(socket.getInputStream());
             this.out = new DataOutputStream(socket.getOutputStream());
@@ -26,7 +30,6 @@ public class ServerClient implements Runnable {
             e.printStackTrace();
         }
     }
-
 
     public void writeUTF(String text) {
         try {
@@ -44,9 +47,7 @@ public class ServerClient implements Runnable {
                 if (received.equals("\\quit")) {
                     isConnected = false;
                     this.server.removeClient(this);
-                } else {
-                    this.server.sendToAllClients("<" + this.name + "> : " + received);
-                }
+                } else if (server.containsRoom(received.substring(0,3)));
             } catch (SocketException e){
              isConnected = false;
              this.server.removeClient(this);
@@ -54,6 +55,10 @@ public class ServerClient implements Runnable {
                 e.printStackTrace();
             }
         }
+    }
+
+    public boolean checkPassword(String in){
+        return password.equals(in);
     }
 
     public String getName() {

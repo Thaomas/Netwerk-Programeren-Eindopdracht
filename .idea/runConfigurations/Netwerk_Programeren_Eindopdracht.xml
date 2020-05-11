@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Netwerk-Programeren-Eindopdracht" type="Application" factoryName="Application">
+  <configuration default="false" name="Netwerk-Programeren-Eindopdracht" type="Application" factoryName="Application" singleton="false">
     <option name="MAIN_CLASS_NAME" value="client.Client" />
     <module name="Netwerk-Programeren-Eindopdracht" />
     <method v="2">

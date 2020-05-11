@@ -13,7 +13,7 @@ public class User implements Runnable {
     private String name;
     private String password;
     private Server server;
-    private boolean isConnected = true;
+    private boolean isConnected;
 
     public User(String name, String password, Server server) {
         this.name = name;
@@ -39,12 +39,18 @@ public class User implements Runnable {
         }
     }
 
+    public boolean isConnected() {
+        return isConnected;
+    }
+
     @Override
     public void run() {
+        isConnected = true;
         while (isConnected) {
             try {
                 String received = this.in.readUTF();
                 if (received.equals("\\quit")) {
+                    System.out.println("disconnect");
                     isConnected = false;
                     this.server.removeClient(this);
                 } else if (server.containsRoom(received.substring(0,3)));

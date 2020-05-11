@@ -11,7 +11,6 @@ public class ChatGUI {
     private final Stage stage;
     public ChatGUI(Stage stage) {
         this.stage = stage;
-        User user = new User();
         start();
     }
 

@@ -20,11 +20,12 @@ public class ClientGUI {
     private final int buttonWIDTH = 150;
     private final int buttonHEIGHT = 100;
     private final String TITLE = "Connect 4";
-
+    private Administration administration;
     private Stage stage;
 
-    public ClientGUI(Stage primaryStage) {
+    public ClientGUI(Stage primaryStage, Administration administration) {
         this.stage = primaryStage;
+        this.administration = administration;
     }
 
     public void start() {
@@ -68,6 +69,7 @@ public class ClientGUI {
 
         MenuItem signOut = new MenuItem("Sign Out");
         signOut.setOnAction(event -> {
+            administration.disconnect();
             Administration administration = new Administration();
             administration.start(stage);
         });

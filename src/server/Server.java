@@ -1,6 +1,7 @@
 package server;
 
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -16,6 +17,7 @@ public class Server {
     private ServerSocket serverSocket;
 
     private HashMap<String, User> users = new HashMap<>();
+    private HashMap<String, User> connectedUsers = new HashMap<>();
     //private ArrayList<Thread> clientThreads = new ArrayList<>();
     private HashMap<String, Thread> clientThreads = new HashMap<>();
     private HashMap<String, Room> rooms = new HashMap<>();
@@ -31,6 +33,10 @@ public class Server {
         return rooms.containsKey(room);
     }
 
+    protected void connectUser(User user) {
+        connectedUsers.put(user.getName(), user);
+    }
+
 
     public void connect() {
 
@@ -44,7 +50,10 @@ public class Server {
 
                 System.out.println("Waiting for clients...");
                 Socket socket = this.serverSocket.accept();
-                Connecter connection = new Connecter(socket,this);
+                System.out.println("Client connected via address: " + socket.getInetAddress().getHostAddress());
+                System.out.println("Connected clients: " + this.connectedUsers.size());
+                System.out.println("Total users: " + this.users.size());
+                Connecter connection = new Connecter(socket, this);
                 Thread t = new Thread(connection);
                 connection.setThread(t);
                 t.start();
@@ -58,7 +67,7 @@ public class Server {
 
     public void writeStringToSocket(Socket socket, String text) {
         try {
-            socket.getOutputStream().write(text.getBytes());
+            new DataOutputStream(socket.getOutputStream()).writeUTF(text);
             System.out.println(text);
         } catch (IOException e) {
             e.printStackTrace();
@@ -67,7 +76,7 @@ public class Server {
 
     public void removeClient(User user) {
         String nickname = user.getName();
-        this.users.remove(user);
+        this.connectedUsers.remove(user.getName());
 
         Thread t = this.clientThreads.get(nickname);
         try {
@@ -85,7 +94,7 @@ public class Server {
         return users;
     }
 
-    public void addClientThread(String name, Thread t){
+    public void addClientThread(String name, Thread t) {
         this.clientThreads.put(name, t);
     }
 }

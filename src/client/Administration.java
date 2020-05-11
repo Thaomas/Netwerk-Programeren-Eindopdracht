@@ -14,6 +14,11 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
+
 public class Administration extends Application {
 
     private Stage stage;
@@ -23,9 +28,23 @@ public class Administration extends Application {
     private TextField username;
     private TextField password;
     private VBox centerPane;
+    private Socket socket;
+
+    public static void main(String[] args) {
+        launch(Administration.class);
+    }
+
+    private void connect() {
+        try {
+            socket = new Socket("localhost", 10000);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Override
     public void start(Stage primaryStage) {
+        connect();
         borderPane = new BorderPane();
         gridPane = new GridPane();
         centerPane = new VBox(10);
@@ -89,7 +108,7 @@ public class Administration extends Application {
         centerPane.getChildren().add(gridPane);
     }
 
-    public void login() {
+    private void login() {
         credential();
 
         Text login = new Text("Login");
@@ -97,9 +116,10 @@ public class Administration extends Application {
 
         Button loginButton = new Button("Login");
         loginButton.setOnAction(e -> {
-            System.out.println(username.getText() + "|" + password.getText());
-
-            clientGUI();
+            if (tryLogin()) {
+                System.out.println(username.getText() + "|" + password.getText());
+                clientGUI();
+            }
         });
 
         gridPane.add(login, 0, 0);
@@ -109,7 +129,39 @@ public class Administration extends Application {
         centerPane.getChildren().add(gridPane);
     }
 
-    public void register() {
+    private boolean tryLogin() {
+        if (!username.getText().isEmpty() && !password.getText().isEmpty()) {
+            try {
+                DataInputStream in = new DataInputStream(socket.getInputStream());
+                DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+
+                out.writeUTF("LogU" + username.getText() + "|" + password.getText());
+                String response = in.readUTF();
+                if (response.equals("connected")) {
+                    return true;
+                } else if (response.contains("error")) {
+                    if (response.charAt(5) == '2') {
+                        //Invalid Password
+
+                        System.out.println("invalid password");
+                    } else if (response.charAt(5) == '3') {
+                        //invalid Username
+                        System.out.println("invalid name");
+
+                    }else if (response.charAt(5) == '5'){
+                        //User already connected
+                        System.out.println("User already connected");
+                    }
+                }
+                return false;
+            } catch (IOException e) {
+                e.printStackTrace();
+                return false;
+            }
+        } else return false;
+    }
+
+    private void register() {
         credential();
 
         Text register = new Text("Register");
@@ -117,9 +169,10 @@ public class Administration extends Application {
 
         Button registerButton = new Button("Register account");
         registerButton.setOnAction(event -> {
-            System.out.println(username.getText() + "|" + password.getText());
-
-            login();
+            if (tryRegister()) {
+                System.out.println(username.getText() + "|" + password.getText());
+                clientGUI();
+            }
         });
 
         gridPane.add(register, 0, 0);
@@ -129,7 +182,29 @@ public class Administration extends Application {
         centerPane.getChildren().add(gridPane);
     }
 
-    public void credential() {
+    private boolean tryRegister() {
+        if (!username.getText().isEmpty() && !password.getText().isEmpty()) {
+            try {
+                DataInputStream in = new DataInputStream(socket.getInputStream());
+                DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+
+                out.writeUTF("RegU" + username.getText() + "|" + password.getText());
+                String response = in.readUTF();
+                if (response.equals("connected")) {
+                    return true;
+                } else if (response.contains("error")) {
+                    //Name already in use
+                    System.out.println("invalid name");
+                }
+                return false;
+            } catch (IOException e) {
+                e.printStackTrace();
+                return false;
+            }
+        } else return false;
+    }
+
+    private void credential() {
         borderPane.setTop(toolBar);
         gridPane.getChildren().clear();
         centerPane.getChildren().clear();
@@ -158,15 +233,17 @@ public class Administration extends Application {
         gridPane.add(visiblePassword, 3, 2);
     }
 
-
-    public void clientGUI() {
-        ClientGUI gui = new ClientGUI(stage);
-        gui.start();
+    protected void disconnect(){
+        try {
+            DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+            out.writeUTF("\\quit");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    public static void main(String[] args) {
-//        Client client = new Client();
-        launch(Administration.class);
-//        client.connect();
+    private void clientGUI() {
+        ClientGUI gui = new ClientGUI(stage, this);
+        gui.start();
     }
 }

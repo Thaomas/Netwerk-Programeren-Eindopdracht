@@ -17,12 +17,6 @@ public class Client {
     private Socket socket;
     private ClientGUI gui;
 
-    public static void main(String[] args) {
-        Client client = new Client();
-        launch(ClientGUI.class);
-        client.connect();
-    }
-
     public Client() {
         Scanner scanner = new Scanner(System.in);
         while (!isConnected) {

@@ -24,6 +24,10 @@ public class Administration extends Application {
     private TextField password;
     private VBox centerPane;
 
+    public static void main(String[] args) {
+        launch(Administration.class);
+    }
+
     @Override
     public void start(Stage primaryStage) {
         borderPane = new BorderPane();
@@ -165,9 +169,4 @@ public class Administration extends Application {
         gui.start(stage);
     }
 
-    public static void main(String[] args) {
-//        Client client = new Client();
-        launch(Administration.class);
-//        client.connect();
-    }
 }

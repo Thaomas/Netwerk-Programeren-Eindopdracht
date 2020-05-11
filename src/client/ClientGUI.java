@@ -60,17 +60,13 @@ public class ClientGUI {
 
         Menu accountMenu = new Menu("Account");
 
-        MenuItem prefrences = new MenuItem("Prefrences");
-        prefrences.setOnAction(event -> {
-            account();
-        });
+        MenuItem preferences = new MenuItem("Preferences");
+        preferences.setOnAction(event -> account());
 
         MenuItem signOut = new MenuItem("Sign Out");
-        signOut.setOnAction(event -> {
-            administration();
-        });
+        signOut.setOnAction(event -> administration());
 
-        accountMenu.getItems().addAll(prefrences, signOut);
+        accountMenu.getItems().addAll(preferences, signOut);
 
         menubar.getMenus().add(accountMenu);
 

@@ -46,7 +46,6 @@ public class ClientGUI {
 
         stage.setTitle(TITLE);
         stage.setScene(scene);
-        stage.show();
 
         /*
         stage.widthProperty().addListener((observable, oldValue, newValue) -> {
@@ -63,20 +62,22 @@ public class ClientGUI {
     public MenuBar lobbyMenu() {
         MenuBar menubar = new MenuBar();
 
-        Menu account = new Menu("Account");
+        Menu accountMenu = new Menu("Account");
 
         MenuItem prefrences = new MenuItem("Prefrences");
+        prefrences.setOnAction(event -> {
+            account();
+        });
 
         MenuItem signOut = new MenuItem("Sign Out");
         signOut.setOnAction(event -> {
             administration.disconnect();
-            Administration administration = new Administration();
-            administration.start(stage);
+            administration();
         });
 
-        account.getItems().addAll(prefrences, signOut);
+        accountMenu.getItems().addAll(prefrences, signOut);
 
-        menubar.getMenus().add(account);
+        menubar.getMenus().add(accountMenu);
 
         return menubar;
     }
@@ -115,6 +116,16 @@ public class ClientGUI {
         gridPane.add(optionButton, 1, 1);
 
         return gridPane;
+    }
+
+    public void administration(){
+        Administration administration = new Administration();
+        administration.start(stage);
+    }
+
+    public void account(){
+        Account account = new Account();
+        account.start(stage);
     }
 
 }

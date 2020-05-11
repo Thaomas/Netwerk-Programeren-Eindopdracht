@@ -12,7 +12,6 @@ import java.util.HashSet;
 
 public class Server {
 
-
     private final int port = 10000;
     private ServerSocket serverSocket;
 
@@ -20,7 +19,6 @@ public class Server {
     //private ArrayList<Thread> clientThreads = new ArrayList<>();
     private HashMap<String, Thread> clientThreads = new HashMap<>();
     private HashMap<String, Room> rooms = new HashMap<>();
-
 
     public static void main(String[] args) {
 

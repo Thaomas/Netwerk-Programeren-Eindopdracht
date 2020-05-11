@@ -5,6 +5,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import server.User;
 
 public class ChatGUI {
     private final Stage stage;
@@ -24,9 +25,12 @@ public class ChatGUI {
         borderPane.setBottom(input);
         Scene scene = new Scene(borderPane);
         stage.setScene(scene);
+        stage.show();
     }
 
     private void updateChat(){
         chat.setText(chat.getText());
     }
+
+
 }

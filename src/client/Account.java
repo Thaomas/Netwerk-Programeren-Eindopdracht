@@ -30,9 +30,11 @@ public class Account {
     private TextField oldPass;
     private TextField newPass;
     private TextField newPassConfirm;
+    private ClientGUI clientGUI;
 
-    public void start(Stage primaryStage) {
+    public void start(Stage primaryStage, ClientGUI clientGUI) {
         stage = primaryStage;
+        this.clientGUI = clientGUI;
         BorderPane borderPane = new BorderPane();
         ToolBar toolBar = new ToolBar();
         GridPane credentials = new GridPane();
@@ -40,9 +42,7 @@ public class Account {
         VBox statsBox = new VBox();
 
         Button backButton = new Button("Back");
-        backButton.setOnAction(event -> {
-            clientGUI();
-        });
+        backButton.setOnAction(event -> clientGUI());
 
         toolBar.getItems().add(backButton);
 
@@ -65,13 +65,21 @@ public class Account {
         Label visible = new Label("View password?");
         CheckBox viewBox = new CheckBox();
         viewBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
-            String text = oldPass.getText();
+            String textOldPass = oldPass.getText();
+            String textNewPass = newPass.getText();
+            String textNewPassConfirm = newPassConfirm.getText();
             if (viewBox.isSelected()) {
                 oldPass = new TextField();
+                newPass = new TextField();
+                newPassConfirm = new TextField();
             } else {
                 oldPass = new PasswordField();
+                newPass = new PasswordField();
+                newPassConfirm = new PasswordField();
             }
-            oldPass.setText(text);
+            oldPass.setText(textOldPass);
+            newPass.setText(textNewPass);
+            newPassConfirm.setText(textNewPassConfirm);
             credentials.add(oldPass, 1, 0);
         });
         HBox visiblePassword = new HBox(viewBox, visible);
@@ -85,9 +93,9 @@ public class Account {
 
         Label statistics = new Label("Stats");
         statistics.setFont(Font.font("Arial", FontPosture.ITALIC,40));
-        Label gamesPlayed = new Label("Total games played: " + String.valueOf(this.gamesPlayed));
-        Label wins = new Label("Total wins: " + String.valueOf(this.wins));
-        Label losses = new Label("Total losses: " + String.valueOf(this.losses));
+        Label gamesPlayed = new Label("Total games played: " + this.gamesPlayed);
+        Label wins = new Label("Total wins: " + this.wins);
+        Label losses = new Label("Total losses: " + this.losses);
 
         statsBox.getChildren().add(statistics);
         statsBox.getChildren().add(gamesPlayed);
@@ -108,7 +116,6 @@ public class Account {
     }
 
     public void clientGUI() {
-        ClientGUI gui = new ClientGUI();
-        gui.start(stage);
+        clientGUI.start();
     }
 }

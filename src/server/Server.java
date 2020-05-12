@@ -20,7 +20,7 @@ public class Server {
     private HashMap<String, User> connectedUsers = new HashMap<>();
     //private ArrayList<Thread> clientThreads = new ArrayList<>();
     private HashMap<String, Thread> clientThreads = new HashMap<>();
-    private HashMap<String, Room> rooms = new HashMap<>();
+    private HashMap<String, ChatRoom> rooms = new HashMap<>();
 
     public static void main(String[] args) {
 
@@ -65,18 +65,30 @@ public class Server {
         }
     }
 
-    public void writeStringToSocket(Socket socket, String text) {
-        try {
-            new DataOutputStream(socket.getOutputStream()).writeUTF(text);
-            System.out.println(text);
-        } catch (IOException e) {
-            e.printStackTrace();
+    public ArrayList<String> getChatLog(String servername){
+        return rooms.get(servername).getChatlog();
+    }
+
+    public void connectToChatRoom(String roomName, User user) {
+        rooms.get(roomName).addUser(user);
+    }
+
+    public void disconnectChatRoom(String roomName, User user) {
+        rooms.get(roomName).removeUser(user);
+    }
+
+    public void writeToChatRoom(String roomName, User user, String message) {
+        ChatRoom room = rooms.get(roomName);
+        if (!room.checkUser(user)) {
+            room.addUser(user);
         }
+        room.messageAll("<" + user + ">: " + message);
     }
 
     public void removeClient(User user) {
         String nickname = user.getName();
         this.connectedUsers.remove(user.getName());
+
 
         Thread t = this.clientThreads.get(nickname);
         try {

@@ -4,25 +4,35 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 public class ChatRoom implements Room {
-    private HashSet<User> users;
-    private ArrayList<String> chatlog;
+    private final HashSet<User> users;
+    private final ArrayList<String> chatlog;
 
     public ChatRoom() {
-        users = new HashSet();
+        users = new HashSet<>();
         chatlog = new ArrayList<>();
     }
 
-    public void addUser(User user){
+    public void addUser(User user) {
         users.add(user);
+    }
+
+    public void removeUser(User user) {
+        users.remove(user);
+    }
+
+    public boolean checkUser(User user) {
+        return users.contains(user);
     }
 
     public ArrayList<String> getChatlog() {
         return chatlog;
     }
-    public void messageAll(String message){
+
+    public void messageAll(String message) {
         chatlog.add(message);
-        for (User user:users) {
+        for (User user : users) {
             user.writeUTF(message);
         }
     }
+
 }

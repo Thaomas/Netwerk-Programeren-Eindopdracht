@@ -1,10 +1,11 @@
 package server;
 
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
-public class Connecter implements Runnable{
+public class Connecter implements Runnable {
 
     private Socket socket;
     private Server server;
@@ -29,7 +30,7 @@ public class Connecter implements Runnable{
             e.printStackTrace();
         }
         boolean loggedIn = false;
-        while(!loggedIn) {
+        while (!loggedIn) {
             try {
                 String input = in.readUTF();
                 String awnser = input.substring(0, 4);
@@ -55,7 +56,7 @@ public class Connecter implements Runnable{
                             this.server.getUsers().put(user.getName(), user);
                             loggedIn = true;
                         } else {
-                            server.writeStringToSocket(socket, "error1");
+                            respond("error1");
                             continue;
                         }
                     } else {
@@ -66,36 +67,51 @@ public class Connecter implements Runnable{
                                 if (!user.isConnected()) {
                                     user.setSocket(socket);
                                     loggedIn = true;
-                                }else {
-                                    server.writeStringToSocket(socket, "error5");
+                                } else {
+                                    respond("error5");
                                     continue;
                                 }
                             } else {
-                                server.writeStringToSocket(socket, "error2");
+                                respond("error2");
                                 continue;
                             }
                         } else {
-                            server.writeStringToSocket(socket, "error3");
+                            respond("error3");
                             continue;
                         }
                     }
                     server.connectUser(user);
                     Thread t = new Thread(user);
                     t.start();
-                    server.writeStringToSocket(socket,"connected");
+                    respond("connected");
                     System.out.println(nickname + " connected");
                     server.addClientThread(nickname, t);
                 } else {
-                    server.writeStringToSocket(socket, "error4");
+                    //Invalid command
+                    respond("error4");
                 }
-            }catch (IOException e){
-                System.out.println("Unexpected connection loss");
+            } catch (IOException e) {
+                System.out.println("Unexpected connection loss " + socket.getRemoteSocketAddress().toString());
+                try {
+                    thread.join();
+                } catch (InterruptedException interruptedException) {
+                    interruptedException.printStackTrace();
+                }
                 break;
             }
         }
         try {
             thread.join();
         } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void respond(String response) {
+        try {
+            new DataOutputStream(socket.getOutputStream()).writeUTF(response);
+            System.out.println(response);
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }

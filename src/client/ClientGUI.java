@@ -22,10 +22,13 @@ public class ClientGUI {
     private final String TITLE = "Connect 4";
     private Administration administration;
     private Stage stage;
+    private Account account;
 
     public ClientGUI(Stage primaryStage, Administration administration) {
         this.stage = primaryStage;
         this.administration = administration;
+        this.account = new Account();
+        Runtime.getRuntime().addShutdownHook(new Thread(administration::disconnect));
     }
 
     public void start() {
@@ -64,18 +67,13 @@ public class ClientGUI {
 
         Menu accountMenu = new Menu("Account");
 
-        MenuItem prefrences = new MenuItem("Prefrences");
-        prefrences.setOnAction(event -> {
-            account();
-        });
+        MenuItem preferences = new MenuItem("Preferences");
+        preferences.setOnAction(e -> account());
 
         MenuItem signOut = new MenuItem("Sign Out");
-        signOut.setOnAction(event -> {
-            administration.disconnect();
-            administration();
-        });
+        signOut.setOnAction(e -> administration());
 
-        accountMenu.getItems().addAll(prefrences, signOut);
+        accountMenu.getItems().addAll(preferences, signOut);
 
         menubar.getMenus().add(accountMenu);
 
@@ -119,13 +117,12 @@ public class ClientGUI {
     }
 
     public void administration(){
-        Administration administration = new Administration();
+        administration.disconnect();
         administration.start(stage);
     }
 
     public void account(){
-        Account account = new Account();
-        account.start(stage);
+        account.start(stage, this);
     }
 
 }

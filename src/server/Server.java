@@ -1,15 +1,10 @@
 package server;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 
 public class Server {
 
@@ -18,7 +13,6 @@ public class Server {
 
     private HashMap<String, User> users = new HashMap<>();
     private HashMap<String, User> connectedUsers = new HashMap<>();
-    //private ArrayList<Thread> clientThreads = new ArrayList<>();
     private HashMap<String, Thread> clientThreads = new HashMap<>();
     private HashMap<String, ChatRoom> rooms = new HashMap<>();
 
@@ -88,7 +82,9 @@ public class Server {
     public void removeClient(User user) {
         String nickname = user.getName();
         this.connectedUsers.remove(user.getName());
-
+        for (ChatRoom room: rooms.values()){
+            room.removeUser(user  );
+        }
 
         Thread t = this.clientThreads.get(nickname);
         try {
@@ -104,6 +100,11 @@ public class Server {
 
     public HashMap<String, User> getUsers() {
         return users;
+    }
+
+    public void addUser(User user){
+        this.users.put(user.getName(), user);
+
     }
 
     public void addClientThread(String name, Thread t) {

@@ -32,6 +32,19 @@ public class User implements Runnable {
         this.creationDate = LocalDate.now();
     }
 
+
+    public int getGamesPlayed() {
+        return gamesPlayed;
+    }
+
+    public int getGamesWon() {
+        return gamesWon;
+    }
+
+    public LocalDate getCreationDate() {
+        return creationDate;
+    }
+
     public void setSocket(Socket socket) {
         this.socket = socket;
         try {

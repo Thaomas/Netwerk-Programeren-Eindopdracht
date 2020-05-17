@@ -42,7 +42,7 @@ public class Account {
         this.losses = 0;
     }
 
-    public void start(Stage primaryStage) {
+    public void start(Stage primaryStage, ClientGUI clientGUI) {
 
         testData();
 

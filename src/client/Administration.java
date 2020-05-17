@@ -70,6 +70,7 @@ public class Administration extends Application {
         Scene scene = new Scene(borderPane, 400, 300);
 
         stage = primaryStage;
+        stage.setResizable(false);
         stage.setTitle("Connect 4 login");
         stage.setScene(scene);
         stage.show();
@@ -84,6 +85,8 @@ public class Administration extends Application {
         });
 
          */
+
+
     }
 
     public void startScene() {

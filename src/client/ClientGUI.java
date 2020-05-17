@@ -15,19 +15,28 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import java.io.FileNotFoundException;
+
 public class ClientGUI {
 
     private final int buttonWIDTH = 150;
     private final int buttonHEIGHT = 100;
     private final String TITLE = "Connect 4";
+
     private Administration administration;
-    private Stage stage;
+
     private Account account;
+    private ChatGUI chatGUI;
+    private CreateGameGUI createGameGUI;
+
+    private Stage stage;
 
     public ClientGUI(Stage primaryStage, Administration administration) {
         this.stage = primaryStage;
         this.administration = administration;
         this.account = new Account();
+        this.chatGUI = new ChatGUI();
+        createGameGUI = new CreateGameGUI();
         Runtime.getRuntime().addShutdownHook(new Thread(administration::disconnect));
     }
 
@@ -95,6 +104,7 @@ public class ClientGUI {
         createButton = new Button("Create game");
         createButton.setAlignment(Pos.CENTER);
         createButton.setPrefSize(buttonWIDTH, buttonHEIGHT);
+        createButton.setOnAction(event -> CreateGameGUI());
 
         joinButton = new Button("Join game");
         joinButton.setAlignment(Pos.CENTER);
@@ -103,6 +113,7 @@ public class ClientGUI {
         chatButton = new Button("Chat");
         chatButton.setAlignment(Pos.CENTER);
         chatButton.setPrefSize(buttonWIDTH, buttonHEIGHT);
+        chatButton.setOnAction(event -> ChatGUI());
 
         optionButton = new Button("Options");
         optionButton.setAlignment(Pos.CENTER);
@@ -116,13 +127,21 @@ public class ClientGUI {
         return gridPane;
     }
 
-    public void administration(){
+    public void administration() {
         administration.disconnect();
         administration.start(stage);
     }
 
-    public void account(){
+    public void account() {
         account.start(stage, this);
+    }
+
+    public void ChatGUI() {
+        chatGUI.start(stage, this);
+    }
+
+    public void CreateGameGUI() {
+        createGameGUI.start(stage, this);
     }
 
 }

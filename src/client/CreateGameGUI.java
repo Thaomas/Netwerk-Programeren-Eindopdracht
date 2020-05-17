@@ -91,30 +91,6 @@ public class CreateGameGUI {
 
         borderPane.setCenter(gridPane);
 
-//        BorderPane rightPane = new BorderPane();
-//        rightPane.setPadding(new Insets(10));
-//
-//        chatPane = new VBox();
-//        chatPane.setBorder(new Border(new BorderStroke(Color.BLACK,
-//                BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
-//        chatPane.setSpacing(10);
-//
-//        HBox messagePane = new HBox();
-//
-//        input = new TextField();
-//
-//        Button enterButton = new Button("SEND");
-//        enterButton.setOnAction(event -> {
-//            updateChat();
-//            input.clear();
-//        });
-//
-//        messagePane.getChildren().add(input);
-//        messagePane.getChildren().add(enterButton);
-//
-//        rightPane.setCenter(chatPane);
-//        rightPane.setBottom(messagePane);
-
         ChatGUI test = new ChatGUI();
 
         BorderPane rightPane = test.chatBox(275,620);
@@ -124,19 +100,6 @@ public class CreateGameGUI {
         stage.setTitle("Create game");
         stage.setScene(scene);
         stage.show();
-    }
-
-    private void updateChat(){
-        Text chat = new Text();
-
-        chat.setWrappingWidth(190);
-        chat.setFont(Font.font("Arial",24));
-        chat.setText("You: " + input.getText());
-
-        if(chatPane.getChildren().size() == 10){
-            chatPane.getChildren().remove(0);
-        }
-        chatPane.getChildren().add(chat);
     }
 
     private void clientGUI() {

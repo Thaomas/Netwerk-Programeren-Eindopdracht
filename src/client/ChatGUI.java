@@ -42,36 +42,36 @@ public class ChatGUI {
     public BorderPane chatBox(int width, int height) {
         BorderPane borderPane = new BorderPane();
 
-        ScrollPane scrollPane = new ScrollPane();
-
+        //Center items
         TextFlow textFlow = new TextFlow();
         textFlow.setLineSpacing(10);
-        TextField textField = new TextField();
-        textField.setPrefHeight(30);
-        Button button = new Button("Send");
-        button.setPrefSize(80, 30);
+        VBox.setVgrow(textFlow, Priority.ALWAYS);
+
+        VBox vBox = new VBox();
+        vBox.getChildren().addAll(textFlow);
+
+        ScrollPane scrollPane = new ScrollPane();
+        VBox.setVgrow(scrollPane, Priority.ALWAYS);
+
+        scrollPane.setVmax(width + 40);
+        scrollPane.setPrefSize(width, height);
+        scrollPane.setContent(vBox);
+        scrollPane.vvalueProperty().bind(vBox.heightProperty());
+
         VBox centerTextBox = new VBox();
         centerTextBox.setPadding(new Insets(10));
         centerTextBox.getChildren().addAll(scrollPane, textFlow);
 
         borderPane.setCenter(centerTextBox);
 
-        HBox inputBox = new HBox(textField, button);
-        inputBox.setPadding(new Insets(0,10,10,10));
+        //Bottom items
+        TextField textField = new TextField();
+        textField.setPrefHeight(30);
+        textField.setPrefWidth(width-80);
         HBox.setHgrow(textField,Priority.ALWAYS);
 
-        borderPane.setBottom(inputBox);
-        VBox.setVgrow(scrollPane, Priority.ALWAYS);
-        VBox.setVgrow(textFlow, Priority.ALWAYS);
-        textField.setPrefWidth(width-80);
-
-        textField.setOnKeyPressed(e -> {
-            // On Enter press
-            if (e.getCode() == KeyCode.ENTER) {
-                button.fire();
-            }
-        });
-
+        Button button = new Button("Send");
+        button.setPrefSize(80, 30);
         button.setOnAction(e -> {
             Text text;
             if (!textField.getText().isEmpty() || !textField.getText().equals(" ")) {
@@ -85,12 +85,18 @@ public class ChatGUI {
                 textField.requestFocus();
             }
         });
-        VBox vBox = new VBox();
-        vBox.getChildren().addAll(textFlow);
-        scrollPane.setVmax(width + 40);
-        scrollPane.setPrefSize(width, height);
-        scrollPane.setContent(vBox);
-        scrollPane.vvalueProperty().bind(vBox.heightProperty());
+
+        textField.setOnKeyPressed(e -> {
+            // On Enter press
+            if (e.getCode() == KeyCode.ENTER) {
+                button.fire();
+            }
+        });
+
+        HBox inputBox = new HBox(textField, button);
+        inputBox.setPadding(new Insets(0,10,10,10));
+
+        borderPane.setBottom(inputBox);
 
         return borderPane;
     }

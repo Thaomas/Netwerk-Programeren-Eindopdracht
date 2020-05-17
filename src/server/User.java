@@ -6,7 +6,9 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.SocketException;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class User implements Runnable {
 
@@ -17,11 +19,17 @@ public class User implements Runnable {
     private String password;
     private Server server;
     private boolean isConnected;
+    private int gamesPlayed;
+    private int gamesWon;
+    private LocalDate creationDate;
 
     public User(String name, String password, Server server) {
         this.name = name;
         this.password = password;
         this.server = server;
+        this.gamesPlayed = 0;
+        this.gamesWon= 0;
+        this.creationDate = LocalDate.now();
     }
 
     public void setSocket(Socket socket) {

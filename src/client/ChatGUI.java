@@ -1,36 +1,29 @@
 package client;
 
-import javafx.application.Application;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToolBar;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
+import javafx.scene.input.KeyCode;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
-import server.User;
 
-public class ChatGUI{
+public class ChatGUI {
 
-    private Stage stage;
     private ClientGUI clientGUI;
-
     private BorderPane borderPane;
-    private VBox centerPane;
-    private TextField input;
 
-    public void start(Stage primaryStage, ClientGUI clientGUI){
-        this.stage = primaryStage;
+    public void start(Stage primaryStage, ClientGUI clientGUI) {
         this.clientGUI = clientGUI;
 
-        borderPane = new BorderPane();
+        borderPane = chatBox(400, 520);
 
         ToolBar toolBar = new ToolBar();
 
@@ -40,41 +33,66 @@ public class ChatGUI{
         toolBar.getItems().add(backButton);
         borderPane.setTop(toolBar);
 
-        centerPane = new VBox();
-
-        borderPane.setCenter(centerPane);
-        input = new TextField();
-
-        Button enterButton = new Button("SEND");
-        enterButton.setOnAction(event -> {
-            updateChat();
-            input.clear();
-        });
-
-        HBox bottomPane = new HBox();
-        bottomPane.setSpacing(10);
-        bottomPane.setPadding(new Insets(10));
-        HBox.setHgrow(input, Priority.ALWAYS);
-        bottomPane.getChildren().add(input);
-        bottomPane.getChildren().add(enterButton);
-        borderPane.setBottom(bottomPane);
-        Scene scene = new Scene(borderPane,600,600);
-        stage.setTitle("Chat");
-        stage.setScene(scene);
-        stage.show();
+        Scene scene = new Scene(borderPane, 600, 600);
+        primaryStage.setScene(scene);
+        primaryStage.setTitle("ChatBox");
+        primaryStage.show();
     }
 
-    private void updateChat(){
-        Text chat = new Text();
+    public BorderPane chatBox(int width, int height) {
+        BorderPane borderPane = new BorderPane();
 
-        chat.wrappingWidthProperty().bind(borderPane.widthProperty());
-        chat.setFont(Font.font("Arial",24));
-        chat.setText("You: " + input.getText());
+        ScrollPane scrollPane = new ScrollPane();
 
-        if(centerPane.getChildren().size() == 19){
-            centerPane.getChildren().remove(0);
-        }
-        centerPane.getChildren().add(chat);
+        TextFlow textFlow = new TextFlow();
+        textFlow.setLineSpacing(10);
+        TextField textField = new TextField();
+        textField.setPrefHeight(30);
+        Button button = new Button("Send");
+        button.setPrefSize(80, 30);
+        VBox centerTextBox = new VBox();
+        centerTextBox.setPadding(new Insets(10));
+        centerTextBox.getChildren().addAll(scrollPane, textFlow);
+
+        borderPane.setCenter(centerTextBox);
+
+        HBox inputBox = new HBox(textField, button);
+        inputBox.setPadding(new Insets(0,10,10,10));
+        HBox.setHgrow(textField,Priority.ALWAYS);
+
+        borderPane.setBottom(inputBox);
+        VBox.setVgrow(scrollPane, Priority.ALWAYS);
+        VBox.setVgrow(textFlow, Priority.ALWAYS);
+        textField.setPrefWidth(width-80);
+
+        textField.setOnKeyPressed(e -> {
+            // On Enter press
+            if (e.getCode() == KeyCode.ENTER) {
+                button.fire();
+            }
+        });
+
+        button.setOnAction(e -> {
+            Text text;
+            if (!textField.getText().isEmpty() || !textField.getText().equals(" ")) {
+                if (textFlow.getChildren().size() == 0) {
+                    text = new Text("You: " + textField.getText());
+                } else {
+                    text = new Text("\n" + "You: " + textField.getText());
+                }
+                textFlow.getChildren().add(text);
+                textField.clear();
+                textField.requestFocus();
+            }
+        });
+        VBox vBox = new VBox();
+        vBox.getChildren().addAll(textFlow);
+        scrollPane.setVmax(width + 40);
+        scrollPane.setPrefSize(width, height);
+        scrollPane.setContent(vBox);
+        scrollPane.vvalueProperty().bind(vBox.heightProperty());
+
+        return borderPane;
     }
 
     private void clientGUI() {

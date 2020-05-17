@@ -31,6 +31,7 @@ public class Account {
     private TextField oldPass;
     private TextField newPass;
     private TextField newPassConfirm;
+    private ClientGUI clientGUI;
 
     public final void testData() {
         this.username = "'Username'";
@@ -46,6 +47,7 @@ public class Account {
         testData();
 
         stage = primaryStage;
+        this.clientGUI = clientGUI;
         BorderPane borderPane = new BorderPane();
         ToolBar toolBar = new ToolBar();
         GridPane credentials = new GridPane();
@@ -53,9 +55,7 @@ public class Account {
         VBox statsBox = new VBox();
 
         Button backButton = new Button("Back");
-        backButton.setOnAction(event -> {
-            clientGUI();
-        });
+        backButton.setOnAction(event -> clientGUI());
 
         toolBar.getItems().add(backButton);
 
@@ -70,13 +70,21 @@ public class Account {
         Label visible = new Label("View password?");
         CheckBox viewBox = new CheckBox();
         viewBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
-            String text = oldPass.getText();
+            String textOldPass = oldPass.getText();
+            String textNewPass = newPass.getText();
+            String textNewPassConfirm = newPassConfirm.getText();
             if (viewBox.isSelected()) {
                 oldPass = new TextField();
+                newPass = new TextField();
+                newPassConfirm = new TextField();
             } else {
                 oldPass = new PasswordField();
+                newPass = new PasswordField();
+                newPassConfirm = new PasswordField();
             }
-            oldPass.setText(text);
+            oldPass.setText(textOldPass);
+            newPass.setText(textNewPass);
+            newPassConfirm.setText(textNewPassConfirm);
             credentials.add(oldPass, 1, 0);
         });
         HBox visiblePassword = new HBox(viewBox, visible);
@@ -140,7 +148,6 @@ public class Account {
     }
 
     public void clientGUI() {
-        ClientGUI gui = new ClientGUI();
-        gui.start(stage);
+        clientGUI.start();
     }
 }

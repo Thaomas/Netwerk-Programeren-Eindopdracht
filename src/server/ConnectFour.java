@@ -2,16 +2,16 @@ package server;
 
 import java.util.ArrayList;
 
-public class VierOpEenRij {
+public class ConnectFour {
     private final ArrayList<ArrayList<Integer>> grid;
     private int w;
     private int h;
 
     public static void main(String[] args) {
-        new VierOpEenRij(10, 25);
+        new ConnectFour(10, 25);
     }
 
-    public VierOpEenRij(int w, int h) {
+    public ConnectFour(int w, int h) {
         this.w = w;
         this.h = h;
         grid = new ArrayList<>();

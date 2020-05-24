@@ -27,6 +27,7 @@ public class CreateGameGUI {
     private Socket socket;
     private DataInputStream in;
     private DataOutputStream out;
+//    private int[][] board = new int[7][6];
 
     public void start(Stage primaryStage, ClientGUI clientGUI){
         stage = primaryStage;
@@ -62,9 +63,8 @@ public class CreateGameGUI {
             for (int y = 0; y < 6; y++) {
                 Image image = new Image("\\white.png");
                 ImageView imageView = new ImageView(image);
-                imageView.setId(x+""+y);
+                imageView.setId("Neutral - Height: " + y + ", Length: " + x);
                 gridPane.add(imageView,x,y);
-
 
                 Button button = new Button();
                 button.setMaxSize(Double.MAX_VALUE,Double.MAX_VALUE);
@@ -73,20 +73,37 @@ public class CreateGameGUI {
                 final int height = y;
                 final int length = x;
                 button.setOnAction(event -> {
-                    System.out.println("Height: " + height + ", Length: " + length);
-                    Image image2;
+
                     int index = counter.get();
                     //TODO Wont work if online where it has to update on both sides
+                    ImageView imageView2;
                     if(index%2==0){
-                        image2 = new Image("\\red.png");
+                        Image red = new Image("\\red.png");
+                        imageView2 = new ImageView(red);
+                        imageView2.setId("Red - Height: " + height + ", Length: " + length);
                     }else {
-                        image2 = new Image("\\yellow.png");
+                        Image yellow = new Image("\\yellow.png");
+                        imageView2 = new ImageView(yellow);
+                        imageView2.setId("Yellow - Height: " + height + ", Length: " + length);
                     }
-                    ImageView imageView2 = new ImageView(image2);
                     gridPane.add(imageView2,length,height);
+                    System.out.println(gridPane.getChildren());
 
                     counter.getAndIncrement();
 
+                    System.out.println("Height: " + height + ", Length: " + length);
+
+                    /* TODO Logic for connect 4 not complete. This only sends the height and length to the server.
+                     *  The logic has to be made in the server for the images to be properly displayed.
+                     */
+
+                    /*
+                    try {
+                        out.writeUTF(String.valueOf(height)+"#"+String.valueOf(length));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                     */
 
                 });
                 gridPane.add(button,x,y);

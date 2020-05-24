@@ -8,13 +8,15 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 import util.RandomString;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class CreateGameGUI {
@@ -22,18 +24,16 @@ public class CreateGameGUI {
     private Stage stage;
     private ClientGUI clientGUI;
 
-    private BorderPane borderPane;
-    private BorderPane rightPane;
-    private GridPane gridPane;
-    private VBox chatPane;
-    private TextField input;
+    private Socket socket;
+    private DataInputStream in;
+    private DataOutputStream out;
 
     public void start(Stage primaryStage, ClientGUI clientGUI){
         stage = primaryStage;
         this.clientGUI = clientGUI;
 
-        borderPane = new BorderPane();
-        gridPane = new GridPane();
+        BorderPane borderPane = new BorderPane();
+        GridPane gridPane = new GridPane();
 
         ToolBar toolBar = new ToolBar();
 
@@ -44,7 +44,7 @@ public class CreateGameGUI {
 
         Label lobbyCode = new Label("Room code: " + randomString.nextString());
 
-        Text opponentName = new Text("Opponent: adsdgasdgsdgdg");
+        Text opponentName = new Text("Opponent: TESTNAME");
 
         Separator separator = new Separator();
         Separator separator2 = new Separator();
@@ -86,6 +86,8 @@ public class CreateGameGUI {
                     gridPane.add(imageView2,length,height);
 
                     counter.getAndIncrement();
+
+
                 });
                 gridPane.add(button,x,y);
             }
@@ -161,6 +163,16 @@ public class CreateGameGUI {
         borderPane.setBottom(inputBox);
 
         return borderPane;
+    }
+
+    public void setSocket(Socket socket) {
+        this.socket = socket;
+        try {
+            this.in = new DataInputStream(socket.getInputStream());
+            this.out = new DataOutputStream(socket.getOutputStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void clientGUI() {

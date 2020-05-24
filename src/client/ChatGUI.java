@@ -1,6 +1,5 @@
 package client;
 
-import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -9,8 +8,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToolBar;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
@@ -60,7 +57,7 @@ public class ChatGUI {
 
         VBox centerTextBox = new VBox();
         centerTextBox.setPadding(new Insets(10));
-        centerTextBox.getChildren().addAll(scrollPane, textFlow);
+        centerTextBox.getChildren().addAll(scrollPane);
 
         borderPane.setCenter(centerTextBox);
 

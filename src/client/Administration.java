@@ -71,7 +71,7 @@ public class Administration extends Application {
 
         stage = primaryStage;
 
-//        stage.setResizable(false);
+        stage.setResizable(false);
 
         stage.setTitle("Connect 4 login");
         stage.setScene(scene);

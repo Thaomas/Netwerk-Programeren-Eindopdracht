@@ -63,13 +63,13 @@ public class User implements Runnable {
                     switch (received.substring(0, 4)) {
                         case "Conn":
                             if (server.containsRoom(received.substring(4, 8))) {
-                                String servername = received.substring(4, 8);
-                                server.connectToChatRoom(servername, this);
-                                sendChatLog(server.getChatLog(servername));
+                                String serverName = received.substring(4, 8);
+                                server.connectToChatRoom(serverName, this);
+                                sendChatLog(server.getChatLog(serverName));
                                 respond("Connected");
                             } else
                                 respond("Invalid room name");
-                            //todo make error-code and handeling client side
+                            //todo make error-code and handling client side
                             break;
                         case "Send":
                             if (server.containsRoom(received.substring(4, 8))) {
@@ -78,7 +78,7 @@ public class User implements Runnable {
                             }
                             else
                                 respond("Invalid room name");
-                            //todo make error-code and handeling client side
+                            //todo make error-code and handling client side
                             break;
                         case "Disc":
                             if (server.containsRoom(received.substring(4, 8))) {
@@ -87,11 +87,11 @@ public class User implements Runnable {
                             }
                             else
                                 respond("Invalid room name");
-                            //todo make error-code and handeling client side
+                            //todo make error-code and handling client side
                             break;
                         default:
                             respond("Invalid command");
-                            //todo make error-code and handeling client side
+                            //todo make error-code and handling client side
                             break;
                     }
                 }

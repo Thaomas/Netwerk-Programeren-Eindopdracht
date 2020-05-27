@@ -12,6 +12,9 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 
+import java.io.DataOutputStream;
+import java.io.IOException;
+
 public class ChatGUI {
 
     private ClientGUI clientGUI;

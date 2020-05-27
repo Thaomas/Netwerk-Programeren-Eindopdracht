@@ -15,11 +15,8 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 public class Account {
-
-    private Stage stage;
 
     private String username;
     private String password;
@@ -46,7 +43,6 @@ public class Account {
 
         testData();
 
-        stage = primaryStage;
         this.clientGUI = clientGUI;
         BorderPane borderPane = new BorderPane();
         ToolBar toolBar = new ToolBar();
@@ -111,9 +107,9 @@ public class Account {
         Label statistics = new Label("Stats");
         statistics.setFont(Font.font("Arial", FontPosture.ITALIC,30));
         Label accountCreated = new Label("Account created on: " + this.accountCreated.toString());
-        Label gamesPlayed = new Label("Total games played: " + String.valueOf(this.gamesPlayed));
-        Label wins = new Label("Total wins: " + String.valueOf(this.wins));
-        Label losses = new Label("Total losses: " + String.valueOf(this.losses));
+        Label gamesPlayed = new Label("Total games played: " + this.gamesPlayed);
+        Label wins = new Label("Total wins: " + this.wins);
+        Label losses = new Label("Total losses: " + this.losses);
 
         statsBox.getChildren().add(statistics);
         statsBox.getChildren().add(accountCreated);
@@ -132,8 +128,8 @@ public class Account {
 
         Scene scene = new Scene(borderPane,600,300);
 
-        stage.setTitle("Account settings");
-        stage.setScene(scene);
+        primaryStage.setTitle("Account settings");
+        primaryStage.setScene(scene);
 
         /*
         stage.widthProperty().addListener((observable, oldValue, newValue) -> {

@@ -1,15 +1,10 @@
 package server;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 
 public class Server {
 
@@ -47,7 +42,7 @@ public class Server {
 
             boolean isRunning = true;
             while (isRunning) {
-
+                //TODO Update the boolean isRunning
                 System.out.println("Waiting for clients...");
                 Socket socket = this.serverSocket.accept();
                 System.out.println("Client connected via address: " + socket.getInetAddress().getHostAddress());
@@ -59,14 +54,14 @@ public class Server {
                 t.start();
 
             }
-            this.serverSocket.close();
+//            this.serverSocket.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public ArrayList<String> getChatLog(String servername){
-        return rooms.get(servername).getChatlog();
+    public ArrayList<String> getChatLog(String serverName){
+        return rooms.get(serverName).getChatLog();
     }
 
     public void connectToChatRoom(String roomName, User user) {

@@ -21,7 +21,6 @@ public class JoinGameGUI {
 
     private Stage stage;
     private ClientGUI clientGUI;
-    private CreateGameGUI createGameGUI;
 
     public void start(Stage primaryStage, ClientGUI clientGUI){
         stage = primaryStage;
@@ -77,7 +76,7 @@ public class JoinGameGUI {
     }
 
     public void CreateGameGUI() {
-        createGameGUI = new CreateGameGUI();
+        CreateGameGUI createGameGUI = new CreateGameGUI();
         createGameGUI.start(stage, clientGUI);
     }
 }

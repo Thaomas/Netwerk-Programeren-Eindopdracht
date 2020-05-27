@@ -93,6 +93,7 @@ public class Connecter implements Runnable {
             } catch (IOException e) {
                 System.out.println("Unexpected connection loss " + socket.getRemoteSocketAddress().toString());
                 try {
+                    System.out.println("Disconnected");
                     thread.join();
                 } catch (InterruptedException interruptedException) {
                     interruptedException.printStackTrace();

@@ -1,21 +1,14 @@
 package server;
 
-import javafx.scene.image.Image;
-import jdk.nashorn.internal.parser.JSONParser;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.json.JSONWriter;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
-import java.util.concurrent.ExecutorService;
-import java.util.stream.Collectors;
 
 public class Server {
 
@@ -51,12 +44,13 @@ public class Server {
             e.printStackTrace();
         }
 
-        for (Thread thread : clientThreads.values()) {
-            try {
+        try {
+            for (Thread thread : clientThreads.values()) {
                 thread.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
             }
+            this.serverSocket.close();
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
         }
 
     }
@@ -77,7 +71,7 @@ public class Server {
         connectedUsers.put(user.getName(), user);
     }
 
-    private synchronized void newRoom(String roomname) {
+    public synchronized String newRoom(String roomname) {
         Random random = new Random();
         String roomcode = "";
         boolean validRoomCode = false;
@@ -91,6 +85,7 @@ public class Server {
             }
         }
         addChatRoom(roomcode, new ChatRoom(roomname));
+        return roomcode;
     }
 
 
@@ -133,9 +128,6 @@ public class Server {
 
     public void writeToChatRoom(String roomName, User user, String message) {
         ChatRoom room = rooms.get(roomName);
-        if (!room.checkUser(user)) {
-            room.addUser(user);
-        }
         room.messageAll("<" + user + ">: " + message);
     }
 

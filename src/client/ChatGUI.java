@@ -12,20 +12,41 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
+import java.util.ArrayList;
+
 public class ChatGUI {
 
     private ClientGUI clientGUI;
-    private BorderPane borderPane;
+    private ObjectOutputStream out;
+    private String roomName;
 
-    public void start(Stage primaryStage, ClientGUI clientGUI) {
+    public void start(String roomName, Stage primaryStage, ClientGUI clientGUI, Socket socket, ArrayList<String> chatlog) {
         this.clientGUI = clientGUI;
+        this.roomName = roomName;
 
-        borderPane = chatBox(400, 520);
+        try {
+            this.out = new ObjectOutputStream(socket.getOutputStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        BorderPane borderPane = chatBox(socket, chatlog);
 
         ToolBar toolBar = new ToolBar();
 
         Button backButton = new Button("Back");
-        backButton.setOnAction(event -> clientGUI());
+        backButton.setOnAction(event -> {
+            try {
+                listenThread.join();
+                out.writeUTF("Disc"+this.roomName);
+            } catch (InterruptedException | IOException e) {
+                e.printStackTrace();
+            }
+            clientGUI();
+        });
 
         toolBar.getItems().add(backButton);
         borderPane.setTop(toolBar);
@@ -36,7 +57,7 @@ public class ChatGUI {
         primaryStage.show();
     }
 
-    public BorderPane chatBox(int width, int height) {
+    private BorderPane chatBox(Socket socket, ArrayList<String> chatlog) {
         BorderPane borderPane = new BorderPane();
 
         //Center items
@@ -44,40 +65,43 @@ public class ChatGUI {
         textFlow.setLineSpacing(10);
         VBox.setVgrow(textFlow, Priority.ALWAYS);
 
+        for (String message : chatlog){
+            textFlow.getChildren().add(new Text(message));
+        }
+
         VBox vBox = new VBox();
-        vBox.getChildren().addAll(textFlow);
+        vBox.getChildren().add(textFlow);
 
         ScrollPane scrollPane = new ScrollPane();
         VBox.setVgrow(scrollPane, Priority.ALWAYS);
 
-        scrollPane.setVmax(width + 40);
-        scrollPane.setPrefSize(width, height);
+        scrollPane.setVmax(400 + 40);
+        scrollPane.setPrefSize(400, 520);
         scrollPane.setContent(vBox);
         scrollPane.vvalueProperty().bind(vBox.heightProperty());
 
         VBox centerTextBox = new VBox();
         centerTextBox.setPadding(new Insets(10));
-        centerTextBox.getChildren().addAll(scrollPane);
+        centerTextBox.getChildren().add(scrollPane);
 
         borderPane.setCenter(centerTextBox);
 
         //Bottom items
         TextField textField = new TextField();
         textField.setPrefHeight(30);
-        textField.setPrefWidth(width-80);
-        HBox.setHgrow(textField,Priority.ALWAYS);
+        textField.setPrefWidth(400 - 80);
+        HBox.setHgrow(textField, Priority.ALWAYS);
+
 
         Button button = new Button("Send");
         button.setPrefSize(80, 30);
         button.setOnAction(e -> {
-            Text text;
             if (!textField.getText().isEmpty() || !textField.getText().equals(" ")) {
-                if (textFlow.getChildren().size() == 0) {
-                    text = new Text("You: " + textField.getText());
-                } else {
-                    text = new Text("\n" + "You: " + textField.getText());
+                try {
+                    out.writeUTF("CMes" + this.roomName+textField.getText());
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
                 }
-                textFlow.getChildren().add(text);
                 textField.clear();
                 textField.requestFocus();
             }
@@ -90,13 +114,19 @@ public class ChatGUI {
             }
         });
 
+        ChatListener listener = new ChatListener(textFlow, socket);
+        listenThread = new Thread(listener);
+        listenThread.start();
+
         HBox inputBox = new HBox(textField, button);
-        inputBox.setPadding(new Insets(0,10,10,10));
+        inputBox.setPadding(new Insets(0, 10, 10, 10));
 
         borderPane.setBottom(inputBox);
 
         return borderPane;
     }
+
+    private Thread listenThread;
 
     private void clientGUI() {
         clientGUI.start();

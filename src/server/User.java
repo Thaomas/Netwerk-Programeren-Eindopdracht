@@ -28,7 +28,7 @@ public class User implements Runnable {
         this.password = password;
         this.server = server;
         this.gamesPlayed = 0;
-        this.gamesWon= 0;
+        this.gamesWon = 0;
         this.creationDate = LocalDate.now();
     }
 
@@ -73,42 +73,55 @@ public class User implements Runnable {
 
     @Override
     public void run() {
+        System.out.println("Start " + name);
         isConnected = true;
         while (isConnected) {
             try {
+                System.out.println("Start2 " + name);
                 String received = this.in.readUTF();
+                String command = received.substring(0, 4);
+                System.out.println(received);
                 if (received.equals("\\quit")) {
-                    System.out.println("disconnect "+ name);
+                    System.out.println("disconnect " + name);
                     disconnect();
                 } else {
-                    switch (received.substring(0, 4)) {
+                    switch (command) {
                         case "Conn":
+                            System.out.println("Connect" + received.substring(4, 8));
                             if (server.containsRoom(received.substring(4, 8))) {
                                 String servername = received.substring(4, 8);
                                 server.connectToChatRoom(servername, this);
-                                sendChatLog(server.getChatLog(servername));
                                 respond("Connected");
+                                sendChatLog(server.getChatLog(servername));
                             } else
                                 respond("Invalid room name");
                             //todo make error-code and handeling client side
                             break;
-                        case "Send":
+                        case "CMes":
+                            System.out.println(received);
                             if (server.containsRoom(received.substring(4, 8))) {
-                                server.writeToChatRoom(received.substring(4, 8), this, received.substring(4));
-                                respond("Connected");
-                            }
-                            else
+                                server.writeToChatRoom(received.substring(4, 8), this, received.substring(8));
+                            } else
                                 respond("Invalid room name");
                             //todo make error-code and handeling client side
+                            break;
+                        case "GMes":
+
                             break;
                         case "Disc":
                             if (server.containsRoom(received.substring(4, 8))) {
                                 server.disconnectChatRoom(received.substring(4, 8), this);
-                                respond("Connected");
-                            }
-                            else
+                                respond("Disconnected");
+                            } else
                                 respond("Invalid room name");
                             //todo make error-code and handeling client side
+                            break;
+                        case "CrCR":
+                            String code = server.newRoom(received.substring(4));
+                            respond(code);
+                            break;
+                        case "CrGR":
+
                             break;
                         default:
                             respond("Invalid command");
@@ -117,14 +130,16 @@ public class User implements Runnable {
                     }
                 }
             } catch (SocketException e) {
+                System.out.println("Disconnecting");
                 disconnect();
             } catch (IOException e) {
+                System.out.println("error");
                 e.printStackTrace();
             }
         }
     }
 
-    private void sendChatLog(ArrayList<String> chatlog){
+    private void sendChatLog(ArrayList<String> chatlog) {
         try {
             new ObjectOutputStream(socket.getOutputStream()).writeObject(chatlog);
         } catch (IOException e) {
@@ -137,15 +152,15 @@ public class User implements Runnable {
         return password.equals(in);
     }
 
-    private void disconnect(){
+    private void disconnect() {
         isConnected = false;
         this.server.removeClient(this);
     }
 
     private void respond(String response) {
+        System.out.println(response);
         try {
             new DataOutputStream(socket.getOutputStream()).writeUTF(response);
-            System.out.println(response);
         } catch (IOException e) {
             e.printStackTrace();
         }

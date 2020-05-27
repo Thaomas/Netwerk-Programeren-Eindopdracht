@@ -46,7 +46,7 @@ public class ChatRoom implements Room {
     public void messageAll(String message) {
         chatlog.add(message);
         for (User user : users) {
-            user.writeUTF("CMes"+roomcode+message);
+            user.writeUTF("CMes"+message);
         }
     }
 

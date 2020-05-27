@@ -53,7 +53,7 @@ public class Connecter implements Runnable {
                         if (!server.getUsers().containsKey(nickname)) {
                             user = new User(nickname, password, server);
                             user.setSocket(socket);
-                            this.server.getUsers().put(user.getName(), user);
+                            server.addUser(user);
                             loggedIn = true;
                         } else {
                             respond("error1");
@@ -93,6 +93,7 @@ public class Connecter implements Runnable {
             } catch (IOException e) {
                 System.out.println("Unexpected connection loss " + socket.getRemoteSocketAddress().toString());
                 try {
+                    System.out.println("Disconnected");
                     thread.join();
                 } catch (InterruptedException interruptedException) {
                     interruptedException.printStackTrace();

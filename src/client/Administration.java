@@ -249,7 +249,7 @@ public class Administration extends Application {
     }
 
     private void clientGUI() {
-        ClientGUI gui = new ClientGUI(stage, this);
+        ClientGUI gui = new ClientGUI(stage, this, socket);
         gui.start();
     }
 }

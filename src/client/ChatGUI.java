@@ -17,16 +17,14 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-
 public class ChatGUI {
 
     private ClientGUI clientGUI;
     private ObjectOutputStream out;
     private String roomName;
+    private Thread listenThread;
 
-    public void start(String roomName, Stage primaryStage, ClientGUI clientGUI, Socket socket, ArrayList<String> chatlog) {
+    public void start(String roomName, Stage primaryStage, ClientGUI clientGUI, Socket socket, ArrayList<String> chatLog) {
         this.clientGUI = clientGUI;
         this.roomName = roomName;
 
@@ -36,15 +34,16 @@ public class ChatGUI {
             e.printStackTrace();
         }
 
-        BorderPane borderPane = chatBox(socket, chatlog);
+        BorderPane borderPane = chatBox(socket, chatLog);
 
         ToolBar toolBar = new ToolBar();
 
         Button backButton = new Button("Back");
         backButton.setOnAction(event -> {
             try {
+                //Disconnect with the room name
                 listenThread.join();
-                out.writeUTF("Disc"+this.roomName);
+                out.writeUTF("Disc" + this.roomName);
             } catch (InterruptedException | IOException e) {
                 e.printStackTrace();
             }
@@ -60,7 +59,7 @@ public class ChatGUI {
         primaryStage.show();
     }
 
-    private BorderPane chatBox(Socket socket, ArrayList<String> chatlog) {
+    private BorderPane chatBox(Socket socket, ArrayList<String> chatLog) {
         BorderPane borderPane = new BorderPane();
 
         //Center items
@@ -68,7 +67,7 @@ public class ChatGUI {
         textFlow.setLineSpacing(10);
         VBox.setVgrow(textFlow, Priority.ALWAYS);
 
-        for (String message : chatlog){
+        for (String message : chatLog){
             textFlow.getChildren().add(new Text(message));
         }
 
@@ -90,27 +89,26 @@ public class ChatGUI {
         borderPane.setCenter(centerTextBox);
 
         //Bottom items
-        TextField textField = new TextField();
-        textField.setPrefHeight(30);
-        textField.setPrefWidth(400 - 80);
-        HBox.setHgrow(textField, Priority.ALWAYS);
-
+        TextField chatTextField = new TextField();
+        chatTextField.setPrefHeight(30);
+        chatTextField.setPrefWidth(320);
+        HBox.setHgrow(chatTextField, Priority.ALWAYS);
 
         Button button = new Button("Send");
         button.setPrefSize(80, 30);
         button.setOnAction(e -> {
-            if (!textField.getText().isEmpty() || !textField.getText().equals(" ")) {
+            if (!chatTextField.getText().isEmpty() || !chatTextField.getText().equals(" ")) {
                 try {
-                    out.writeUTF("CMes" + this.roomName+textField.getText());
+                    out.writeUTF("CMes" + this.roomName + chatTextField.getText());
                 } catch (IOException ioException) {
                     ioException.printStackTrace();
                 }
-                textField.clear();
-                textField.requestFocus();
+                chatTextField.clear();
+                chatTextField.requestFocus();
             }
         });
 
-        textField.setOnKeyPressed(e -> {
+        chatTextField.setOnKeyPressed(e -> {
             // On Enter press
             if (e.getCode() == KeyCode.ENTER) {
                 button.fire();
@@ -121,7 +119,7 @@ public class ChatGUI {
         listenThread = new Thread(listener);
         listenThread.start();
 
-        HBox inputBox = new HBox(textField, button);
+        HBox inputBox = new HBox(chatTextField, button);
         inputBox.setPadding(new Insets(0, 10, 10, 10));
 
         borderPane.setBottom(inputBox);
@@ -129,9 +127,7 @@ public class ChatGUI {
         return borderPane;
     }
 
-    private Thread listenThread;
-
-    private void clientGUI() {
+     private void clientGUI() {
         clientGUI.start();
     }
 }

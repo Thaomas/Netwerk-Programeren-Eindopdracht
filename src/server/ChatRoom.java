@@ -5,26 +5,26 @@ import java.util.HashSet;
 
 public class ChatRoom implements Room {
     private final HashSet<User> users;
-    private final String roomname;
-    private String roomcode;
+    private final String roomName;
+    private String roomCode;
     private final ArrayList<String> chatLog;
 
     public ChatRoom(String roomname) {
         users = new HashSet<>();
-        this.roomname = roomname;
+        this.roomName = roomname;
         chatLog = new ArrayList<>();
     }
 
-    public void setRoomcode(String code){
-        roomcode = code;
+    public void setRoomCode(String code){
+        roomCode = code;
     }
 
-    public String getRoomcode() {
-        return roomcode;
+    public String getRoomCode() {
+        return roomCode;
     }
 
-    public String getRoomname() {
-        return roomname;
+    public String getRoomName() {
+        return roomName;
     }
 
     public void addUser(User user) {

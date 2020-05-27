@@ -22,6 +22,8 @@ public class JoinGameGUI {
     private Stage stage;
     private ClientGUI clientGUI;
 
+    //Has to ask server if room is full.
+
     public void start(Stage primaryStage, ClientGUI clientGUI){
         stage = primaryStage;
         this.clientGUI = clientGUI;

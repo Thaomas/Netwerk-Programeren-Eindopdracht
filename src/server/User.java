@@ -87,6 +87,7 @@ public class User implements Runnable {
                 } else {
                     switch (command) {
                         case "Conn":
+                            //Connect
                             System.out.println("Connect" + received.substring(4, 8));
                             if (server.containsRoom(received.substring(4, 8))) {
                                 String serverName = received.substring(4, 8);
@@ -98,6 +99,7 @@ public class User implements Runnable {
                             //todo make error-code and handling client side
                             break;
                         case "CMes":
+                            //Chat message
                             System.out.println(received);
                             if (server.containsRoom(received.substring(4, 8))) {
                                 server.writeToChatRoom(received.substring(4, 8), this, received.substring(8));
@@ -106,9 +108,11 @@ public class User implements Runnable {
                             //todo make error-code and handling client side
                             break;
                         case "GMes":
+                            //Game message
 
                             break;
                         case "Disc":
+                            //Disconnect
                             if (server.containsRoom(received.substring(4, 8))) {
                                 server.disconnectChatRoom(received.substring(4, 8), this);
                                 respond("Disconnected");
@@ -117,10 +121,12 @@ public class User implements Runnable {
                             //todo make error-code and handling client side
                             break;
                         case "CrCR":
+                            //Create chat room
                             String code = server.newRoom(received.substring(4));
                             respond(code);
                             break;
                         case "CrGR":
+                            //Create game room
 
                             break;
                         default:

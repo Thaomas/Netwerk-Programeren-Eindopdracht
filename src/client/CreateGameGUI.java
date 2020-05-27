@@ -29,6 +29,10 @@ public class CreateGameGUI {
     private DataOutputStream out;
 //    private int[][] board = new int[7][6];
 
+    //When creating a game. The client has to ask the server for a room code.
+    //When an opponent connect it has to update the opponents name.
+    //When an opponent disconnects it has to update the opponents name to nothing.
+
     public void start(Stage primaryStage, ClientGUI clientGUI){
         stage = primaryStage;
         this.clientGUI = clientGUI;

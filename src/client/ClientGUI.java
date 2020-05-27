@@ -15,7 +15,9 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-import java.io.FileNotFoundException;
+import java.io.*;
+import java.net.Socket;
+import java.util.ArrayList;
 
 public class ClientGUI {
 
@@ -31,14 +33,16 @@ public class ClientGUI {
     private JoinGameGUI joinGameGUI;
 
     private Stage stage;
+    private Socket socket;
 
-    public ClientGUI(Stage primaryStage, Administration administration) {
+    public ClientGUI(Stage primaryStage, Administration administration, Socket socket) {
         this.stage = primaryStage;
         this.administration = administration;
         this.account = new Account();
         this.chatGUI = new ChatGUI();
         createGameGUI = new CreateGameGUI();
         joinGameGUI = new JoinGameGUI();
+        this.socket = socket;
         Runtime.getRuntime().addShutdownHook(new Thread(administration::disconnect));
     }
 
@@ -140,7 +144,20 @@ public class ClientGUI {
     }
 
     public void ChatGUI() {
-        chatGUI.start(stage, this);
+        try {
+            System.out.println("Connmain");
+            DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+            DataInputStream in = new DataInputStream(socket.getInputStream());
+            out.writeUTF("Connmain");
+            String message = in.readUTF();
+            if (message.equals("Connected")) {
+                ObjectInputStream inOb = new ObjectInputStream(socket.getInputStream());
+                ArrayList<String> chatlog = (ArrayList<String>)inOb.readObject();
+                chatGUI.start("main", stage, this, socket, chatlog);
+            }
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     public void CreateGameGUI() {

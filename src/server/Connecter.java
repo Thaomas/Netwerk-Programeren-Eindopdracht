@@ -33,8 +33,8 @@ public class Connecter implements Runnable {
         while (!loggedIn) {
             try {
                 String input = in.readUTF();
-                String awnser = input.substring(0, 4);
-                if ((awnser.equals("RegU") || awnser.equals("LogU")) && input.length() >= 7) {
+                String answer = input.substring(0, 4);
+                if ((answer.equals("RegU") || answer.equals("LogU")) && input.length() >= 7) {
                     String nickname = input.substring(4, input.indexOf('|'));
                     String password = input.substring(input.indexOf('|'));
                     User user;
@@ -48,12 +48,12 @@ public class Connecter implements Runnable {
                     connected = Registered/Logged in without errors
                      */
 
-                    if (awnser.equals("RegU")) {
+                    if (answer.equals("RegU")) {
                         System.out.println("Register");
                         if (!server.getUsers().containsKey(nickname)) {
                             user = new User(nickname, password, server);
                             user.setSocket(socket);
-                            this.server.getUsers().put(user.getName(), user);
+                            server.addUser(user);
                             loggedIn = true;
                         } else {
                             respond("error1");
@@ -93,6 +93,7 @@ public class Connecter implements Runnable {
             } catch (IOException e) {
                 System.out.println("Unexpected connection loss " + socket.getRemoteSocketAddress().toString());
                 try {
+                    System.out.println("Disconnected");
                     thread.join();
                 } catch (InterruptedException interruptedException) {
                     interruptedException.printStackTrace();

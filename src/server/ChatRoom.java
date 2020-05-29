@@ -1,30 +1,56 @@
 package server;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-public class ChatRoom implements Room {
-    private final HashSet<User> users;
+public class ChatRoom {
+    private final String roomName;
+    private final String roomCode;
     private final ArrayList<String> chatlog;
-    private final String roomname;
-    private String roomcode;
+    private final HashSet<User> users;
 
-    public ChatRoom(String roomname) {
+    public ChatRoom(String roomname, String roomcode) {
+        this.roomName = roomname;
+        this.roomCode = roomcode;
+        testChat(100);
         users = new HashSet<>();
         chatlog = new ArrayList<>();
-        this.roomname = roomname;
     }
 
-    public void setRoomcode(String code){
-        roomcode = code;
+    public ChatRoom(String roomName, String roomCode, ArrayList<String> chatlog) {
+        this.roomName = roomName;
+        this.roomCode = roomCode;
+        this.chatlog = chatlog;
+        this.users = new HashSet<>();
     }
 
-    public String getRoomcode() {
-        return roomcode;
+    private void testChat(int amount) {
+        System.out.println(this.roomName);
+        System.out.println(this.roomCode);
+        System.out.println(this.chatlog);
+        for (int i = 0; i < amount; i++) {
+            chatlog.add("test " + i+"\n");
+        }
     }
 
-    public String getRoomname() {
-        return roomname;
+    public JSONObject getJSON(){
+        JSONObject object = new JSONObject();
+        object.put("roomName", this.roomName);
+        object.put("roomCode", this.roomCode);
+        object.put("chatlog",  this.chatlog);
+        return object;
+    }
+
+    public String getRoomCode() {
+        return roomCode;
+    }
+
+    public String getRoomName() {
+        return roomName;
     }
 
     public void addUser(User user) {
@@ -46,7 +72,7 @@ public class ChatRoom implements Room {
     public void messageAll(String message) {
         chatlog.add(message);
         for (User user : users) {
-            user.writeUTF("CMes"+message);
+            user.writeUTF("CMes" + message);
         }
     }
 

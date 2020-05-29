@@ -1,4 +1,4 @@
 package server;
 
-public class GameRoom implements Room {
+public class GameRoom {
 }

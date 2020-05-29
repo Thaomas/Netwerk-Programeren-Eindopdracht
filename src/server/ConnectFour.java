@@ -4,8 +4,8 @@ import java.util.ArrayList;
 
 public class ConnectFour {
     private final ArrayList<ArrayList<Integer>> grid;
-    private int w;
-    private int h;
+    private final int w;
+    private final int h;
 
     public static void main(String[] args) {
         new ConnectFour(10, 25);

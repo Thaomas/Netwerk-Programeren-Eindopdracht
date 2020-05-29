@@ -1,9 +1,8 @@
 package server;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import org.json.simple.JSONObject;
+
+import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
 import java.time.LocalDate;
@@ -15,13 +14,13 @@ public class User implements Runnable {
     private Socket socket;
     private DataInputStream in;
     private DataOutputStream out;
-    private String name;
-    private String password;
     private Server server;
     private boolean isConnected;
+    private String name;
+    private String password;
     private int gamesPlayed;
     private int gamesWon;
-    private LocalDate creationDate;
+    private final LocalDate creationDate;
 
     public User(String name, String password, Server server) {
         this.name = name;
@@ -32,6 +31,24 @@ public class User implements Runnable {
         this.creationDate = LocalDate.now();
     }
 
+    public User(String name, String password, int gamesPlayed, int gamesWon, LocalDate creationDate, Server server) {
+        this.name = name;
+        this.password = password;
+        this.gamesPlayed = gamesPlayed;
+        this.gamesWon = gamesWon;
+        this.creationDate = creationDate;
+        this.server = server;
+    }
+
+    public JSONObject getJson() {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("name", this.name);
+        jsonObject.put("password", this.password);
+        jsonObject.put("gamesPlayed", this.gamesPlayed);
+        jsonObject.put("gamesWon", this.gamesWon);
+        jsonObject.put("creationDate", this.creationDate.toString());
+        return jsonObject;
+    }
 
     public int getGamesPlayed() {
         return gamesPlayed;
@@ -79,64 +96,63 @@ public class User implements Runnable {
             try {
                 System.out.println("Start2 " + name);
                 String received = this.in.readUTF();
-                String command = received.substring(0, 4);
                 System.out.println(received);
-                if (received.equals("\\quit")) {
-                    System.out.println("disconnect " + name);
-                    disconnect();
-                } else {
-                    switch (command) {
-                        case "Conn":
-                            System.out.println("Connect" + received.substring(4, 8));
-                            if (server.containsRoom(received.substring(4, 8))) {
-                                String servername = received.substring(4, 8);
-                                server.connectToChatRoom(servername, this);
-                                respond("Connected");
-                                sendChatLog(server.getChatLog(servername));
-                            } else
-                                respond("Invalid room name");
-                            //todo make error-code and handeling client side
-                            break;
-                        case "CMes":
-                            System.out.println(received);
-                            if (server.containsRoom(received.substring(4, 8))) {
-                                server.writeToChatRoom(received.substring(4, 8), this, received.substring(8));
-                            } else
-                                respond("Invalid room name");
-                            //todo make error-code and handeling client side
-                            break;
-                        case "GMes":
+                String command = received.substring(0, 4);
+                switch (command) {
+                    case "quit":
+                        disconnect();
+                        break;
+                    case "Conn":
+                        System.out.println("Connect " + name + " to " + received.substring(4, 8));
+                        if (server.containsRoom(received.substring(4, 8))) {
+                            String servername = received.substring(4, 8);
+                            server.connectToChatRoom(servername, this);
+                            respond("Connected");
+                            sendChatLog(server.getChatLog(servername));
+                        } else
+                            respond("Invalid room name");
+                        //todo make error-code and handeling client side
+                        break;
+                    case "CMes":
+                        System.out.println(received);
+                        if (server.containsRoom(received.substring(4, 8))) {
+                            server.writeToChatRoom(received.substring(4, 8), this, received.substring(8));
+                        } else
+                            respond("Invalid room name");
+                        //todo make error-code and handeling client side
+                        break;
+                    case "GMes":
 
-                            break;
-                        case "Disc":
-                            if (server.containsRoom(received.substring(4, 8))) {
-                                server.disconnectChatRoom(received.substring(4, 8), this);
-                                respond("Disconnected");
-                            } else
-                                respond("Invalid room name");
-                            //todo make error-code and handeling client side
-                            break;
-                        case "CrCR":
-                            String code = server.newRoom(received.substring(4));
-                            respond(code);
-                            break;
-                        case "CrGR":
+                        break;
+                    case "Disc":
+                        if (server.containsRoom(received.substring(4, 8))) {
+                            server.disconnectChatRoom(received.substring(4, 8), this);
+                            respond("Disc");
+                        } else
+                            respond("Invalid room name");
+                        //todo make error-code and handeling client side
+                        break;
+                    case "CrCR":
+                        String code = server.newRoom(received.substring(4));
+                        respond(code);
+                        break;
+                    case "CrGR":
 
-                            break;
-                        default:
-                            respond("Invalid command");
-                            //todo make error-code and handeling client side
-                            break;
-                    }
+                        break;
+                    default:
+                        respond("Invalid command");
+                        //todo make error-code and handeling client side
+                        break;
                 }
             } catch (SocketException e) {
-                System.out.println("Disconnecting");
+//                e.printStackTrace();
                 disconnect();
             } catch (IOException e) {
                 System.out.println("error");
                 e.printStackTrace();
             }
         }
+        System.out.println("Stopped running");
     }
 
     private void sendChatLog(ArrayList<String> chatlog) {
@@ -153,8 +169,13 @@ public class User implements Runnable {
     }
 
     private void disconnect() {
+        System.out.println("Disconnect " + name);
         isConnected = false;
-        this.server.removeClient(this);
+        try {
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void respond(String response) {

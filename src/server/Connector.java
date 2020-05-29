@@ -5,13 +5,13 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
-public class Connecter implements Runnable {
+public class Connector implements Runnable {
 
-    private Socket socket;
-    private Server server;
+    private final Socket socket;
+    private final Server server;
     private Thread thread;
 
-    public Connecter(Socket socket, Server server) {
+    public Connector(Socket socket, Server server) {
         this.socket = socket;
         this.server = server;
     }
@@ -36,7 +36,7 @@ public class Connecter implements Runnable {
                 String awnser = input.substring(0, 4);
                 if ((awnser.equals("RegU") || awnser.equals("LogU")) && input.length() >= 7) {
                     String nickname = input.substring(4, input.indexOf('|'));
-                    String password = input.substring(input.indexOf('|'));
+                    String password = input.substring(input.indexOf('|')+1);
                     User user;
 
                     /*
@@ -52,7 +52,6 @@ public class Connecter implements Runnable {
                         System.out.println("Register");
                         if (!server.getUsers().containsKey(nickname)) {
                             user = new User(nickname, password, server);
-                            user.setSocket(socket);
                             server.addUser(user);
                             loggedIn = true;
                         } else {
@@ -80,10 +79,11 @@ public class Connecter implements Runnable {
                             continue;
                         }
                     }
+                    user.setSocket(socket);
                     server.connectUser(user);
+                    respond("connected");
                     Thread t = new Thread(user);
                     t.start();
-                    respond("connected");
                     System.out.println(nickname + " connected");
                     server.addClientThread(nickname, t);
                 } else {

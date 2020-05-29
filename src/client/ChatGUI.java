@@ -21,11 +21,11 @@ public class ChatGUI {
 
     private ClientGUI clientGUI;
     private ObjectOutputStream out;
-    private String roomName;
+    private String roomCode;
 
-    public void start(String roomName, Stage primaryStage, ClientGUI clientGUI, Socket socket, ArrayList<String> chatlog) {
+    public void start(String roomCode, Stage primaryStage, ClientGUI clientGUI, Socket socket, ArrayList<String> chatlog) {
         this.clientGUI = clientGUI;
-        this.roomName = roomName;
+        this.roomCode = roomCode;
 
         try {
             this.out = new ObjectOutputStream(socket.getOutputStream());
@@ -40,8 +40,8 @@ public class ChatGUI {
         Button backButton = new Button("Back");
         backButton.setOnAction(event -> {
             try {
+                out.writeUTF("Disc"+this.roomCode);
                 listenThread.join();
-                out.writeUTF("Disc"+this.roomName);
             } catch (InterruptedException | IOException e) {
                 e.printStackTrace();
             }
@@ -93,12 +93,12 @@ public class ChatGUI {
         HBox.setHgrow(textField, Priority.ALWAYS);
 
 
-        Button button = new Button("Send");
-        button.setPrefSize(80, 30);
-        button.setOnAction(e -> {
-            if (!textField.getText().isEmpty() || !textField.getText().equals(" ")) {
+        Button sendButton = new Button("Send");
+        sendButton.setPrefSize(80, 30);
+        sendButton.setOnAction(e -> {
+            if (!textField.getText().isEmpty() && !textField.getText().equals("")) {
                 try {
-                    out.writeUTF("CMes" + this.roomName+textField.getText());
+                    out.writeUTF("CMes" + this.roomCode +textField.getText());
                 } catch (IOException ioException) {
                     ioException.printStackTrace();
                 }
@@ -110,7 +110,7 @@ public class ChatGUI {
         textField.setOnKeyPressed(e -> {
             // On Enter press
             if (e.getCode() == KeyCode.ENTER) {
-                button.fire();
+                sendButton.fire();
             }
         });
 
@@ -118,7 +118,7 @@ public class ChatGUI {
         listenThread = new Thread(listener);
         listenThread.start();
 
-        HBox inputBox = new HBox(textField, button);
+        HBox inputBox = new HBox(textField, sendButton);
         inputBox.setPadding(new Insets(0, 10, 10, 10));
 
         borderPane.setBottom(inputBox);

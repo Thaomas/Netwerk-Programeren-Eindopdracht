@@ -38,6 +38,8 @@ public class ChatListener implements Runnable {
                         textFlow.getChildren().add(new Text("\n" + input.substring(4)));
                     }
 
+                }else if (command.equals("Disc")){
+                    connected = false;
                 }
             } catch (IOException e) {
                 e.printStackTrace();

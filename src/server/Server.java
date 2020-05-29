@@ -158,49 +158,49 @@ public class Server {
     public synchronized void addUser(User user) {
         this.users.put(user.getName(), user);
         System.out.println("add user");
-        saveUsers();
+//        saveUsers();
     }
 
     private void addChatRoom(String roomcode, ChatRoom room) {
         rooms.put(roomcode, room);
-        saveRoom();
+//        saveRoom();
     }
 
-    private synchronized void saveRoom() {
-        File file = new File("saves/save.json");
-        JSONObject object;
-        if (file.exists())
-            object = new JSONObject(file);
-        else
-            object = new JSONObject();
-
-        object.put("rooms", new JSONObject(rooms));
-        try (FileWriter fileWriter = new FileWriter("saves/save.json")) {
-            fileWriter.write(object.toString());
-            fileWriter.flush();
-            System.out.println("Save");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private synchronized void saveUsers() {
-        File file = new File("saves/save.json");
-        JSONObject object;
-        if (file.exists())
-            object = new JSONObject(file);
-        else
-            object = new JSONObject();
-        object.put("users", new JSONObject(users));
-        try (FileWriter fileWriter = new FileWriter("saves/save.json")) {
-            fileWriter.write(object.toString());
-            System.out.println(object.toString());
-            fileWriter.flush();
-            System.out.println("Save");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+//    private synchronized void saveRoom() {
+//        File file = new File("saves/save.json");
+//        JSONObject object;
+//        if (file.exists())
+//            object = new JSONObject(file);
+//        else
+//            object = new JSONObject();
+//
+//        object.put("rooms", new JSONObject(rooms));
+//        try (FileWriter fileWriter = new FileWriter("saves/save.json")) {
+//            fileWriter.write(object.toString());
+//            fileWriter.flush();
+//            System.out.println("Save");
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
+//
+//    private synchronized void saveUsers() {
+//        File file = new File("saves/save.json");
+//        JSONObject object;
+//        if (file.exists())
+//            object = new JSONObject(file);
+//        else
+//            object = new JSONObject();
+//        object.put("users", new JSONObject(users));
+//        try (FileWriter fileWriter = new FileWriter("saves/save.json")) {
+//            fileWriter.write(object.toString());
+//            System.out.println(object.toString());
+//            fileWriter.flush();
+//            System.out.println("Save");
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
 
     public void addClientThread(String name, Thread t) {

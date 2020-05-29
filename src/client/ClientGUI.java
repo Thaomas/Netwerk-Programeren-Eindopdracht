@@ -40,7 +40,7 @@ public class ClientGUI {
         this.administration = administration;
         this.account = new Account();
         this.chatGUI = new ChatGUI();
-        createGameGUI = new CreateGameGUI();
+
         joinGameGUI = new JoinGameGUI();
         this.socket = socket;
         Runtime.getRuntime().addShutdownHook(new Thread(administration::disconnect));
@@ -161,6 +161,7 @@ public class ClientGUI {
     }
 
     public void CreateGameGUI() {
+        createGameGUI = new CreateGameGUI();
         createGameGUI.start(stage, this);
     }
 

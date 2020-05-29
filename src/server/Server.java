@@ -166,17 +166,23 @@ public class Server {
 
     public void writeToChatRoom(String roomName, User user, String message) {
         ChatRoom room = rooms.get(roomName);
-        room.messageAll("<" + user + ">: " + message);
+        room.messageAll("<" + user.getName() + ">: " + message);
     }
 
     private void disconnectListener() {
+        int i = 0;
         while (true) {
             for (String key : clientThreads.keySet()) {
-                if (!clientThreads.get(key).isAlive()){
+                if (!clientThreads.get(key).isAlive()) {
                     removeClient(users.get(key));
                     System.out.println(key + " is dead");
                 }
             }
+            if (i >= 50) {
+                save();
+                i = 0;
+            } else
+                i++;
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {

@@ -1,18 +1,15 @@
 package client;
 
-import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
-
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.Socket;
 
 public class ChatListener implements Runnable {
-    private TextFlow textFlow;
-    private Socket socket;
+    private final ChatGUI chatGUI;
+    private final Socket socket;
 
-    public ChatListener(TextFlow textFlow, Socket socket) {
-        this.textFlow = textFlow;
+    public ChatListener(ChatGUI gui, Socket socket) {
+        this.chatGUI = gui;
         this.socket = socket;
     }
 
@@ -32,18 +29,16 @@ public class ChatListener implements Runnable {
                 input = in.readUTF();
                 command = input.substring(0, 4);
                 if (command.equals("CMes")) {
-                    if (textFlow.getChildren().size() == 0) {
-                        textFlow.getChildren().add(new Text(input.substring(4)));
-                    } else {
-                        textFlow.getChildren().add(new Text("\n" + input.substring(4)));
-                    }
+                    chatGUI.addMessage(input.substring(4));
 
                 }else if (command.equals("Disc")){
                     connected = false;
                 }
             } catch (IOException e) {
                 e.printStackTrace();
+                connected = false;
             }
         }
+        System.out.println("Chat listener stopped");
     }
 }

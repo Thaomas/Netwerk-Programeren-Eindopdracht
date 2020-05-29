@@ -1,5 +1,6 @@
 package client;
 
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -12,15 +13,15 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 
 public class ChatGUI {
 
     private ClientGUI clientGUI;
-    private ObjectOutputStream out;
+    private DataOutputStream out;
     private String roomCode;
 
     public void start(String roomCode, Stage primaryStage, ClientGUI clientGUI, Socket socket, ArrayList<String> chatlog) {
@@ -28,7 +29,7 @@ public class ChatGUI {
         this.roomCode = roomCode;
 
         try {
-            this.out = new ObjectOutputStream(socket.getOutputStream());
+            this.out = new DataOutputStream(socket.getOutputStream());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -48,6 +49,7 @@ public class ChatGUI {
             clientGUI();
         });
 
+
         toolBar.getItems().add(backButton);
         borderPane.setTop(toolBar);
 
@@ -56,17 +58,17 @@ public class ChatGUI {
         primaryStage.setTitle("ChatBox");
         primaryStage.show();
     }
-
+private TextFlow textFlow;
     private BorderPane chatBox(Socket socket, ArrayList<String> chatlog) {
         BorderPane borderPane = new BorderPane();
 
         //Center items
-        TextFlow textFlow = new TextFlow();
-        textFlow.setLineSpacing(10);
+        textFlow = new TextFlow();
+        textFlow.setLineSpacing(5);
         VBox.setVgrow(textFlow, Priority.ALWAYS);
 
         for (String message : chatlog){
-            textFlow.getChildren().add(new Text(message));
+            textFlow.getChildren().add(new Text("\n"+message));
         }
 
         VBox vBox = new VBox();
@@ -99,6 +101,7 @@ public class ChatGUI {
             if (!textField.getText().isEmpty() && !textField.getText().equals("")) {
                 try {
                     out.writeUTF("CMes" + this.roomCode +textField.getText());
+                    System.out.println("CMes" + this.roomCode +textField.getText());
                 } catch (IOException ioException) {
                     ioException.printStackTrace();
                 }
@@ -114,7 +117,7 @@ public class ChatGUI {
             }
         });
 
-        ChatListener listener = new ChatListener(textFlow, socket);
+        ChatListener listener = new ChatListener(this, socket);
         listenThread = new Thread(listener);
         listenThread.start();
 
@@ -124,6 +127,9 @@ public class ChatGUI {
         borderPane.setBottom(inputBox);
 
         return borderPane;
+    }
+    protected void addMessage(String message){
+        Platform.runLater(()-> textFlow.getChildren().add(new Text("\n"+message)));
     }
 
     private Thread listenThread;

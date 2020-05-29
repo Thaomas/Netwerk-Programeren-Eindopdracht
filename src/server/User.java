@@ -113,6 +113,14 @@ public class User implements Runnable {
                             respond("Invalid room name");
                         //todo make error-code and handeling client side
                         break;
+                    case "Disc":
+                        if (server.containsRoom(received.substring(4, 8))) {
+                            server.disconnectChatRoom(received.substring(4, 8), this);
+                            respond("Disc");
+                        } else
+                            respond("Invalid room name");
+                        //todo make error-code and handeling client side
+                        break;
                     case "CMes":
                         System.out.println(received);
                         if (server.containsRoom(received.substring(4, 8))) {
@@ -123,14 +131,6 @@ public class User implements Runnable {
                         break;
                     case "GMes":
 
-                        break;
-                    case "Disc":
-                        if (server.containsRoom(received.substring(4, 8))) {
-                            server.disconnectChatRoom(received.substring(4, 8), this);
-                            respond("Disc");
-                        } else
-                            respond("Invalid room name");
-                        //todo make error-code and handeling client side
                         break;
                     case "CrCR":
                         String code = server.newRoom(received.substring(4));

@@ -3,7 +3,6 @@ package client;
 import client.gamelogic.Disc;
 import client.gamelogic.Square;
 import javafx.animation.AnimationTimer;
-import javafx.animation.TranslateTransition;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -17,15 +16,12 @@ import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 import org.jfree.fx.FXGraphics2D;
 import util.RandomString;
 
-//import java.awt.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
-//import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -33,9 +29,6 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import javafx.geometry.Point2D;
 
 public class CreateGameGUI {
 
@@ -45,10 +38,6 @@ public class CreateGameGUI {
     private Socket socket;
     private DataInputStream in;
     private DataOutputStream out;
-
-    //When creating a game. The client has to ask the server for a room code.
-    //When an opponent connect it has to update the opponents name.
-    //When an opponent disconnects it has to update the opponents name to nothing.
 
     public void start(Stage primaryStage, ClientGUI clientGUI) {
         stage = primaryStage;
@@ -80,16 +69,13 @@ public class CreateGameGUI {
 
         //center pane
         discs = new ArrayList<>();
-//        squares = new ArrayList<>();
         squares = makeColumns();
 
         canvas = new Canvas(800, 700);
         canvas.setOnMouseClicked(event -> {
-//            addDisc(event.getX(), event.getY());
             System.out.println("X: " + event.getX() + ", Y: " + event.getY());
             for (int i = 0; i < squares.size(); i++) {
                 if (squares.get(i).getSquare().getBounds().contains(event.getX(), event.getY())) {
-                    //Doesnt work
                     placeDisc(i);
                 }
             }

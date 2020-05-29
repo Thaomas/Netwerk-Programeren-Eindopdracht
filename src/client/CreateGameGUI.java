@@ -1,23 +1,34 @@
 package client;
 
+import client.gamelogic.Disc;
+import client.gamelogic.Square;
+import javafx.animation.AnimationTimer;
 import javafx.geometry.Insets;
-import javafx.geometry.NodeOrientation;
 import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
+import org.jfree.fx.FXGraphics2D;
 import util.RandomString;
 
+import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
+import java.awt.geom.Rectangle2D;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.ArrayList;
+import java.util.Optional;
 
 public class CreateGameGUI {
 
@@ -27,18 +38,12 @@ public class CreateGameGUI {
     private Socket socket;
     private DataInputStream in;
     private DataOutputStream out;
-//    private int[][] board = new int[7][6];
 
-    //When creating a game. The client has to ask the server for a room code.
-    //When an opponent connect it has to update the opponents name.
-    //When an opponent disconnects it has to update the opponents name to nothing.
-
-    public void start(Stage primaryStage, ClientGUI clientGUI){
+    public void start(Stage primaryStage, ClientGUI clientGUI) {
         stage = primaryStage;
         this.clientGUI = clientGUI;
 
         BorderPane borderPane = new BorderPane();
-        GridPane gridPane = new GridPane();
 
         ToolBar toolBar = new ToolBar();
 
@@ -62,69 +67,224 @@ public class CreateGameGUI {
 
         borderPane.setTop(toolBar);
 
-        AtomicInteger counter = new AtomicInteger();
-        for (int x = 0; x < 7; x++) {
-            for (int y = 0; y < 6; y++) {
-                Image image = new Image("\\white.png");
-                ImageView imageView = new ImageView(image);
-                imageView.setId("Neutral - Height: " + y + ", Length: " + x);
-                gridPane.add(imageView,x,y);
+        //center pane
+        discs = new ArrayList<>();
+        squares = makeColumns();
 
-                Button button = new Button();
-                button.setMaxSize(Double.MAX_VALUE,Double.MAX_VALUE);
-                button.setOpacity(0);
-
-                final int height = y;
-                final int length = x;
-                button.setOnAction(event -> {
-
-                    int index = counter.get();
-                    //TODO Wont work if online where it has to update on both sides
-                    ImageView imageView2;
-                    if(index%2==0){
-                        Image red = new Image("\\red.png");
-                        imageView2 = new ImageView(red);
-                        imageView2.setId("Red - Height: " + height + ", Length: " + length);
-                    }else {
-                        Image yellow = new Image("\\yellow.png");
-                        imageView2 = new ImageView(yellow);
-                        imageView2.setId("Yellow - Height: " + height + ", Length: " + length);
-                    }
-                    gridPane.add(imageView2,length,height);
-                    System.out.println(gridPane.getChildren());
-
-                    counter.getAndIncrement();
-
-                    System.out.println("Height: " + height + ", Length: " + length);
-
-                    /* TODO Logic for connect 4 not complete. This only sends the height and length to the server.
-                     *  The logic has to be made in the server for the images to be properly displayed.
-                     */
-
-                    /*
-                    try {
-                        out.writeUTF(String.valueOf(height)+"#"+String.valueOf(length));
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                     */
-
-                });
-                gridPane.add(button,x,y);
+        canvas = new Canvas(800, 700);
+        canvas.setOnMouseClicked(event -> {
+            System.out.println("X: " + event.getX() + ", Y: " + event.getY());
+            for (int i = 0; i < squares.size(); i++) {
+                if (squares.get(i).getSquare().getBounds().contains(event.getX(), event.getY())) {
+                    placeDisc(i);
+                }
             }
-        }
 
-        borderPane.setCenter(gridPane);
+        });
 
-        borderPane.setRight(setChatPane(275,620));
+        Color transparent = new Color(255, 255, 255, 50);
+        Color noColor = new Color(0, 0, 0, 0);
+        canvas.setOnMouseMoved(event -> {
+            for (Square square : squares) {
+                if (square.getSquare().getBounds().contains(event.getX(), event.getY())) {
+                    square.setColor(transparent);
+                } else {
+                    square.setColor(noColor);
+                }
+            }
+        });
 
-        Scene scene = new Scene(borderPane,1000,635);
+        borderPane.setCenter(canvas);
+
+        fxGraphics2D = new FXGraphics2D(canvas.getGraphicsContext2D());
+        draw(fxGraphics2D);
+
+        //right pane
+        borderPane.setRight(setChatPane(275, 620));
+
+        Scene scene = new Scene(borderPane, 1200, 835);
         stage.setTitle("Create game");
         stage.setScene(scene);
         stage.show();
+
+        new AnimationTimer() {
+            long last = 0;
+
+            @Override
+            public void handle(long now) {
+                if (last == -1)
+                    last = now;
+                update((now - last) / 10000.0);
+                last = now;
+                draw(fxGraphics2D);
+            }
+        }.start();
     }
 
-    public BorderPane setChatPane(int width, int height){
+    private Canvas canvas;
+    private FXGraphics2D fxGraphics2D;
+
+    private final int SQUARE_SIZE = 100;
+    private final int COLUMNS = 7;
+    private final int ROWS = 6;
+
+    private ArrayList<Disc> discs;
+    private ArrayList<Square> squares;
+
+    private Disc[][] grid = new Disc[COLUMNS][ROWS];
+
+    private boolean redMove = true;
+
+    private void draw(FXGraphics2D fxGraphics2D) {
+        fxGraphics2D.setBackground(Color.white);
+        fxGraphics2D.clearRect(0, 0, (COLUMNS + 1) * SQUARE_SIZE, (ROWS + 1) * SQUARE_SIZE);
+        fxGraphics2D.setTransform(new AffineTransform());
+
+        makeConnect4Grid().drawFill(fxGraphics2D);
+
+
+        for (Square square : squares) {
+            square.drawFill(fxGraphics2D);
+        }
+
+        for (Disc disc : discs) {
+            disc.draw(fxGraphics2D);
+        }
+
+    }
+
+    public Square makeConnect4Grid() {
+        Square shape = new Square(new Rectangle((COLUMNS + 1) * SQUARE_SIZE, (ROWS + 1) * SQUARE_SIZE),
+                Color.blue);
+        for (int y = 0; y < ROWS; y++) {
+            for (int x = 0; x < COLUMNS; x++) {
+                Disc disc = new Disc(new java.awt.geom.Point2D.Double(x * (SQUARE_SIZE + 10) + SQUARE_SIZE / 5, y * (SQUARE_SIZE + 10) + SQUARE_SIZE / 5), Color.WHITE, SQUARE_SIZE);
+                Area areaShape = new Area(shape.getSquare());
+                Area areaDisc = new Area(disc.getCircle());
+                areaShape.subtract(areaDisc);
+                shape.setSquare(areaShape);
+            }
+        }
+
+        return shape;
+
+    }
+
+    private ArrayList<Square> makeColumns() {
+        ArrayList<Square> squares = new ArrayList<>();
+
+        for (int x = 0; x < COLUMNS; x++) {
+            Square shape = new Square(new Rectangle2D.Double(x * (SQUARE_SIZE + 10) + SQUARE_SIZE / 5, 0, SQUARE_SIZE, (ROWS + 1) * SQUARE_SIZE),
+                    null);
+            squares.add(shape);
+        }
+
+        return squares;
+    }
+
+    private void placeDisc(int column) {
+        int row = ROWS - 1;
+
+
+        while (row >= 0) {
+            if (!getDisc(column, row).isPresent())
+                break;
+
+            System.out.println("test row:" + row);
+            row--;
+        }
+
+        if (row < 0)
+            return;
+
+        Disc disc = new Disc(new java.awt.geom.Point2D.Double(
+                column * (SQUARE_SIZE + 10) + SQUARE_SIZE / 5,
+                row * (SQUARE_SIZE + 10) + SQUARE_SIZE / 5), Color.red, SQUARE_SIZE);
+
+        if (redMove) {
+            disc.setColor(Color.red);
+        } else {
+            disc.setColor(Color.yellow);
+        }
+
+        redMove = !redMove;
+        grid[column][row] = disc;
+        discs.add(disc);
+
+//        if(gameEnded(column,row)){
+//            gameOver();
+//        }
+
+        System.out.println("Disc column: " + column + ", row: " + row);
+
+    }
+
+    private Optional<Disc> getDisc(int column, int row) {
+        if (column < 0 || column >= COLUMNS
+                || row < 0 || row >= ROWS)
+            return Optional.empty();
+
+        return Optional.ofNullable(grid[column][row]);
+    }
+
+//    Doesnt work (TODO)
+//    //dont use
+//    private boolean gameEnded(int column, int row) {
+//        ArrayList<Point2D> vertical = (ArrayList<Point2D>) IntStream.rangeClosed(row - 3, row + 3)
+//                .mapToObj(r -> new Point2D(column, r))
+//                .collect(Collectors.toList());
+//
+//        ArrayList<Point2D> horizontal = (ArrayList<Point2D>) IntStream.rangeClosed(column - 3, column + 3)
+//                .mapToObj(c -> new Point2D(c, row))
+//                .collect(Collectors.toList());
+//
+//        Point2D topLeft = new Point2D(column - 3, row - 3);
+//        ArrayList<Point2D> diagonal1 = (ArrayList<Point2D>) IntStream.rangeClosed(0, 6)
+//                .mapToObj(i -> topLeft.add(i, i))
+//                .collect(Collectors.toList());
+//
+//        Point2D botLeft = new Point2D(column - 3, row + 3);
+//        ArrayList<Point2D> diagonal2 = (ArrayList<Point2D>) IntStream.rangeClosed(0, 6)
+//                .mapToObj(i -> botLeft.add(i, -i))
+//                .collect(Collectors.toList());
+//
+//        return checkRange(vertical) || checkRange(horizontal)
+//                || checkRange(diagonal1) || checkRange(diagonal2);
+//    }
+//
+//    //dont use
+//    private boolean checkRange(ArrayList<Point2D> points) {
+//        int chain = 0;
+//
+//        for (Point2D p : points) {
+//            int column = (int) p.getX();
+//            int row = (int) p.getY();
+//
+//            Disc disc = getDisc(column, row).orElse(
+//                    new Disc(new java.awt.geom.Point2D.Double(0, 0), Color.WHITE, SQUARE_SIZE));
+//            if (redMove) {
+//                chain++;
+//                if (chain == 4) {
+//                    return true;
+//                }
+//            } else {
+//                chain = 0;
+//            }
+//        }
+//
+//        return false;
+//    }
+//
+//    //dont use
+//    private void gameOver() {
+//        System.out.println("Winner: " + (redMove ? "RED" : "YELLOW"));
+//    }
+
+    private void update(double time) {
+
+    }
+
+    public BorderPane setChatPane(int width, int height) {
         BorderPane borderPane = new BorderPane();
 
         //Center items
@@ -152,8 +312,8 @@ public class CreateGameGUI {
         //Bottom items
         TextField textField = new TextField();
         textField.setPrefHeight(30);
-        textField.setPrefWidth(width-80);
-        HBox.setHgrow(textField,Priority.ALWAYS);
+        textField.setPrefWidth(width - 80);
+        HBox.setHgrow(textField, Priority.ALWAYS);
 
         Button button = new Button("Send");
         button.setPrefSize(80, 30);
@@ -179,7 +339,7 @@ public class CreateGameGUI {
         });
 
         HBox inputBox = new HBox(textField, button);
-        inputBox.setPadding(new Insets(0,10,10,10));
+        inputBox.setPadding(new Insets(0, 10, 10, 10));
 
         borderPane.setBottom(inputBox);
 
@@ -199,5 +359,5 @@ public class CreateGameGUI {
     private void clientGUI() {
         clientGUI.start();
     }
-    
+
 }

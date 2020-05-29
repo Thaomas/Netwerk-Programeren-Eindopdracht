@@ -6,6 +6,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import java.io.*;
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.time.LocalDate;
@@ -146,14 +147,14 @@ public class Server {
                 t.start();
             }
 
-            this.serverSocket.close();
+//            this.serverSocket.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public ArrayList<String> getChatLog(String servername) {
-        return rooms.get(servername).getChatlog();
+    public ArrayList<String> getChatLog(String serverName){
+        return rooms.get(serverName).getChatLog();
     }
 
     public void connectToChatRoom(String roomName, User user) {

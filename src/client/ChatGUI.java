@@ -34,7 +34,7 @@ public class ChatGUI {
             e.printStackTrace();
         }
 
-        BorderPane borderPane = chatBox(socket, chatlog);
+        BorderPane borderPane = chatBox(socket, chatLog);
 
         ToolBar toolBar = new ToolBar();
 
@@ -89,11 +89,10 @@ private TextFlow textFlow;
         borderPane.setCenter(centerTextBox);
 
         //Bottom items
-        TextField textField = new TextField();
-        textField.setPrefHeight(30);
-        textField.setPrefWidth(400 - 80);
-        HBox.setHgrow(textField, Priority.ALWAYS);
-
+        TextField chatTextField = new TextField();
+        chatTextField.setPrefHeight(30);
+        chatTextField.setPrefWidth(320);
+        HBox.setHgrow(chatTextField, Priority.ALWAYS);
 
         Button sendButton = new Button("Send");
         sendButton.setPrefSize(80, 30);
@@ -105,12 +104,12 @@ private TextFlow textFlow;
                 } catch (IOException ioException) {
                     ioException.printStackTrace();
                 }
-                textField.clear();
-                textField.requestFocus();
+                chatTextField.clear();
+                chatTextField.requestFocus();
             }
         });
 
-        textField.setOnKeyPressed(e -> {
+        chatTextField.setOnKeyPressed(e -> {
             // On Enter press
             if (e.getCode() == KeyCode.ENTER) {
                 sendButton.fire();
@@ -132,9 +131,7 @@ private TextFlow textFlow;
         Platform.runLater(()-> textFlow.getChildren().add(new Text("\n"+message)));
     }
 
-    private Thread listenThread;
-
-    private void clientGUI() {
+     private void clientGUI() {
         clientGUI.start();
     }
 }

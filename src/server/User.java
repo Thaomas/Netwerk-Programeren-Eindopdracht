@@ -98,6 +98,7 @@ public class User implements Runnable {
                 String received = this.in.readUTF();
                 System.out.println(received);
                 String command = received.substring(0, 4);
+                            //Connect
                 switch (command) {
                     case "quit":
                         disconnect();
@@ -130,13 +131,16 @@ public class User implements Runnable {
                         //todo make error-code and handeling client side
                         break;
                     case "GMes":
+                            //Game message
 
                         break;
                     case "CrCR":
+                            //Create chat room
                         String code = server.newRoom(received.substring(4));
                         respond(code);
                         break;
                     case "CrGR":
+                            //Create game room
 
                         break;
                     default:

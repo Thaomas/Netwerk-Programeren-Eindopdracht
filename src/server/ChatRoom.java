@@ -65,12 +65,12 @@ public class ChatRoom {
         return users.contains(user);
     }
 
-    public ArrayList<String> getChatlog() {
-        return chatlog;
+    public ArrayList<String> getChatLog() {
+        return chatLog;
     }
 
     public void messageAll(String message) {
-        chatlog.add(message);
+        chatLog.add(message);
         for (User user : users) {
             user.writeUTF("CMes" + message);
         }

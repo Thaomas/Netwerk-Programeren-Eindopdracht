@@ -30,6 +30,7 @@ public class ClientGUI {
     private Account account;
     private ChatGUI chatGUI;
     private CreateGameGUI createGameGUI;
+    private JoinGameGUI joinGameGUI;
 
     private Stage stage;
     private Socket socket;
@@ -39,7 +40,8 @@ public class ClientGUI {
         this.administration = administration;
         this.account = new Account();
         this.chatGUI = new ChatGUI();
-        createGameGUI = new CreateGameGUI();
+
+        joinGameGUI = new JoinGameGUI();
         this.socket = socket;
         Runtime.getRuntime().addShutdownHook(new Thread(administration::disconnect));
     }
@@ -113,6 +115,7 @@ public class ClientGUI {
         joinButton = new Button("Join game");
         joinButton.setAlignment(Pos.CENTER);
         joinButton.setPrefSize(buttonWIDTH, buttonHEIGHT);
+        joinButton.setOnAction(event -> JoinGameGUI());
 
         chatButton = new Button("Chat");
         chatButton.setAlignment(Pos.CENTER);
@@ -159,7 +162,11 @@ public class ClientGUI {
     }
 
     public void CreateGameGUI() {
+        createGameGUI = new CreateGameGUI();
         createGameGUI.start(stage, this);
     }
 
+    public void JoinGameGUI() {
+        joinGameGUI.start(stage, this);
+    }
 }

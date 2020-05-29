@@ -33,8 +33,8 @@ public class Connector implements Runnable {
         while (!loggedIn) {
             try {
                 String input = in.readUTF();
-                String awnser = input.substring(0, 4);
-                if ((awnser.equals("RegU") || awnser.equals("LogU")) && input.length() >= 7) {
+                String answer = input.substring(0, 4);
+                if ((answer.equals("RegU") || answer.equals("LogU")) && input.length() >= 7) {
                     String nickname = input.substring(4, input.indexOf('|'));
                     String password = input.substring(input.indexOf('|')+1);
                     User user;
@@ -48,7 +48,7 @@ public class Connector implements Runnable {
                     connected = Registered/Logged in without errors
                      */
 
-                    if (awnser.equals("RegU")) {
+                    if (answer.equals("RegU")) {
                         System.out.println("Register");
                         if (!server.getUsers().containsKey(nickname)) {
                             user = new User(nickname, password, server);

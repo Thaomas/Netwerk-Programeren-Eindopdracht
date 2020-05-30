@@ -17,18 +17,16 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 import org.jfree.fx.FXGraphics2D;
+import server.ConnectFour;
 import util.RandomString;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Optional;
 
 public class CreateGameGUI {
 
@@ -36,12 +34,24 @@ public class CreateGameGUI {
     private ClientGUI clientGUI;
 
     private Socket socket;
-    private DataInputStream in;
-    private DataOutputStream out;
+    private DataOutputStream dataOutputStream;
+    private DataInputStream dataInputStream;
+    private ObjectOutputStream objectOutputStream;
+    private ObjectInputStream objectInputStream;
 
-    public void start(Stage primaryStage, ClientGUI clientGUI) {
+    public void start(Stage primaryStage, ClientGUI clientGUI, Socket socket) {
         stage = primaryStage;
         this.clientGUI = clientGUI;
+        this.socket = socket;
+
+        try {
+            this.dataOutputStream = new DataOutputStream(socket.getOutputStream());
+            this.dataInputStream = new DataInputStream(socket.getInputStream());
+            this.objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+            this.objectInputStream = new ObjectInputStream(socket.getInputStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         BorderPane borderPane = new BorderPane();
 
@@ -71,16 +81,26 @@ public class CreateGameGUI {
         discs = new ArrayList<>();
         squares = makeColumns();
 
-        canvas = new Canvas(800, 700);
+        Canvas canvas = new Canvas(800, 700);
         canvas.setOnMouseClicked(event -> {
             System.out.println("X: " + event.getX() + ", Y: " + event.getY());
+//            if(mouseDisabled)
             for (int i = 0; i < squares.size(); i++) {
                 if (squares.get(i).getSquare().getBounds().contains(event.getX(), event.getY())) {
-                    placeDisc(i);
+//                   Have to change
+                    try {
+                        dataOutputStream.writeUTF("#" + i);
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    discs.add(connectFour.placeDisc(i));
                 }
             }
 
         });
+        ;
 
         Color transparent = new Color(255, 255, 255, 50);
         Color noColor = new Color(0, 0, 0, 0);
@@ -121,7 +141,6 @@ public class CreateGameGUI {
         }.start();
     }
 
-    private Canvas canvas;
     private FXGraphics2D fxGraphics2D;
 
     private final int SQUARE_SIZE = 100;
@@ -131,9 +150,9 @@ public class CreateGameGUI {
     private ArrayList<Disc> discs;
     private ArrayList<Square> squares;
 
-    private Disc[][] grid = new Disc[COLUMNS][ROWS];
+    private boolean mouseDisabled = true;
 
-    private boolean redMove = true;
+    private ConnectFour connectFour = new ConnectFour();
 
     private void draw(FXGraphics2D fxGraphics2D) {
         fxGraphics2D.setBackground(Color.white);
@@ -141,7 +160,6 @@ public class CreateGameGUI {
         fxGraphics2D.setTransform(new AffineTransform());
 
         makeConnect4Grid().drawFill(fxGraphics2D);
-
 
         for (Square square : squares) {
             square.drawFill(fxGraphics2D);
@@ -174,111 +192,15 @@ public class CreateGameGUI {
         ArrayList<Square> squares = new ArrayList<>();
 
         for (int x = 0; x < COLUMNS; x++) {
-            Square shape = new Square(new Rectangle2D.Double(x * (SQUARE_SIZE + 10) + SQUARE_SIZE / 5, 0, SQUARE_SIZE, (ROWS + 1) * SQUARE_SIZE),
+            Square shape = new Square(new Rectangle2D.Double(
+                    x * (SQUARE_SIZE + 10) + SQUARE_SIZE / 5,
+                    0, SQUARE_SIZE, (ROWS + 1) * SQUARE_SIZE),
                     null);
             squares.add(shape);
         }
 
         return squares;
     }
-
-    private void placeDisc(int column) {
-        int row = ROWS - 1;
-
-
-        while (row >= 0) {
-            if (!getDisc(column, row).isPresent())
-                break;
-
-            System.out.println("test row:" + row);
-            row--;
-        }
-
-        if (row < 0)
-            return;
-
-        Disc disc = new Disc(new java.awt.geom.Point2D.Double(
-                column * (SQUARE_SIZE + 10) + SQUARE_SIZE / 5,
-                row * (SQUARE_SIZE + 10) + SQUARE_SIZE / 5), Color.red, SQUARE_SIZE);
-
-        if (redMove) {
-            disc.setColor(Color.red);
-        } else {
-            disc.setColor(Color.yellow);
-        }
-
-        redMove = !redMove;
-        grid[column][row] = disc;
-        discs.add(disc);
-
-//        if(gameEnded(column,row)){
-//            gameOver();
-//        }
-
-        System.out.println("Disc column: " + column + ", row: " + row);
-
-    }
-
-    private Optional<Disc> getDisc(int column, int row) {
-        if (column < 0 || column >= COLUMNS
-                || row < 0 || row >= ROWS)
-            return Optional.empty();
-
-        return Optional.ofNullable(grid[column][row]);
-    }
-
-//    Doesnt work (TODO)
-//    //dont use
-//    private boolean gameEnded(int column, int row) {
-//        ArrayList<Point2D> vertical = (ArrayList<Point2D>) IntStream.rangeClosed(row - 3, row + 3)
-//                .mapToObj(r -> new Point2D(column, r))
-//                .collect(Collectors.toList());
-//
-//        ArrayList<Point2D> horizontal = (ArrayList<Point2D>) IntStream.rangeClosed(column - 3, column + 3)
-//                .mapToObj(c -> new Point2D(c, row))
-//                .collect(Collectors.toList());
-//
-//        Point2D topLeft = new Point2D(column - 3, row - 3);
-//        ArrayList<Point2D> diagonal1 = (ArrayList<Point2D>) IntStream.rangeClosed(0, 6)
-//                .mapToObj(i -> topLeft.add(i, i))
-//                .collect(Collectors.toList());
-//
-//        Point2D botLeft = new Point2D(column - 3, row + 3);
-//        ArrayList<Point2D> diagonal2 = (ArrayList<Point2D>) IntStream.rangeClosed(0, 6)
-//                .mapToObj(i -> botLeft.add(i, -i))
-//                .collect(Collectors.toList());
-//
-//        return checkRange(vertical) || checkRange(horizontal)
-//                || checkRange(diagonal1) || checkRange(diagonal2);
-//    }
-//
-//    //dont use
-//    private boolean checkRange(ArrayList<Point2D> points) {
-//        int chain = 0;
-//
-//        for (Point2D p : points) {
-//            int column = (int) p.getX();
-//            int row = (int) p.getY();
-//
-//            Disc disc = getDisc(column, row).orElse(
-//                    new Disc(new java.awt.geom.Point2D.Double(0, 0), Color.WHITE, SQUARE_SIZE));
-//            if (redMove) {
-//                chain++;
-//                if (chain == 4) {
-//                    return true;
-//                }
-//            } else {
-//                chain = 0;
-//            }
-//        }
-//
-//        return false;
-//    }
-//
-//    //dont use
-//    private void gameOver() {
-//        System.out.println("Winner: " + (redMove ? "RED" : "YELLOW"));
-//    }
 
     private void update(double time) {
 
@@ -344,16 +266,6 @@ public class CreateGameGUI {
         borderPane.setBottom(inputBox);
 
         return borderPane;
-    }
-
-    public void setSocket(Socket socket) {
-        this.socket = socket;
-        try {
-            this.in = new DataInputStream(socket.getInputStream());
-            this.out = new DataOutputStream(socket.getOutputStream());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     private void clientGUI() {

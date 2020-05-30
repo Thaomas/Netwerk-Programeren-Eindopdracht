@@ -1,22 +1,48 @@
 package server;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-public class ChatRoom implements Room {
-    private final HashSet<User> users;
+public class ChatRoom {
     private final String roomName;
-    private String roomCode;
-    private final ArrayList<String> chatLog;
+    private final String roomCode;
+    private final ArrayList<String> chatlog;
+    private final HashSet<User> users;
 
-    public ChatRoom(String roomname) {
-        users = new HashSet<>();
+    public ChatRoom(String roomname, String roomcode) {
         this.roomName = roomname;
-        chatLog = new ArrayList<>();
+        this.roomCode = roomcode;
+        testChat(100);
+        users = new HashSet<>();
+        chatlog = new ArrayList<>();
     }
 
-    public void setRoomCode(String code){
-        roomCode = code;
+    public ChatRoom(String roomName, String roomCode, ArrayList<String> chatlog) {
+        this.roomName = roomName;
+        this.roomCode = roomCode;
+        this.chatlog = chatlog;
+        this.users = new HashSet<>();
+    }
+
+    private void testChat(int amount) {
+        System.out.println(this.roomName);
+        System.out.println(this.roomCode);
+        System.out.println(this.chatlog);
+        for (int i = 0; i < amount; i++) {
+            chatlog.add("test " + i+"\n");
+        }
+    }
+
+    public JSONObject getJSON(){
+        JSONObject object = new JSONObject();
+        object.put("roomName", this.roomName);
+        object.put("roomCode", this.roomCode);
+        object.put("chatlog",  this.chatlog);
+        return object;
     }
 
     public String getRoomCode() {
@@ -40,13 +66,13 @@ public class ChatRoom implements Room {
     }
 
     public ArrayList<String> getChatLog() {
-        return chatLog;
+        return this.chatlog;
     }
 
     public void messageAll(String message) {
-        chatLog.add(message);
+        chatlog.add(message);
         for (User user : users) {
-            user.writeUTF("CMes"+message);
+            user.writeUTF("CMes" + message);
         }
     }
 

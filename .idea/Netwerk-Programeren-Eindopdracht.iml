@@ -8,9 +8,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="json-20190722" level="project" />
-    <orderEntry type="library" name="json-20190722" level="project" />
-    <orderEntry type="library" name="fxgraphics2d-2.0" level="project" />
+    <orderEntry type="library" name="json-simple-1.1.1" level="project" />
     <orderEntry type="library" name="fxgraphics2d-1.9" level="project" />
   </component>
 </module>

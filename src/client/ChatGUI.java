@@ -1,5 +1,6 @@
 package client;
 
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -12,24 +13,25 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 
 public class ChatGUI {
 
     private ClientGUI clientGUI;
-    private ObjectOutputStream out;
-    private String roomName;
+    private DataOutputStream out;
+    private String roomCode;
+    private TextFlow textFlow;
     private Thread listenThread;
 
-    public void start(String roomName, Stage primaryStage, ClientGUI clientGUI, Socket socket, ArrayList<String> chatLog) {
+    public void start(String roomCode, Stage primaryStage, ClientGUI clientGUI, Socket socket, ArrayList<String> chatLog) {
         this.clientGUI = clientGUI;
-        this.roomName = roomName;
+        this.roomCode = roomCode;
 
         try {
-            this.out = new ObjectOutputStream(socket.getOutputStream());
+            this.out = new DataOutputStream(socket.getOutputStream());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -41,9 +43,8 @@ public class ChatGUI {
         Button backButton = new Button("Back");
         backButton.setOnAction(event -> {
             try {
-                //Disconnect with the room name
+                out.writeUTF("Disc"+this.roomCode);
                 listenThread.join();
-                out.writeUTF("Disc" + this.roomName);
             } catch (InterruptedException | IOException e) {
                 e.printStackTrace();
             }
@@ -58,16 +59,17 @@ public class ChatGUI {
         primaryStage.setTitle("ChatBox");
         primaryStage.show();
     }
-
-    private BorderPane chatBox(Socket socket, ArrayList<String> chatLog) {
+    private BorderPane chatBox(Socket socket, ArrayList<String> chatlog) {
         BorderPane borderPane = new BorderPane();
 
         //Center items
-        TextFlow textFlow = new TextFlow();
-        textFlow.setLineSpacing(10);
+        textFlow = new TextFlow();
+        textFlow.setLineSpacing(5);
         VBox.setVgrow(textFlow, Priority.ALWAYS);
 
-        for (String message : chatLog){
+        for (String message : chatlog){
+            if (textFlow.getChildren().size()>0)
+                message = "\n" + message;
             textFlow.getChildren().add(new Text(message));
         }
 
@@ -94,12 +96,13 @@ public class ChatGUI {
         chatTextField.setPrefWidth(320);
         HBox.setHgrow(chatTextField, Priority.ALWAYS);
 
-        Button button = new Button("Send");
-        button.setPrefSize(80, 30);
-        button.setOnAction(e -> {
-            if (!chatTextField.getText().isEmpty() || !chatTextField.getText().equals(" ")) {
+        Button sendButton = new Button("Send");
+        sendButton.setPrefSize(80, 30);
+        sendButton.setOnAction(e -> {
+            if (!chatTextField.getText().isEmpty() && !chatTextField.getText().equals("")) {
                 try {
-                    out.writeUTF("CMes" + this.roomName + chatTextField.getText());
+                    out.writeUTF("CMes" + this.roomCode +chatTextField.getText());
+                    System.out.println("CMes" + this.roomCode +chatTextField.getText());
                 } catch (IOException ioException) {
                     ioException.printStackTrace();
                 }
@@ -111,23 +114,27 @@ public class ChatGUI {
         chatTextField.setOnKeyPressed(e -> {
             // On Enter press
             if (e.getCode() == KeyCode.ENTER) {
-                button.fire();
+                sendButton.fire();
             }
         });
 
-        ChatListener listener = new ChatListener(textFlow, socket);
+        ChatListener listener = new ChatListener(this, socket);
         listenThread = new Thread(listener);
         listenThread.start();
 
-        HBox inputBox = new HBox(chatTextField, button);
+        HBox inputBox = new HBox(chatTextField, sendButton);
         inputBox.setPadding(new Insets(0, 10, 10, 10));
 
         borderPane.setBottom(inputBox);
 
         return borderPane;
     }
+    protected void addMessage(String message){
+        Platform.runLater(()-> textFlow.getChildren().add(new Text("\n"+message)));
+    }
 
      private void clientGUI() {
         clientGUI.start();
     }
+
 }

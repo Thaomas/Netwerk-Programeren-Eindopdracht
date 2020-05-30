@@ -109,7 +109,10 @@ public class User implements Runnable {
                             break;
                         case "GMes":
                             //Game message
+                            if (received.contains("#")) {
+                                System.out.println(received.substring(5));
 
+                            }
                             break;
                         case "Disc":
                             //Disconnect

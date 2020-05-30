@@ -152,7 +152,7 @@ public class ClientGUI {
             String message = in.readUTF();
             if (message.equals("Connected")) {
                 ObjectInputStream inOb = new ObjectInputStream(socket.getInputStream());
-                ArrayList<String> chatlog = (ArrayList<String>)inOb.readObject();
+                ArrayList<String> chatlog = (ArrayList<String>) inOb.readObject();
                 chatGUI.start("main", stage, this, socket, chatlog);
             }
         } catch (IOException | ClassNotFoundException e) {
@@ -162,7 +162,7 @@ public class ClientGUI {
 
     public void CreateGameGUI() {
         createGameGUI = new CreateGameGUI();
-        createGameGUI.start(stage, this);
+        createGameGUI.start(stage, this, socket);
     }
 
     public void JoinGameGUI() {

@@ -166,6 +166,10 @@ public class Server {
 //        saveRoom();
     }
 
+    public void writeToLogic(){
+
+    }
+
 //    private synchronized void saveRoom() {
 //        File file = new File("saves/save.json");
 //        JSONObject object;

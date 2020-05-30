@@ -166,6 +166,6 @@ public class ClientGUI {
     }
 
     public void JoinGameGUI() {
-        joinGameGUI.start(stage, this);
+        joinGameGUI.start(stage, this, socket);
     }
 }

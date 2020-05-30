@@ -17,16 +17,20 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
+import java.net.Socket;
+
 public class JoinGameGUI {
 
     private Stage stage;
     private ClientGUI clientGUI;
+    private Socket socket;
 
     //Has to ask server if room is full.
 
-    public void start(Stage primaryStage, ClientGUI clientGUI){
+    public void start(Stage primaryStage, ClientGUI clientGUI, Socket socket){
         stage = primaryStage;
         this.clientGUI = clientGUI;
+        this.socket = socket;
 
         BorderPane borderPane = new BorderPane();
 
@@ -79,6 +83,6 @@ public class JoinGameGUI {
 
     public void CreateGameGUI() {
         CreateGameGUI createGameGUI = new CreateGameGUI();
-        createGameGUI.start(stage, clientGUI);
+        createGameGUI.start(stage, clientGUI,socket);
     }
 }

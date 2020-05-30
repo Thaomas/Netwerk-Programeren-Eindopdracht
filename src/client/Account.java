@@ -1,5 +1,6 @@
 package client;
 
+import com.sun.security.ntlm.Client;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -14,7 +15,12 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
 import java.time.LocalDate;
+import java.util.Scanner;
 
 public class Account {
 
@@ -24,6 +30,7 @@ public class Account {
     private int gamesPlayed;
     private int wins;
     private int losses;
+    private Socket socket;
 
     private TextField oldPass;
     private TextField newPass;
@@ -39,11 +46,37 @@ public class Account {
         this.losses = 0;
     }
 
+    private DataOutputStream out;
+    private DataInputStream in;
+
+    private void getData() {
+        try {
+            socket = clientGUI.getSocket();
+            out = new DataOutputStream(socket.getOutputStream());
+            in = new DataInputStream(socket.getInputStream());
+
+            out.writeUTF("GUsD");
+            String response = in.readUTF();
+            Scanner reader = new Scanner(response);
+            reader.useDelimiter("/");
+
+            username = reader.next();
+            gamesPlayed = Integer.parseInt(reader.next());
+            wins = Integer.parseInt(reader.next());
+            losses = gamesPlayed- wins;
+            accountCreated = LocalDate.parse(reader.next());
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void start(Stage primaryStage, ClientGUI clientGUI) {
-
-        testData();
-
         this.clientGUI = clientGUI;
+
+        getData();
+
         BorderPane borderPane = new BorderPane();
         ToolBar toolBar = new ToolBar();
         GridPane credentials = new GridPane();
@@ -59,9 +92,9 @@ public class Account {
         credentials.setHgap(10);
         credentials.setPadding(new Insets(10));
 
-        credentials.add(new Label("Old password: "),0,0);
+        credentials.add(new Label("Old password: "), 0, 0);
         oldPass = new PasswordField();
-        credentials.add(oldPass,1,0);
+        credentials.add(oldPass, 1, 0);
 
         Label visible = new Label("View password?");
         CheckBox viewBox = new CheckBox();
@@ -82,20 +115,38 @@ public class Account {
             newPass.setText(textNewPass);
             newPassConfirm.setText(textNewPassConfirm);
             credentials.add(oldPass, 1, 0);
+            credentials.add(newPass, 1, 1);
+            credentials.add(newPassConfirm, 1, 2);
         });
         HBox visiblePassword = new HBox(viewBox, visible);
         credentials.add(visiblePassword, 2, 0);
 
-        credentials.add(new Label("New password: "),0,1);
+        credentials.add(new Label("New password: "), 0, 1);
         newPass = new PasswordField();
-        credentials.add(newPass,1,1);
+        credentials.add(newPass, 1, 1);
 
-        credentials.add(new Label("New password \n confirmation: "),0,2);
+        credentials.add(new Label("New password \n confirmation: "), 0, 2);
         newPassConfirm = new PasswordField();
-        credentials.add(newPassConfirm,1,2);
+        credentials.add(newPassConfirm, 1, 2);
 
         Button changePassButton = new Button("Change password");
-        credentials.add(changePassButton,1,3);
+        credentials.add(changePassButton, 1, 3);
+        changePassButton.setOnAction(e->{
+            try {
+                out.writeUTF("ChPw"+oldPass.getText()+"|"+newPass.getText()+"|"+newPassConfirm.getText());
+                String response = in.readUTF();
+                if (response.equals("Conf")){
+                    oldPass.clear();
+                    newPass.clear();
+                    newPassConfirm.clear();
+                }else {
+
+                }
+            } catch (IOException ioException) {
+                ioException.printStackTrace();
+            }
+        });
+
 
         Text title = new Text(username + " Settings");
         title.setFont(Font.font("Arial", FontWeight.BOLD, 30));
@@ -105,7 +156,7 @@ public class Account {
         centerPane.setAlignment(Pos.CENTER_LEFT);
 
         Label statistics = new Label("Stats");
-        statistics.setFont(Font.font("Arial", FontPosture.ITALIC,30));
+        statistics.setFont(Font.font("Arial", FontPosture.ITALIC, 30));
         Label accountCreated = new Label("Account created on: " + this.accountCreated.toString());
         Label gamesPlayed = new Label("Total games played: " + this.gamesPlayed);
         Label wins = new Label("Total wins: " + this.wins);
@@ -126,7 +177,7 @@ public class Account {
         borderPane.setCenter(centerPane);
         borderPane.setRight(statsBox);
 
-        Scene scene = new Scene(borderPane,600,300);
+        Scene scene = new Scene(borderPane, 600, 300);
 
         primaryStage.setTitle("Account settings");
         primaryStage.setScene(scene);

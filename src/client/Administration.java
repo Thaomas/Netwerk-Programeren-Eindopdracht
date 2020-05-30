@@ -5,6 +5,9 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -17,7 +20,6 @@ import javafx.stage.Stage;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 public class Administration extends Application {
@@ -36,16 +38,18 @@ public class Administration extends Application {
     }
 
     private void connect() {
-        try {
-            socket = new Socket("localhost", 10000);
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (!isConnected) {
+            try {
+                socket = new Socket("localhost", 10000);
+                isConnected = true;
+            } catch (IOException e) {
+                System.out.println("No connection to server");
+            }
         }
     }
 
     @Override
     public void start(Stage primaryStage) {
-        connect();
         borderPane = new BorderPane();
         gridPane = new GridPane();
         centerPane = new VBox(10);
@@ -135,8 +139,11 @@ public class Administration extends Application {
         centerPane.getChildren().add(gridPane);
     }
 
+    private boolean isConnected = false;
+
     private boolean tryLogin() {
-        if (!username.getText().isEmpty() && !password.getText().isEmpty()) {
+        connect();
+        if (isConnected && !username.getText().isEmpty() && !password.getText().isEmpty()) {
             try {
                 DataInputStream in = new DataInputStream(socket.getInputStream());
                 DataOutputStream out = new DataOutputStream(socket.getOutputStream());
@@ -154,7 +161,7 @@ public class Administration extends Application {
                         //invalid Username
                         System.out.println("invalid name");
 
-                    }else if (response.charAt(5) == '5'){
+                    } else if (response.charAt(5) == '5') {
                         //User already connected
                         System.out.println("User already connected");
                     }
@@ -189,7 +196,8 @@ public class Administration extends Application {
     }
 
     private boolean tryRegister() {
-        if (!username.getText().isEmpty() && !password.getText().isEmpty()) {
+        connect();
+        if (isConnected && !username.getText().isEmpty() && !password.getText().isEmpty()) {
             try {
                 DataInputStream in = new DataInputStream(socket.getInputStream());
                 DataOutputStream out = new DataOutputStream(socket.getOutputStream());
@@ -239,10 +247,12 @@ public class Administration extends Application {
         gridPane.add(visiblePassword, 3, 2);
     }
 
-    protected void disconnect(){
+    protected void disconnect() {
         try {
             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
-            out.writeUTF("\\quit");
+            out.writeUTF("quit");
+            socket.close();
+            isConnected = false;
         } catch (IOException e) {
             e.printStackTrace();
         }

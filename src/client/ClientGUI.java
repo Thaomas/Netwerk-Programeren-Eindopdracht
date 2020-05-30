@@ -143,17 +143,22 @@ public class ClientGUI {
         account.start(stage, this);
     }
 
+    protected Socket getSocket(){
+        return this.socket;
+    }
+
     public void ChatGUI() {
         try {
-            System.out.println("Connmain");
+            String roomCode = "main";
+            System.out.println("Conn"+roomCode);
             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
             DataInputStream in = new DataInputStream(socket.getInputStream());
-            out.writeUTF("Connmain");
+            out.writeUTF("Conn"+roomCode);
             String message = in.readUTF();
             if (message.equals("Connected")) {
                 ObjectInputStream inOb = new ObjectInputStream(socket.getInputStream());
-                ArrayList<String> chatlog = (ArrayList<String>) inOb.readObject();
-                chatGUI.start("main", stage, this, socket, chatlog);
+                ArrayList<String> chatlog = (ArrayList<String>)inOb.readObject();
+                chatGUI.start(roomCode, stage, this, socket, chatlog);
             }
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();

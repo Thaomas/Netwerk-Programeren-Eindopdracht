@@ -167,10 +167,10 @@ public class ClientGUI {
 
     public void CreateGameGUI() {
         createGameGUI = new CreateGameGUI();
-        createGameGUI.start(stage, this);
+        createGameGUI.start(stage, this, socket);
     }
 
     public void JoinGameGUI() {
-        joinGameGUI.start(stage, this);
+        joinGameGUI.start(stage, this, socket);
     }
 }

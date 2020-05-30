@@ -1,70 +1,122 @@
 package server;
 
+import client.gamelogic.Disc;
+
+import java.awt.*;
 import java.util.ArrayList;
+import java.util.Optional;
 
 public class ConnectFour {
-    private final ArrayList<ArrayList<Integer>> grid;
-    private final int w;
-    private final int h;
 
-    public static void main(String[] args) {
-        new ConnectFour(10, 25);
-    }
+    private final int SQUARE_SIZE = 100;
+    private final int COLUMNS = 7;
+    private final int ROWS = 6;
 
-    public ConnectFour(int w, int h) {
-        this.w = w;
-        this.h = h;
-        grid = new ArrayList<>();
-        for (int i = 0; i < this.w; i++) {
-            grid.add(new ArrayList<>());
-//            for (int j = 0; j < h; j++) {
-//                grid.get(i).add(null);
-//            }
-            System.out.println((i+1)+ ": "+ grid.get(i).size());
+    private Disc[][] grid = new Disc[COLUMNS][ROWS];
+
+    private boolean redMove = true;
+
+    public Disc placeDisc(int column) {
+        int row = ROWS - 1;
+
+        while (row >= 0) {
+            if (!getDisc(column, row).isPresent())
+                break;
+
+            System.out.println("test row:" + row);
+            row--;
         }
 
-    }
+        Disc disc = new Disc(new java.awt.geom.Point2D.Double(
+                column * (SQUARE_SIZE + 10) + SQUARE_SIZE / 5,
+                row * (SQUARE_SIZE + 10) + SQUARE_SIZE / 5), Color.red, SQUARE_SIZE);
 
-    public void move(int player, int w) throws Exception{
-        if (grid.get(w).size() < this.h){
-            grid.get(w).add(player);
-        }else {
-            throw new Exception("Invalid move");
+        if (redMove) {
+            disc.setColor(Color.red);
+        } else {
+            disc.setColor(Color.yellow);
         }
+
+        redMove = !redMove;
+        grid[column][row] = disc;
+//        discs.add(disc);
+
+        if(ConnectFour.checkWin(grid,Color.red,COLUMNS,ROWS)){
+            System.out.println("GAME OVER - RED WINS");
+//            mouseDisabled = false;
+        }
+        if(ConnectFour.checkWin(grid,Color.yellow,COLUMNS,ROWS)){
+            System.out.println("GAME OVER - YELLOW WINS");
+//            mouseDisabled = false;
+        }
+
+        System.out.println("Disc column: " + column + ", row: " + row);
+
+        return disc;
     }
 
-    public boolean checkWin(int player){
+    private Optional<Disc> getDisc(int column, int row) {
+        if (column < 0 || column >= COLUMNS
+                || row < 0 || row >= ROWS)
+            return Optional.empty();
 
-        // horizontalCheck
-        for (int j = 0; j<this.h-3 ; j++ ){
-            for (int i = 0; i<this.w; i++){
-                if (this.grid.get(i).get(j) == player && this.grid.get(i).get(j + 1) == player && this.grid.get(i).get(j + 2) == player && this.grid.get(i).get(j + 3) == player){
+        return Optional.ofNullable(grid[column][row]);
+    }
+
+    public static boolean checkWin(Disc[][] grid, Color color, int COLUMNS, int ROWS) {
+
+        for (int i = 0; i < COLUMNS; i++) {
+            for (int j = 0; j < ROWS - 3; j++) {
+                // Vertical Check
+                if (grid[i][j] != null && grid[i][j + 1] != null && grid[i][j + 2] != null && grid[i][j + 3] != null &&
+                        grid[i][j].getColor().equals(color) &&
+                        grid[i][j + 1].getColor().equals(color) &&
+                        grid[i][j + 2].getColor().equals(color) &&
+                        grid[i][j + 3].getColor().equals(color)) {
                     return true;
                 }
             }
         }
-        // verticalCheck
-        for (int i = 0; i<this.w-3 ; i++ ){
-            for (int j = 0; j<this.h; j++){
-                if (this.grid.get(i).get(j) == player && this.grid.get(i + 1).get(j) == player && this.grid.get(i + 2).get(j) == player && this.grid.get(i + 3).get(j) == player){
+
+        for (int i = 0; i < COLUMNS - 3; i++) {
+            for (int j = 0; j < ROWS; j++) {
+                // Horizontal Check
+                if (grid[i][j] != null && grid[i + 1][j] != null && grid[i + 2][j] != null && grid[i + 3][j] != null &&
+                        grid[i][j].getColor().equals(color) &&
+                        grid[i + 1][j].getColor().equals(color) &&
+                        grid[i + 2][j].getColor().equals(color) &&
+                        grid[i + 3][j].getColor().equals(color)) {
                     return true;
                 }
             }
         }
-        // ascendingDiagonalCheck
-        for (int i=3; i<this.w; i++){
-            for (int j=0; j<this.h-3; j++){
-                if (this.grid.get(i).get(j) == player && this.grid.get(i - 1).get(j + 1) == player && this.grid.get(i - 2).get(j + 2) == player && this.grid.get(i - 3).get(j + 3) == player)
+
+        for (int i = 3; i < COLUMNS; i++) {
+            for (int j = 0; j < ROWS - 3; j++) {
+                // Ascending DiagonalCheck
+                if (grid[i][j] != null && grid[i - 1][j + 1] != null && grid[i - 2][j + 2] != null && grid[i - 3][j + 3] != null &&
+                        grid[i][j].getColor().equals(color) &&
+                        grid[i - 1][j + 1].getColor().equals(color) &&
+                        grid[i - 2][j + 2].getColor().equals(color) &&
+                        grid[i - 3][j + 3].getColor().equals(color)) {
                     return true;
+                }
             }
         }
-        // descendingDiagonalCheck
-        for (int i=3; i<this.w; i++){
-            for (int j=3; j<this.h; j++){
-                if (this.grid.get(i).get(j) == player && this.grid.get(i - 1).get(j - 1) == player && this.grid.get(i - 2).get(j - 2) == player && this.grid.get(i - 3).get(j - 3) == player)
+
+        for (int i = 3; i < COLUMNS; i++) {
+            for (int j = 3; j < ROWS; j++) {
+                // Descending DiagonalCheck
+                if (grid[i][j] != null && grid[i - 1][j - 1] != null && grid[i - 2][j - 2] != null && grid[i - 3][j - 3] != null &&
+                        grid[i][j].getColor().equals(color) &&
+                        grid[i - 1][j - 1].getColor().equals(color) &&
+                        grid[i - 2][j - 2].getColor().equals(color) &&
+                        grid[i - 3][j - 3].getColor().equals(color)) {
                     return true;
+                }
             }
         }
+
         return false;
     }
 }

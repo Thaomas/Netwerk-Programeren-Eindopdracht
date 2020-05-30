@@ -21,7 +21,8 @@ public class Server {
     private final HashMap<String, User> users;
     private final HashMap<String, User> connectedUsers;
     private final HashMap<String, Thread> clientThreads;
-    private final HashMap<String, ChatRoom> rooms;
+    private final HashMap<String, ChatRoom> chatRooms;
+    private final HashMap<String, GameRoom> gameRooms;
 
     public static void main(String[] args) {
 
@@ -52,7 +53,8 @@ public class Server {
         users = new HashMap<>();
         connectedUsers = new HashMap<>();
         clientThreads = new HashMap<>();
-        rooms = new HashMap<>();
+        chatRooms = new HashMap<>();
+        gameRooms = new HashMap<>();
         load();
     }
 
@@ -68,7 +70,7 @@ public class Server {
                 String roomName = (String) jsonObject.get("roomName");
                 String roomCode = (String) jsonObject.get("roomCode");
                 ArrayList<String> chatlog = (ArrayList<String>) jsonObject.get("chatlog");
-                rooms.put(roomCode, new ChatRoom(roomName, roomCode, chatlog));
+                chatRooms.put(roomCode, new ChatRoom(roomName, roomCode, chatlog));
             }
 
             for (Object o : userArray) {
@@ -86,7 +88,7 @@ public class Server {
         }
     }
 
-    private synchronized void save() {
+    protected synchronized void save() {
         JSONObject object = new JSONObject();
         object.put("rooms", getRoomsArray());
         object.put("users", getUsersArray());
@@ -94,21 +96,29 @@ public class Server {
         try (FileWriter fileWriter = new FileWriter("saves/save.json")) {
             fileWriter.write(object.toJSONString());
             fileWriter.flush();
-            System.out.println("Save");
+//            System.out.println("Save");
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
-    public boolean containsRoom(String room) {
-        return rooms.containsKey(room);
+    public boolean containsGameRoom(String room) {
+        return gameRooms.containsKey(room);
+    }
+    public boolean containsChatRoom(String room) {
+        return chatRooms.containsKey(room);
     }
 
     protected void connectUser(User user) {
         connectedUsers.put(user.getName(), user);
     }
 
-    public synchronized String newRoom(String roomname) {
+    public synchronized String newChatRoom(String roomName) {
+        String roomcode = generateCode();
+        addChatRoom(roomName, roomcode);
+        return roomcode;
+    }
+
+    private String generateCode() {
         Random random = new Random();
         StringBuilder roomcode = new StringBuilder();
         boolean validRoomCode = false;
@@ -117,12 +127,27 @@ public class Server {
             for (int i = 0; i <= 3; i++) {
                 roomcode.append((char) (random.nextInt(26) + 'a'));
             }
-            if (!rooms.containsKey(roomcode.toString())) {
+            if (!chatRooms.containsKey(roomcode.toString()) && !gameRooms.containsKey(roomcode.toString())) {
                 validRoomCode = true;
             }
         }
-        addChatRoom(roomname, roomcode.toString());
         return roomcode.toString();
+    }
+
+    public String newGameRoom(String response) {
+        String roomcode = generateCode();
+        boolean isPrivate = false;
+        if (response.charAt(0) == 'c')
+            isPrivate = true;
+        addGameRoom(response.substring(1), roomcode, isPrivate);
+        return roomcode;
+    }
+
+    private void addGameRoom(String roomName, String roomCode, boolean isPrivate) {
+        System.out.println(chatRooms.keySet());
+        if (!chatRooms.containsKey(roomCode)) {
+            gameRooms.put(roomCode, new GameRoom(roomName, roomCode, isPrivate));
+        }
     }
 
 
@@ -153,21 +178,30 @@ public class Server {
         }
     }
 
-    public ArrayList<String> getChatLog(String serverName){
-        return rooms.get(serverName).getChatLog();
+    public HashMap<String, GameRoom> getGameRooms() {
+        return gameRooms;
+    }
+
+    public ArrayList<String> getChatLog(String serverName) {
+        return chatRooms.get(serverName).getChatLog();
+    }
+
+    public boolean connectToGameRoom(String roomCode, User user) {
+        return gameRooms.get(roomCode).addUser(user);
     }
 
     public void connectToChatRoom(String roomName, User user) {
-        rooms.get(roomName).addUser(user);
+        chatRooms.get(roomName).addUser(user);
     }
 
     public void disconnectChatRoom(String roomName, User user) {
-        rooms.get(roomName).removeUser(user);
+        chatRooms.get(roomName).removeUser(user);
     }
-
+    public void writeToGameRoom(String roomName, User user, String message) {
+        gameRooms.get(roomName).messageAll("<" + user.getName() + ">: " + message);
+    }
     public void writeToChatRoom(String roomName, User user, String message) {
-        ChatRoom room = rooms.get(roomName);
-        room.messageAll("<" + user.getName() + ">: " + message);
+        chatRooms.get(roomName).messageAll("<" + user.getName() + ">: " + message);
     }
 
     private void disconnectListener() {
@@ -196,7 +230,7 @@ public class Server {
         String nickname = user.getName();
         this.connectedUsers.remove(nickname);
 
-        for (ChatRoom room : rooms.values()) {
+        for (ChatRoom room : chatRooms.values()) {
             room.removeUser(user);
         }
         Thread t = this.clientThreads.get(nickname);
@@ -221,16 +255,16 @@ public class Server {
     }
 
     private void addChatRoom(String roomName, String roomCode) {
-        System.out.println(rooms.keySet());
-        if (!rooms.containsKey(roomCode)) {
-            rooms.put(roomCode, new ChatRoom(roomName, roomCode));
+        System.out.println("Chatroom " + roomName + " has been added under code " +roomCode);
+        if (!chatRooms.containsKey(roomCode)) {
+            chatRooms.put(roomCode, new ChatRoom(roomName, roomCode));
             save();
         }
     }
 
     private JSONArray getRoomsArray() {
         JSONArray roomsArray = new JSONArray();
-        for (ChatRoom chatRoom : rooms.values()) {
+        for (ChatRoom chatRoom : chatRooms.values()) {
             roomsArray.add(chatRoom.getJSON());
         }
         return roomsArray;
@@ -247,4 +281,6 @@ public class Server {
     public void addClientThread(String name, Thread t) {
         this.clientThreads.put(name, t);
     }
+
+
 }

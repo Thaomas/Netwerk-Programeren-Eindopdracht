@@ -66,11 +66,11 @@ public class ChatRoom {
     }
 
     public ArrayList<String> getChatLog() {
-        return chatLog;
+        return this.chatlog;
     }
 
     public void messageAll(String message) {
-        chatLog.add(message);
+        chatlog.add(message);
         for (User user : users) {
             user.writeUTF("CMes" + message);
         }

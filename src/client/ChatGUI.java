@@ -23,8 +23,10 @@ public class ChatGUI {
     private ClientGUI clientGUI;
     private DataOutputStream out;
     private String roomCode;
+    private TextFlow textFlow;
+    private Thread listenThread;
 
-    public void start(String roomCode, Stage primaryStage, ClientGUI clientGUI, Socket socket, ArrayList<String> chatlog) {
+    public void start(String roomCode, Stage primaryStage, ClientGUI clientGUI, Socket socket, ArrayList<String> chatLog) {
         this.clientGUI = clientGUI;
         this.roomCode = roomCode;
 
@@ -49,7 +51,6 @@ public class ChatGUI {
             clientGUI();
         });
 
-
         toolBar.getItems().add(backButton);
         borderPane.setTop(toolBar);
 
@@ -58,7 +59,6 @@ public class ChatGUI {
         primaryStage.setTitle("ChatBox");
         primaryStage.show();
     }
-private TextFlow textFlow;
     private BorderPane chatBox(Socket socket, ArrayList<String> chatlog) {
         BorderPane borderPane = new BorderPane();
 
@@ -68,7 +68,9 @@ private TextFlow textFlow;
         VBox.setVgrow(textFlow, Priority.ALWAYS);
 
         for (String message : chatlog){
-            textFlow.getChildren().add(new Text("\n"+message));
+            if (textFlow.getChildren().size()>0)
+                message = "\n" + message;
+            textFlow.getChildren().add(new Text(message));
         }
 
         VBox vBox = new VBox();
@@ -97,10 +99,10 @@ private TextFlow textFlow;
         Button sendButton = new Button("Send");
         sendButton.setPrefSize(80, 30);
         sendButton.setOnAction(e -> {
-            if (!textField.getText().isEmpty() && !textField.getText().equals("")) {
+            if (!chatTextField.getText().isEmpty() && !chatTextField.getText().equals("")) {
                 try {
-                    out.writeUTF("CMes" + this.roomCode +textField.getText());
-                    System.out.println("CMes" + this.roomCode +textField.getText());
+                    out.writeUTF("CMes" + this.roomCode +chatTextField.getText());
+                    System.out.println("CMes" + this.roomCode +chatTextField.getText());
                 } catch (IOException ioException) {
                     ioException.printStackTrace();
                 }
@@ -120,7 +122,7 @@ private TextFlow textFlow;
         listenThread = new Thread(listener);
         listenThread.start();
 
-        HBox inputBox = new HBox(textField, sendButton);
+        HBox inputBox = new HBox(chatTextField, sendButton);
         inputBox.setPadding(new Insets(0, 10, 10, 10));
 
         borderPane.setBottom(inputBox);
@@ -134,4 +136,5 @@ private TextFlow textFlow;
      private void clientGUI() {
         clientGUI.start();
     }
+
 }

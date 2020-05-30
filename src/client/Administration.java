@@ -251,6 +251,8 @@ public class Administration extends Application {
         try {
             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
             out.writeUTF("quit");
+            socket.close();
+            isConnected = false;
         } catch (IOException e) {
             e.printStackTrace();
         }

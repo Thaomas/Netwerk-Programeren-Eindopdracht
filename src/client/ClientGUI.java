@@ -143,6 +143,10 @@ public class ClientGUI {
         account.start(stage, this);
     }
 
+    protected Socket getSocket(){
+        return this.socket;
+    }
+
     public void ChatGUI() {
         try {
             String roomCode = "main";

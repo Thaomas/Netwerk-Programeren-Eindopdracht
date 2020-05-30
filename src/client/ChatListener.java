@@ -22,6 +22,7 @@ public class ChatListener implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        System.out.println("Start");
         String input;
         String command;
         while (connected) {

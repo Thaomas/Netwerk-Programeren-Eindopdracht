@@ -41,8 +41,6 @@ public class CreateGameGUI {
         try {
             this.out = new DataOutputStream(socket.getOutputStream());
             this.in = new DataInputStream(socket.getInputStream());
-//            this.objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
-//            this.objectInputStream = new ObjectInputStream(socket.getInputStream());
         } catch (IOException e) {
             e.printStackTrace();
         }

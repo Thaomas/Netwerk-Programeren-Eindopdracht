@@ -31,15 +31,15 @@ public class ChatRoom {
         System.out.println(this.roomCode);
         System.out.println(this.chatlog);
         for (int i = 0; i < amount; i++) {
-            chatlog.add("test " + i+"\n");
+            chatlog.add("test " + i + "\n");
         }
     }
 
-    public JSONObject getJSON(){
+    public JSONObject getJSON() {
         JSONObject object = new JSONObject();
         object.put("roomName", this.roomName);
         object.put("roomCode", this.roomCode);
-        object.put("chatlog",  this.chatlog);
+        object.put("chatlog", this.chatlog);
         return object;
     }
 
@@ -70,7 +70,7 @@ public class ChatRoom {
     public void messageAll(String message) {
         chatlog.add(message);
         for (User user : users) {
-            user.writeUTF("CMes" + message);
+            user.writeUTF("CMes" + roomCode + message);
         }
     }
 

@@ -43,6 +43,15 @@ public class GameGUI {
         this.mainMenuGUI = mainMenuGUI;
         this.socket = socket;
 
+        try {
+            this.dataOutputStream = new DataOutputStream(socket.getOutputStream());
+            this.dataInputStream = new DataInputStream(socket.getInputStream());
+            this.objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+            this.objectInputStream = new ObjectInputStream(socket.getInputStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         BorderPane borderPane = new BorderPane();
 
         ToolBar toolBar = new ToolBar();
@@ -257,7 +266,12 @@ public class GameGUI {
     }
 
     private void clientGUI() {
+        try(DataOutputStream out = new DataOutputStream(socket.getOutputStream())) {
+           out.writeUTF("Disc");
         mainMenuGUI.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }

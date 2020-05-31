@@ -1,7 +1,5 @@
 package server;
 
-import org.json.simple.JSONObject;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -13,6 +11,7 @@ public class GameRoom {
     private final HashSet<User> users;
 
     public GameRoom(String roomname, String roomcode, boolean isPrivate) {
+        System.out.println(roomname + " " + isPrivate);
         this.roomName = roomname;
         this.roomCode = roomcode;
         this.isPrivate = isPrivate;
@@ -42,7 +41,7 @@ public class GameRoom {
         return roomName;
     }
 
-    public boolean addUser(User user) {
+    public synchronized boolean addUser(User user) {
         if (users.size() < 2) {
             users.add(user);
             return true;
@@ -50,12 +49,17 @@ public class GameRoom {
             return false;
     }
 
-    public boolean containsUser(User user){
+    public boolean containsUser(User user) {
         return users.contains(user);
     }
 
     public void removeUser(User user) {
-        users.remove(user);
+        if (users.contains(user)) {
+            users.remove(user);
+            lose(user);
+            for (User winner : users)
+                win(winner);
+        }
     }
 
     public boolean checkUser(User user) {
@@ -72,6 +76,14 @@ public class GameRoom {
 
     public void move(String move) {
 
+    }
+
+    private void win(User winner) {
+        winner.win();
+    }
+
+    private void lose(User loser) {
+        loser.lose();
     }
 
     public void messageAll(String message) {

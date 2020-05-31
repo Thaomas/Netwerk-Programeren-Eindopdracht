@@ -18,7 +18,6 @@ import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 import org.jfree.fx.FXGraphics2D;
 import server.ConnectFour;
-import util.RandomString;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -31,7 +30,7 @@ import java.util.ArrayList;
 public class GameGUI {
 
     private Stage stage;
-    private ClientGUI clientGUI;
+    private MainMenuGUI mainMenuGUI;
 
     private Socket socket;
     private DataOutputStream dataOutputStream;
@@ -39,13 +38,12 @@ public class GameGUI {
     private ObjectOutputStream objectOutputStream;
     private ObjectInputStream objectInputStream;
 
-    public void start(Stage primaryStage, ClientGUI clientGUI, Socket socket, String roomCode) {
+    public void start(Stage primaryStage, MainMenuGUI mainMenuGUI, Socket socket, String roomCode) {
         stage = primaryStage;
-        this.clientGUI = clientGUI;
+        this.mainMenuGUI = mainMenuGUI;
         this.socket = socket;
 
         try {
-            dataOutputStream.flush();
             this.dataOutputStream = new DataOutputStream(socket.getOutputStream());
             this.dataInputStream = new DataInputStream(socket.getInputStream());
             this.objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
@@ -270,12 +268,10 @@ public class GameGUI {
     private void clientGUI() {
         try(DataOutputStream out = new DataOutputStream(socket.getOutputStream())) {
            out.writeUTF("Disc");
+        mainMenuGUI.start();
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
-        clientGUI.start();
     }
 
 }

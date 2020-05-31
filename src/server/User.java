@@ -7,6 +7,7 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class User implements Runnable {
 
@@ -125,7 +126,7 @@ public class User implements Runnable {
                             server.disconnectChatRoom(roomCode, this);
                             respond("Disc");
                         } else if (server.containsGameRoom(roomCode)) {
-                            server.disconnectChatRoom();
+                            server.disconnectGameRoom(roomCode, this);
                         } else
                             respond("Invalid room name");
                         //todo make error-code and handeling client side
@@ -171,6 +172,10 @@ public class User implements Runnable {
                         } else
                             respond("IvPw");
                         break;
+                    case "GLst":
+                        //TODO
+                        sendGameRoomList(server.getGameRoomNames());
+                        break;
                     default:
                         respond("Invalid command");
                         //todo make error-code and handeling client side
@@ -194,6 +199,14 @@ public class User implements Runnable {
             e.printStackTrace();
         }
 
+    }
+
+    private void sendGameRoomList(HashMap<String, String> gameRoomList){
+        try {
+            new ObjectOutputStream(socket.getOutputStream()).writeObject(gameRoomList);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public boolean checkPassword(String in) {

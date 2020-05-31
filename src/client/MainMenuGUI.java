@@ -19,15 +19,15 @@ import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 
-public class ClientGUI {
+public class MainMenuGUI {
 
     private final int buttonWIDTH = 150;
     private final int buttonHEIGHT = 100;
     private final String TITLE = "Connect 4";
 
-    private Administration administration;
+    private AdministrationGUI administrationGUI;
 
-    private Account account;
+    private AccountGUI accountGUI;
     private ChatGUI chatGUI;
     private CreateGameGUI createGameGUI;
     private JoinGameGUI joinGameGUI;
@@ -35,15 +35,15 @@ public class ClientGUI {
     private Stage stage;
     private Socket socket;
 
-    public ClientGUI(Stage primaryStage, Administration administration, Socket socket) {
+    public MainMenuGUI(Stage primaryStage, AdministrationGUI administrationGUI, Socket socket) {
         this.stage = primaryStage;
-        this.administration = administration;
-        this.account = new Account();
+        this.administrationGUI = administrationGUI;
+        this.accountGUI = new AccountGUI();
         this.chatGUI = new ChatGUI();
 
         joinGameGUI = new JoinGameGUI();
         this.socket = socket;
-        Runtime.getRuntime().addShutdownHook(new Thread(administration::disconnect));
+        Runtime.getRuntime().addShutdownHook(new Thread(administrationGUI::disconnect));
     }
 
     public void start() {
@@ -135,12 +135,12 @@ public class ClientGUI {
     }
 
     public void administration() {
-        administration.disconnect();
-        administration.start(stage);
+        administrationGUI.disconnect();
+        administrationGUI.start(stage);
     }
 
     public void account() {
-        account.start(stage, this);
+        accountGUI.start(stage, this);
     }
 
     protected Socket getSocket(){

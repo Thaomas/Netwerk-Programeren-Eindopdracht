@@ -22,7 +22,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
-public class Administration extends Application {
+public class AdministrationGUI extends Application {
 
     private Stage stage;
     private GridPane gridPane;
@@ -32,10 +32,6 @@ public class Administration extends Application {
     private TextField password;
     private VBox centerPane;
     private Socket socket;
-
-    public static void main(String[] args) {
-        launch(Administration.class);
-    }
 
     private void connect() {
         if (!isConnected) {
@@ -50,10 +46,12 @@ public class Administration extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        stage = primaryStage;
+
         borderPane = new BorderPane();
         gridPane = new GridPane();
-        centerPane = new VBox(10);
 
+        centerPane = new VBox(10);
         centerPane.setAlignment(Pos.CENTER);
 
         Button backButton = new Button("Back");
@@ -73,11 +71,10 @@ public class Administration extends Application {
 
         Scene scene = new Scene(borderPane, 400, 300);
 
-        stage = primaryStage;
+
 
         stage.setResizable(false);
 
-        stage.setTitle("Connect 4 login");
         stage.setScene(scene);
         stage.show();
 
@@ -116,6 +113,8 @@ public class Administration extends Application {
 
         centerPane.getChildren().add(signIn);
         centerPane.getChildren().add(gridPane);
+
+        stage.setTitle("Connect 4");
     }
 
     private void login() {
@@ -137,6 +136,8 @@ public class Administration extends Application {
 
         centerPane.getChildren().add(login);
         centerPane.getChildren().add(gridPane);
+
+        stage.setTitle(login.getText());
     }
 
     private boolean isConnected = false;
@@ -193,6 +194,9 @@ public class Administration extends Application {
 
         centerPane.getChildren().add(register);
         centerPane.getChildren().add(gridPane);
+
+
+        stage.setTitle(register.getText());
     }
 
     private boolean tryRegister() {
@@ -259,7 +263,7 @@ public class Administration extends Application {
     }
 
     private void clientGUI() {
-        ClientGUI gui = new ClientGUI(stage, this, socket);
+        MainMenuGUI gui = new MainMenuGUI(stage, this, socket);
         gui.start();
     }
 }

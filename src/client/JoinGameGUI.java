@@ -1,12 +1,10 @@
 package client;
 
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.control.ToolBar;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -17,7 +15,11 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import util.RandomString;
 
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.net.Socket;
+import java.util.HashMap;
 
 public class JoinGameGUI {
 
@@ -25,15 +27,15 @@ public class JoinGameGUI {
     private final RandomString randomString = new RandomString(4);
 
     private Stage stage;
-    private ClientGUI clientGUI;
+    private MainMenuGUI mainMenuGUI;
     private Socket socket;
     private String roomCode;
 
     //Has to ask server if room is full.
 
-    public void start(Stage primaryStage, ClientGUI clientGUI, Socket socket){
+    public void start(Stage primaryStage, MainMenuGUI mainMenuGUI, Socket socket){
         stage = primaryStage;
-        this.clientGUI = clientGUI;
+        this.mainMenuGUI = mainMenuGUI;
         this.socket = socket;
         roomCode = randomString.nextString();
 
@@ -46,48 +48,81 @@ public class JoinGameGUI {
 
         toolBar.getItems().add(backButton);
 
-        borderPane.setTop(toolBar);
+        Separator separator = new Separator();
+        separator.setOrientation(Orientation.VERTICAL);
 
         VBox vBox = new VBox();
         vBox.setAlignment(Pos.CENTER);
         HBox hBox = new HBox();
+        hBox.setPadding(new Insets(0,0,0,13));
+        hBox.prefWidthProperty().bind(toolBar.widthProperty().subtract(60));
 
-        Label title = new Label("Room");
-        title.setTextAlignment(TextAlignment.CENTER);
-        title.setFont(Font.font("Arial", FontWeight.BOLD, 30));
-
-        Label roomCode = new Label("Room code: ");
-        roomCode.setAlignment(Pos.CENTER);
-        roomCode.setFont(Font.font("Arial", FontWeight.LIGHT, 20));
+        Label roomCodeLabel = new Label("Game code: ");
+        roomCodeLabel.setAlignment(Pos.CENTER);
+        roomCodeLabel.setFont(Font.font("Arial", FontWeight.LIGHT, 20));
 
         TextField textField = new TextField();
         HBox.setHgrow(textField, Priority.ALWAYS);
 
-        Button join = new Button("Join game");
-        join.setAlignment(Pos.CENTER);
+        Button buttonJoinGame = new Button("Join game");
+        buttonJoinGame.setAlignment(Pos.CENTER);
         //TODO Make it connect to the proper game room and not create a new gameroom.
-        join.setOnAction(event -> CreateGameGUI());
+        buttonJoinGame.setOnAction(event -> CreateGameGUI());
 
-        hBox.getChildren().addAll(roomCode,textField,join);
-        hBox.setSpacing(10);
+        hBox.getChildren().addAll(separator,roomCodeLabel,textField,buttonJoinGame);
+        hBox.setSpacing(8);
 
-        vBox.getChildren().addAll(title,hBox);
+        borderPane.setTop(toolBar);
+
+        Label joinPublicGame = new Label("Public games");
+        joinPublicGame.setTextAlignment(TextAlignment.CENTER);
+        joinPublicGame.setFont(Font.font("Arial", FontWeight.BOLD, 30));
+
+        ListView<HBox> listView = new ListView<>();
+        try {
+            DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
+            dataOutputStream.writeUTF("GLst");
+            //TODO
+            ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
+            HashMap<String, String> list = (HashMap<String,String>) objectInputStream.readObject();
+            for (String roomCode : list.keySet()) {
+                HBox hboxList = new HBox();
+                hboxList.setSpacing(8);
+                Button buttonJoin = new Button("Join");
+                separator = new Separator();
+                separator.setOrientation(Orientation.VERTICAL);
+                Label roomName = new Label(list.get(roomCode) + " " + roomCode);
+                roomName.setFont(Font.font("Arial",20));
+                hboxList.getChildren().add(buttonJoin);
+                hboxList.getChildren().add(separator);
+                hboxList.getChildren().add(roomName);
+                listView.getItems().add(hboxList);
+            }
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+//        vBox.getChildren().addAll(joinPrivateGame,hBox,joinPublicGame,listView);
+
+        toolBar.getItems().add(hBox);
+
+        vBox.getChildren().addAll(joinPublicGame,listView);
         vBox.setPadding(new Insets(10));
 
         borderPane.setCenter(vBox);
 
-        Scene scene = new Scene(borderPane,600,200);
+        Scene scene = new Scene(borderPane,500,490);
         stage.setTitle("Join game");
         stage.setScene(scene);
         stage.show();
     }
 
     private void clientGUI() {
-        clientGUI.start();
+        mainMenuGUI.start();
     }
 
     public void CreateGameGUI() {
         GameGUI gameGUI = new GameGUI();
-        gameGUI.start(stage, clientGUI,socket,roomCode);
+        gameGUI.start(stage, mainMenuGUI,socket,roomCode);
     }
 }

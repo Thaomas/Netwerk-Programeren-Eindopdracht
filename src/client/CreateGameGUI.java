@@ -1,5 +1,6 @@
 package client;
 
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -23,7 +24,7 @@ public class CreateGameGUI {
     private final RandomString randomString = new RandomString(4);
 
     private Stage stage;
-    private ClientGUI clientGUI;
+    private MainMenuGUI mainMenuGUI;
     private Socket socket;
     private String roomCode;
     private DataInputStream in;
@@ -31,9 +32,9 @@ public class CreateGameGUI {
     private boolean isPrivate;
     private TextField roomName;
 
-    public void start(Stage primaryStage, ClientGUI clientGUI, Socket socket) {
+    public void start(Stage primaryStage, MainMenuGUI mainMenuGUI, Socket socket) {
         this.stage = primaryStage;
-        this.clientGUI = clientGUI;
+        this.mainMenuGUI = mainMenuGUI;
         this.socket = socket;
         this.roomCode = randomString.nextString();
 
@@ -113,11 +114,11 @@ public class CreateGameGUI {
     }
 
     private void gameGUI() {
-        new GameGUI().start(stage, clientGUI, socket, roomCode);
+        new GameGUI().start(stage, mainMenuGUI, socket, roomCode);
     }
 
     private void clientGUI() {
-        clientGUI.start();
+        mainMenuGUI.start();
     }
 
 }

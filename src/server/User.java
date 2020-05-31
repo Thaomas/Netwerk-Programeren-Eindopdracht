@@ -124,6 +124,8 @@ public class User implements Runnable {
                         if (server.containsChatRoom(roomCode)) {
                             server.disconnectChatRoom(roomCode, this);
                             respond("Disc");
+                        } else if (server.containsGameRoom(roomCode)) {
+                            server.disconnectChatRoom();
                         } else
                             respond("Invalid room name");
                         //todo make error-code and handeling client side
@@ -208,6 +210,15 @@ public class User implements Runnable {
             }
         }
         return false;
+    }
+
+    protected void lose() {
+        this.gamesPlayed++;
+    }
+
+    protected void win() {
+        this.gamesPlayed++;
+        this.gamesWon++;
     }
 
 

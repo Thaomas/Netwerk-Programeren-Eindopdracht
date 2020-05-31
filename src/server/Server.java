@@ -137,7 +137,7 @@ public class Server {
     public String newGameRoom(String response) {
         String roomcode = generateCode();
         boolean isPrivate = false;
-        if (response.charAt(0) == 'c')
+        if (response.charAt(0) == 'p')
             isPrivate = true;
         addGameRoom(response.substring(1), roomcode, isPrivate);
         return roomcode;
@@ -186,7 +186,7 @@ public class Server {
         return chatRooms.get(serverName).getChatLog();
     }
 
-    public boolean connectToGameRoom(String roomCode, User user) {
+    public synchronized boolean connectToGameRoom(String roomCode, User user) {
         return gameRooms.get(roomCode).addUser(user);
     }
 
@@ -197,6 +197,11 @@ public class Server {
     public void disconnectChatRoom(String roomName, User user) {
         chatRooms.get(roomName).removeUser(user);
     }
+
+    public void disconnectGameRoom(String roomName, User user) {
+        gameRooms.get(roomName).removeUser(user);
+    }
+
     public void writeToGameRoom(String roomName, User user, String message) {
         gameRooms.get(roomName).messageAll("<" + user.getName() + ">: " + message);
     }

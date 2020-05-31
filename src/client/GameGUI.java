@@ -44,14 +44,15 @@ public class GameGUI {
         this.clientGUI = clientGUI;
         this.socket = socket;
 
-//        try {
-//            this.dataOutputStream = new DataOutputStream(socket.getOutputStream());
-//            this.dataInputStream = new DataInputStream(socket.getInputStream());
-//            this.objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
-//            this.objectInputStream = new ObjectInputStream(socket.getInputStream());
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+        try {
+            dataOutputStream.flush();
+            this.dataOutputStream = new DataOutputStream(socket.getOutputStream());
+            this.dataInputStream = new DataInputStream(socket.getInputStream());
+            this.objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+            this.objectInputStream = new ObjectInputStream(socket.getInputStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         BorderPane borderPane = new BorderPane();
 
@@ -267,6 +268,13 @@ public class GameGUI {
     }
 
     private void clientGUI() {
+        try(DataOutputStream out = new DataOutputStream(socket.getOutputStream())) {
+           out.writeUTF("Disc");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
         clientGUI.start();
     }
 

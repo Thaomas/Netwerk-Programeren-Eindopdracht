@@ -13,17 +13,21 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
+import util.RandomString;
 
 import java.net.Socket;
 
 public class JoinGameGUI {
 
+    //needs to be server side
+    private final RandomString randomString = new RandomString(4);
+
     private Stage stage;
     private ClientGUI clientGUI;
     private Socket socket;
+    private String roomCode;
 
     //Has to ask server if room is full.
 
@@ -31,6 +35,7 @@ public class JoinGameGUI {
         stage = primaryStage;
         this.clientGUI = clientGUI;
         this.socket = socket;
+        roomCode = randomString.nextString();
 
         BorderPane borderPane = new BorderPane();
 
@@ -82,7 +87,7 @@ public class JoinGameGUI {
     }
 
     public void CreateGameGUI() {
-        CreateGameGUI createGameGUI = new CreateGameGUI();
-        createGameGUI.start(stage, clientGUI,socket);
+        GameGUI gameGUI = new GameGUI();
+        gameGUI.start(stage, clientGUI,socket,roomCode);
     }
 }

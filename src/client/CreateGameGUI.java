@@ -31,6 +31,7 @@ public class CreateGameGUI {
     private DataOutputStream out;
     private boolean isPrivate;
     private TextField roomName;
+    private CheckBox checkBox;
 
     public void start(Stage primaryStage, MainMenuGUI mainMenuGUI, Socket socket) {
         this.stage = primaryStage;
@@ -72,9 +73,9 @@ public class CreateGameGUI {
         gridPane.add(new Label("Room name: "), 0, 0);
         gridPane.add(roomName, 1, 0);
 
-        CheckBox checkBox = new CheckBox();
-        isPrivate = false;
-        checkBox.selectedProperty().addListener((observable, oldValue, newValue) -> isPrivate = checkBox.isSelected());
+        checkBox = new CheckBox();
+//        isPrivate = false;
+//        checkBox.selectedProperty().addListener((observable, oldValue, newValue) -> isPrivate = checkBox.isSelected());
 
         gridPane.add(new Label("Private: "), 0, 1);
         gridPane.add(checkBox, 1, 1);
@@ -98,7 +99,7 @@ public class CreateGameGUI {
     private void createGame() {
         try {
             String request = "CrGR";
-            if (isPrivate)
+            if (checkBox.isSelected())
                 request += "p";
             else
                 request += "o";

@@ -6,8 +6,9 @@ import org.jfree.fx.FXGraphics2D;
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
+import java.io.Serializable;
 
-public class Disc {
+public class Disc implements Serializable {
 
     private Shape circle;
     private Point2D position;

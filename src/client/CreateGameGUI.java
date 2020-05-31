@@ -27,8 +27,10 @@ public class CreateGameGUI {
     private MainMenuGUI mainMenuGUI;
     private Socket socket;
     private String roomCode;
-    private DataOutputStream dataOutputStream;
-    private DataInputStream dataInputStream;
+    private DataInputStream in;
+    private DataOutputStream out;
+    private boolean isPrivate;
+    private TextField roomName;
 
     public void start(Stage primaryStage, MainMenuGUI mainMenuGUI, Socket socket) {
         this.stage = primaryStage;
@@ -37,8 +39,8 @@ public class CreateGameGUI {
         this.roomCode = randomString.nextString();
 
         try {
-            this.dataOutputStream = new DataOutputStream(socket.getOutputStream());
-            this.dataInputStream = new DataInputStream(socket.getInputStream());
+            this.out = new DataOutputStream(socket.getOutputStream());
+            this.in = new DataInputStream(socket.getInputStream());
 //            this.objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
 //            this.objectInputStream = new ObjectInputStream(socket.getInputStream());
         } catch (IOException e) {
@@ -67,20 +69,22 @@ public class CreateGameGUI {
         gridPane.setVgap(10);
         gridPane.setAlignment(Pos.CENTER);
 
-        TextField roomName = new TextField();
+        roomName = new TextField();
 
-        gridPane.add(new Label("Room name: "),0,0);
-        gridPane.add(roomName,1,0);
+        gridPane.add(new Label("Room name: "), 0, 0);
+        gridPane.add(roomName, 1, 0);
 
         CheckBox checkBox = new CheckBox();
+        isPrivate = false;
+        checkBox.selectedProperty().addListener((observable, oldValue, newValue) -> isPrivate = checkBox.isSelected());
 
-        gridPane.add(new Label("Private: "),0,1);
-        gridPane.add(checkBox,1,1);
+        gridPane.add(new Label("Private: "), 0, 1);
+        gridPane.add(checkBox, 1, 1);
 
         Button createGame = new Button("Start");
-        createGame.setOnAction(event -> GameGUI());
+        createGame.setOnAction(event -> createGame());
 
-        gridPane.add(createGame,1,2);
+        gridPane.add(createGame, 1, 2);
 
         vBox.getChildren().add(title);
         vBox.getChildren().add(gridPane);
@@ -93,9 +97,24 @@ public class CreateGameGUI {
         stage.show();
     }
 
-    private void GameGUI(){
-        GameGUI gameGUI = new GameGUI();
-        gameGUI.start(stage, mainMenuGUI,socket,roomCode);
+    private void createGame() {
+        try {
+            String request = "CrGR";
+            if (isPrivate)
+                request += "p";
+            else
+                request += "o";
+            request += roomName.getText();
+            out.writeUTF(request);
+            roomCode = in.readUTF();
+            gameGUI();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void gameGUI() {
+        new GameGUI().start(stage, mainMenuGUI, socket, roomCode);
     }
 
     private void clientGUI() {

@@ -46,8 +46,8 @@ public class GameGUI {
         try {
             this.dataOutputStream = new DataOutputStream(socket.getOutputStream());
             this.dataInputStream = new DataInputStream(socket.getInputStream());
-            this.objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
-            this.objectInputStream = new ObjectInputStream(socket.getInputStream());
+//            this.objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+//            this.objectInputStream = new ObjectInputStream(socket.getInputStream());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -149,6 +149,7 @@ public class GameGUI {
 
     private boolean mouseDisabled = true;
 
+    //TODO CHANGE SO ITS ONLY SERVER SIDED
     private ConnectFour connectFour = new ConnectFour();
 
     private void draw(FXGraphics2D fxGraphics2D) {
@@ -205,6 +206,19 @@ public class GameGUI {
 
     public BorderPane setChatPane(int width, int height) {
         BorderPane borderPane = new BorderPane();
+        borderPane.setPadding(new Insets(10,0,0,0));
+
+        //Top item
+        ComboBox<String> comboBox = new ComboBox<>();
+
+        comboBox.getItems().add("Game chat");
+        comboBox.getItems().add("Global chat");
+
+        comboBox.getSelectionModel().selectFirst();
+        comboBox.prefWidthProperty().bind(borderPane.widthProperty().subtract(20));
+        comboBox.setTranslateX(10);
+
+        borderPane.setTop(comboBox);
 
         //Center items
         TextFlow textFlow = new TextFlow();

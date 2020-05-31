@@ -34,9 +34,9 @@ public class Connector implements Runnable {
             try {
                 String input = in.readUTF();
                 String answer = input.substring(0, 4);
-                if ((answer.equals("RegU") || answer.equals("LogU")) && input.length() >= 7) {
+                if ((answer.equals("RegU") || answer.equals("LogU") || answer.equals("ReDs")) && input.length() >= 7) {
                     String nickname = input.substring(4, input.indexOf('|'));
-                    String password = input.substring(input.indexOf('|')+1);
+                    String password = input.substring(input.indexOf('|') + 1);
                     User user;
 
                     /*
@@ -79,6 +79,8 @@ public class Connector implements Runnable {
                             continue;
                         }
                     }
+                    server.save();
+
                     user.setSocket(socket);
                     server.connectUser(user);
                     respond("connected");

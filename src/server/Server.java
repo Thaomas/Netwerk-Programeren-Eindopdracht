@@ -101,9 +101,11 @@ public class Server {
             e.printStackTrace();
         }
     }
+
     public boolean containsGameRoom(String room) {
         return gameRooms.containsKey(room);
     }
+
     public boolean containsChatRoom(String room) {
         return chatRooms.containsKey(room);
     }
@@ -140,7 +142,7 @@ public class Server {
         if (response.charAt(0) == 'p')
             isPrivate = true;
         addGameRoom(response.substring(1), roomcode, isPrivate);
-        connectToGameRoom(roomcode,user);
+        connectToGameRoom(roomcode, user);
         return roomcode;
     }
 
@@ -206,6 +208,7 @@ public class Server {
     public void writeToGameRoom(String roomName, User user, String message) {
         gameRooms.get(roomName).messageAll("<" + user.getName() + ">: " + message);
     }
+
     public void writeToChatRoom(String roomName, User user, String message) {
         chatRooms.get(roomName).messageAll("<" + user.getName() + ">: " + message);
     }
@@ -232,7 +235,7 @@ public class Server {
         }
     }
 
-    public void removeClient(User user) {
+    private void removeClient(User user) {
         String nickname = user.getName();
         this.connectedUsers.remove(nickname);
 
@@ -250,6 +253,11 @@ public class Server {
         System.out.println("Connected clients: " + this.users.size());
     }
 
+    public void deleteClient(User user) {
+        users.remove(user.getName());
+    }
+
+
     public HashMap<String, User> getUsers() {
         return users;
     }
@@ -261,7 +269,7 @@ public class Server {
     }
 
     private void addChatRoom(String roomName, String roomCode) {
-        System.out.println("Chatroom " + roomName + " has been added under code " +roomCode);
+        System.out.println("Chatroom " + roomName + " has been added under code " + roomCode);
         if (!chatRooms.containsKey(roomCode)) {
             chatRooms.put(roomCode, new ChatRoom(roomName, roomCode));
             save();
@@ -284,11 +292,11 @@ public class Server {
         return userArray;
     }
 
-    public HashMap<String,String> getGameRoomNames(){
+    public HashMap<String, String> getGameRoomNames() {
         HashMap<String, String> names = new HashMap<>();
 
         //TODO TEST DATA, DELETE AFTER TESTING
-        HashMap<String,GameRoom> gameRooms = gameRoomHashMap();
+        HashMap<String, GameRoom> gameRooms = gameRoomHashMap();
 
         for (String code : gameRooms.keySet()) {
             if (!gameRooms.get(code).isPrivate() && gameRooms.get(code).getUsers().size() < 2) {
@@ -299,12 +307,12 @@ public class Server {
         return names;
     }
 
-    public static HashMap<String,GameRoom> gameRoomHashMap(){
-        HashMap<String,GameRoom> list = new HashMap<>();
+    public static HashMap<String, GameRoom> gameRoomHashMap() {
+        HashMap<String, GameRoom> list = new HashMap<>();
 
-        list.put("4251", new GameRoom("test 1","4251",true));
-        list.put("5454", new GameRoom("Test not private","5454",false));
-        list.put("0101", new GameRoom("test 2","0101",false));
+        list.put("4251", new GameRoom("test 1", "4251", true));
+        list.put("5454", new GameRoom("Test not private", "5454", false));
+        list.put("0101", new GameRoom("test 2", "0101", false));
 
         return list;
     }

@@ -66,6 +66,10 @@ public class GameRoom {
         return this.chatlog;
     }
 
+    public HashSet<User> getUsers() {
+        return users;
+    }
+
     public void move(String move) {
 
     }

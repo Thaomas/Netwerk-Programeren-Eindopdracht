@@ -1,6 +1,5 @@
 package client;
 
-import com.sun.security.ntlm.Client;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -22,7 +21,7 @@ import java.net.Socket;
 import java.time.LocalDate;
 import java.util.Scanner;
 
-public class Account {
+public class AccountGUI {
 
     private String username;
     private String password;
@@ -35,7 +34,7 @@ public class Account {
     private TextField oldPass;
     private TextField newPass;
     private TextField newPassConfirm;
-    private ClientGUI clientGUI;
+    private MainMenuGUI mainMenuGUI;
 
     public final void testData() {
         this.username = "'Username'";
@@ -51,7 +50,7 @@ public class Account {
 
     private void getData() {
         try {
-            socket = clientGUI.getSocket();
+            socket = mainMenuGUI.getSocket();
             out = new DataOutputStream(socket.getOutputStream());
             in = new DataInputStream(socket.getInputStream());
 
@@ -72,8 +71,8 @@ public class Account {
         }
     }
 
-    public void start(Stage primaryStage, ClientGUI clientGUI) {
-        this.clientGUI = clientGUI;
+    public void start(Stage primaryStage, MainMenuGUI mainMenuGUI) {
+        this.mainMenuGUI = mainMenuGUI;
 
         getData();
 
@@ -195,6 +194,6 @@ public class Account {
     }
 
     public void clientGUI() {
-        clientGUI.start();
+        mainMenuGUI.start();
     }
 }

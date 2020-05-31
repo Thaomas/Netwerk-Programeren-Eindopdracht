@@ -1,11 +1,11 @@
 package client;
 
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -24,15 +24,15 @@ public class CreateGameGUI {
     private final RandomString randomString = new RandomString(4);
 
     private Stage stage;
-    private ClientGUI clientGUI;
+    private MainMenuGUI mainMenuGUI;
     private Socket socket;
     private String roomCode;
     private DataOutputStream dataOutputStream;
     private DataInputStream dataInputStream;
 
-    public void start(Stage primaryStage, ClientGUI clientGUI, Socket socket) {
+    public void start(Stage primaryStage, MainMenuGUI mainMenuGUI, Socket socket) {
         this.stage = primaryStage;
-        this.clientGUI = clientGUI;
+        this.mainMenuGUI = mainMenuGUI;
         this.socket = socket;
         this.roomCode = randomString.nextString();
 
@@ -95,11 +95,11 @@ public class CreateGameGUI {
 
     private void GameGUI(){
         GameGUI gameGUI = new GameGUI();
-        gameGUI.start(stage,clientGUI,socket,roomCode);
+        gameGUI.start(stage, mainMenuGUI,socket,roomCode);
     }
 
     private void clientGUI() {
-        clientGUI.start();
+        mainMenuGUI.start();
     }
 
 }

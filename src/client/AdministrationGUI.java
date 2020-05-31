@@ -71,24 +71,10 @@ public class AdministrationGUI extends Application {
 
         Scene scene = new Scene(borderPane, 400, 300);
 
-
-
         stage.setResizable(false);
 
         stage.setScene(scene);
         stage.show();
-
-        /*
-        stage.widthProperty().addListener((observable, oldValue, newValue) -> {
-            System.out.println("Width: " + newValue);
-        });
-
-        stage.heightProperty().addListener((observable, oldValue, newValue) -> {
-            System.out.println("Height: " + newValue);
-        });
-
-         */
-
 
     }
 

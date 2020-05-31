@@ -1,5 +1,7 @@
 package server;
 
+import client.gamelogic.Disc;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -9,6 +11,7 @@ public class GameRoom {
     private final String roomCode;
     private final ArrayList<String> chatlog;
     private final HashSet<User> users;
+    private final ConnectFour connectFour;
 
     public GameRoom(String roomname, String roomcode, boolean isPrivate) {
         System.out.println(roomname + " " + isPrivate);
@@ -17,6 +20,7 @@ public class GameRoom {
         this.isPrivate = isPrivate;
         users = new HashSet<>();
         chatlog = new ArrayList<>();
+        connectFour = new ConnectFour();
 //        testChat(100);
     }
 
@@ -74,8 +78,8 @@ public class GameRoom {
         return users;
     }
 
-    public void move(String move) {
-
+    public Disc move(int column) {
+        return connectFour.placeDisc(column);
     }
 
     private void win(User winner) {

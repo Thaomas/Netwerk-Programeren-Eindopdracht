@@ -134,12 +134,13 @@ public class Server {
         return roomcode.toString();
     }
 
-    public String newGameRoom(String response) {
+    public String newGameRoom(String response, User user) {
         String roomcode = generateCode();
         boolean isPrivate = false;
         if (response.charAt(0) == 'p')
             isPrivate = true;
         addGameRoom(response.substring(1), roomcode, isPrivate);
+        connectToGameRoom(roomcode,user);
         return roomcode;
     }
 

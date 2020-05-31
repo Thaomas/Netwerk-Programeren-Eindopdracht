@@ -2,55 +2,43 @@ package client;
 
 import client.gamelogic.Disc;
 import client.gamelogic.Square;
-import javafx.animation.AnimationTimer;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 import org.jfree.fx.FXGraphics2D;
-import server.ConnectFour;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
-import java.io.*;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 
 public class GameGUI {
 
-    private Stage stage;
     private MainMenuGUI mainMenuGUI;
 
     private Socket socket;
-    private DataOutputStream dataOutputStream;
-    private DataInputStream dataInputStream;
-    private ObjectOutputStream objectOutputStream;
-    private ObjectInputStream objectInputStream;
 
     public void start(Stage primaryStage, MainMenuGUI mainMenuGUI, Socket socket, String roomCode) {
-        stage = primaryStage;
         this.mainMenuGUI = mainMenuGUI;
         this.socket = socket;
-
-        try {
-            this.dataOutputStream = new DataOutputStream(socket.getOutputStream());
-            this.dataInputStream = new DataInputStream(socket.getInputStream());
-//            this.objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
-//            this.objectInputStream = new ObjectInputStream(socket.getInputStream());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
         BorderPane borderPane = new BorderPane();
 
@@ -63,13 +51,10 @@ public class GameGUI {
 
         Text opponentName = new Text("Opponent: TESTNAME");
 
-        Separator separator = new Separator();
-        Separator separator2 = new Separator();
-
         toolBar.getItems().add(backButton);
-        toolBar.getItems().add(separator2);
+        toolBar.getItems().add(new Separator());
         toolBar.getItems().add(lobbyCode);
-        toolBar.getItems().add(separator);
+        toolBar.getItems().add(new Separator());
         toolBar.getItems().add(opponentName);
 
         borderPane.setTop(toolBar);
@@ -79,25 +64,29 @@ public class GameGUI {
         squares = makeColumns();
 
         Canvas canvas = new Canvas(800, 700);
+
+        fxGraphics2D = new FXGraphics2D(canvas.getGraphicsContext2D());
+        draw(fxGraphics2D);
+
         canvas.setOnMouseClicked(event -> {
-            System.out.println("X: " + event.getX() + ", Y: " + event.getY());
-//            if(mouseDisabled)
+
             for (int i = 0; i < squares.size(); i++) {
                 if (squares.get(i).getSquare().getBounds().contains(event.getX(), event.getY())) {
-//                   Have to change
-//                    try {
-////                        dataOutputStream.writeUTF("#" + i);
-//
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
+                    try {
+                        DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
+                        dataOutputStream.writeUTF("GMes" + roomCode + i);
+                        ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
+                        Disc disc = (Disc) objectInputStream.readObject();
+                        discs.add(disc);
+                        draw(fxGraphics2D);
 
-                    discs.add(connectFour.placeDisc(i));
+                    } catch (IOException | ClassNotFoundException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
-
         });
-        ;
+
 
         Color transparent = new Color(255, 255, 255, 50);
         Color noColor = new Color(0, 0, 0, 0);
@@ -109,33 +98,18 @@ public class GameGUI {
                     square.setColor(noColor);
                 }
             }
+            draw(fxGraphics2D);
         });
 
         borderPane.setCenter(canvas);
-
-        fxGraphics2D = new FXGraphics2D(canvas.getGraphicsContext2D());
-        draw(fxGraphics2D);
 
         //right pane
         borderPane.setRight(setChatPane(275, 620));
 
         Scene scene = new Scene(borderPane, 1200, 835);
-        stage.setTitle("Connect 4");
-        stage.setScene(scene);
-        stage.show();
-
-        new AnimationTimer() {
-            long last = 0;
-
-            @Override
-            public void handle(long now) {
-                if (last == -1)
-                    last = now;
-                update((now - last) / 10000.0);
-                last = now;
-                draw(fxGraphics2D);
-            }
-        }.start();
+        primaryStage.setTitle("Connect 4");
+        primaryStage.setScene(scene);
+        primaryStage.show();
     }
 
     private FXGraphics2D fxGraphics2D;
@@ -146,11 +120,6 @@ public class GameGUI {
 
     private ArrayList<Disc> discs;
     private ArrayList<Square> squares;
-
-    private boolean mouseDisabled = true;
-
-    //TODO CHANGE SO ITS ONLY SERVER SIDED
-    private ConnectFour connectFour = new ConnectFour();
 
     private void draw(FXGraphics2D fxGraphics2D) {
         fxGraphics2D.setBackground(Color.white);
@@ -200,13 +169,9 @@ public class GameGUI {
         return squares;
     }
 
-    private void update(double time) {
-
-    }
-
     public BorderPane setChatPane(int width, int height) {
         BorderPane borderPane = new BorderPane();
-        borderPane.setPadding(new Insets(10,0,0,0));
+        borderPane.setPadding(new Insets(10, 0, 0, 0));
 
         //Top item
         ComboBox<String> comboBox = new ComboBox<>();
@@ -280,9 +245,9 @@ public class GameGUI {
     }
 
     private void clientGUI() {
-        try(DataOutputStream out = new DataOutputStream(socket.getOutputStream())) {
-           out.writeUTF("Disc");
-        mainMenuGUI.start();
+        try (DataOutputStream out = new DataOutputStream(socket.getOutputStream())) {
+            out.writeUTF("Disc");
+            mainMenuGUI.start();
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -20,14 +20,14 @@ import java.util.ArrayList;
 
 public class ChatGUI {
 
-    private ClientGUI clientGUI;
+    private MainMenuGUI mainMenuGUI;
     private DataOutputStream out;
     private String roomCode;
     private TextFlow textFlow;
     private Thread listenThread;
 
-    public void start(String roomCode, Stage primaryStage, ClientGUI clientGUI, Socket socket, ArrayList<String> chatLog) {
-        this.clientGUI = clientGUI;
+    public void start(String roomCode, Stage primaryStage, MainMenuGUI mainMenuGUI, Socket socket, ArrayList<String> chatLog) {
+        this.mainMenuGUI = mainMenuGUI;
         this.roomCode = roomCode;
 
         try {
@@ -56,7 +56,7 @@ public class ChatGUI {
 
         Scene scene = new Scene(borderPane, 600, 600);
         primaryStage.setScene(scene);
-        primaryStage.setTitle("ChatBox");
+        primaryStage.setTitle("Global chat");
         primaryStage.show();
     }
     private BorderPane chatBox(Socket socket, ArrayList<String> chatlog) {
@@ -134,7 +134,7 @@ public class ChatGUI {
     }
 
      private void clientGUI() {
-        clientGUI.start();
+        mainMenuGUI.start();
     }
 
 }

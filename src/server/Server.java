@@ -278,6 +278,31 @@ public class Server {
         return userArray;
     }
 
+    public HashMap<String,String> getGameRoomNames(){
+        HashMap<String, String> names = new HashMap<>();
+
+        //TODO TEST DATA, DELETE AFTER TESTING
+        HashMap<String,GameRoom> gameRooms = gameRoomHashMap();
+
+        for (String code : gameRooms.keySet()) {
+            if (!gameRooms.get(code).isPrivate() && gameRooms.get(code).getUsers().size() < 2) {
+                names.put(code, gameRooms.get(code).getRoomName());
+            }
+        }
+
+        return names;
+    }
+
+    public static HashMap<String,GameRoom> gameRoomHashMap(){
+        HashMap<String,GameRoom> list = new HashMap<>();
+
+        list.put("4251", new GameRoom("test 1","4251",true));
+        list.put("5454", new GameRoom("Test not private","5454",false));
+        list.put("0101", new GameRoom("test 2","0101",false));
+
+        return list;
+    }
+
     public void addClientThread(String name, Thread t) {
         this.clientThreads.put(name, t);
     }

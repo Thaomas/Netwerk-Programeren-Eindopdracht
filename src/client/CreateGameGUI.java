@@ -13,6 +13,9 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import util.RandomString;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.net.Socket;
 
 public class CreateGameGUI {
@@ -24,6 +27,8 @@ public class CreateGameGUI {
     private ClientGUI clientGUI;
     private Socket socket;
     private String roomCode;
+    private DataOutputStream dataOutputStream;
+    private DataInputStream dataInputStream;
 
     public void start(Stage primaryStage, ClientGUI clientGUI, Socket socket) {
         this.stage = primaryStage;

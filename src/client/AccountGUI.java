@@ -35,6 +35,8 @@ public class AccountGUI {
     private TextField newPass;
     private TextField newPassConfirm;
     private MainMenuGUI mainMenuGUI;
+    private AdministrationGUI administrationGUI;
+    private Stage primaryStage;
 
     public final void testData() {
         this.username = "'Username'";
@@ -62,7 +64,7 @@ public class AccountGUI {
             username = reader.next();
             gamesPlayed = Integer.parseInt(reader.next());
             wins = Integer.parseInt(reader.next());
-            losses = gamesPlayed- wins;
+            losses = gamesPlayed - wins;
             accountCreated = LocalDate.parse(reader.next());
 
 
@@ -71,8 +73,10 @@ public class AccountGUI {
         }
     }
 
-    public void start(Stage primaryStage, MainMenuGUI mainMenuGUI) {
+    public void start(Stage primaryStage, MainMenuGUI mainMenuGUI, AdministrationGUI administrationGUI) {
+        this.primaryStage = primaryStage;
         this.mainMenuGUI = mainMenuGUI;
+        this.administrationGUI = administrationGUI;
 
         getData();
 
@@ -130,16 +134,14 @@ public class AccountGUI {
 
         Button changePassButton = new Button("Change password");
         credentials.add(changePassButton, 1, 3);
-        changePassButton.setOnAction(e->{
+        changePassButton.setOnAction(e -> {
             try {
-                out.writeUTF("ChPw"+oldPass.getText()+"|"+newPass.getText()+"|"+newPassConfirm.getText());
+                out.writeUTF("ChPw" + oldPass.getText() + "|" + newPass.getText() + "|" + newPassConfirm.getText());
                 String response = in.readUTF();
-                if (response.equals("Conf")){
+                if (response.equals("Conf")) {
                     oldPass.clear();
                     newPass.clear();
                     newPassConfirm.clear();
-                }else {
-
                 }
             } catch (IOException ioException) {
                 ioException.printStackTrace();
@@ -160,12 +162,64 @@ public class AccountGUI {
         Label gamesPlayed = new Label("Total games played: " + this.gamesPlayed);
         Label wins = new Label("Total wins: " + this.wins);
         Label losses = new Label("Total losses: " + this.losses);
+        Button buttonDelete = new Button("Delete account");
+        buttonDelete.setOnAction(event -> {
+            Stage stage = new Stage();
+            stage.setResizable(false);
+            stage.setTitle("Delete account");
+
+            BorderPane borderPaneDelete = new BorderPane();
+
+            ToolBar toolBar1 = new ToolBar();
+
+            Button backButton1 = new Button("Back");
+            backButton1.setOnAction(e -> stage.close());
+
+            toolBar1.getItems().add(backButton1);
+
+            borderPaneDelete.setTop(toolBar1);
+
+            GridPane gridPane = new GridPane();
+
+            gridPane.setPadding(new Insets(10));
+            gridPane.setVgap(10);
+            gridPane.setHgap(10);
+
+            PasswordField passwordField = new PasswordField();
+            PasswordField passwordFieldConfirm = new PasswordField();
+
+            gridPane.add(new Label("Password"), 0, 0);
+            gridPane.add(passwordField, 1, 0);
+            gridPane.add(new Label("Confirm password"), 0, 1);
+            gridPane.add(passwordFieldConfirm, 1, 1);
+
+            Button buttonConfirmDelete = new Button("Confirm delete account");
+            buttonConfirmDelete.setOnAction(e -> {
+                if (passwordFieldConfirm.getText().equals(passwordField.getText())) {
+                    if (tryDeleteAccount(passwordFieldConfirm.getText())) {
+                        stage.close();
+                        administration();
+                    }
+                }
+                passwordField.clear();
+                passwordFieldConfirm.clear();
+            });
+
+            gridPane.add(buttonConfirmDelete, 1, 2);
+
+            borderPaneDelete.setCenter(gridPane);
+
+            Scene scene = new Scene(borderPaneDelete);
+            stage.setScene(scene);
+            stage.show();
+        });
 
         statsBox.getChildren().add(statistics);
         statsBox.getChildren().add(accountCreated);
         statsBox.getChildren().add(gamesPlayed);
         statsBox.getChildren().add(wins);
         statsBox.getChildren().add(losses);
+        statsBox.getChildren().add(buttonDelete);
 
         statsBox.setAlignment(Pos.TOP_CENTER);
         statsBox.setTranslateY(30);
@@ -178,8 +232,8 @@ public class AccountGUI {
 
         Scene scene = new Scene(borderPane, 600, 300);
 
-        primaryStage.setTitle("Account settings");
-        primaryStage.setScene(scene);
+        this.primaryStage.setTitle("Account settings");
+        this.primaryStage.setScene(scene);
 
         /*
         stage.widthProperty().addListener((observable, oldValue, newValue) -> {
@@ -191,6 +245,29 @@ public class AccountGUI {
         });
 
          */
+    }
+
+    private boolean tryDeleteAccount(String password) {
+        try {
+            DataInputStream in = new DataInputStream(socket.getInputStream());
+            DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+
+            out.writeUTF("DelU" + password);
+            String response = in.readUTF();
+            if (response.equals("Account deleted")) {
+                System.out.println("Account deleted from server");
+                return true;
+            }
+            return false;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private void administration() {
+        administrationGUI.disconnect();
+        administrationGUI.start(primaryStage);
     }
 
     public void clientGUI() {

@@ -102,8 +102,6 @@ public class JoinGameGUI {
             e.printStackTrace();
         }
 
-//        vBox.getChildren().addAll(joinPrivateGame,hBox,joinPublicGame,listView);
-
         toolBar.getItems().add(hBox);
 
         vBox.getChildren().addAll(joinPublicGame,listView);

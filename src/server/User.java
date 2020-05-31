@@ -1,7 +1,9 @@
 package server;
 
+import client.gamelogic.Disc;
 import org.json.simple.JSONObject;
 
+import java.awt.*;
 import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
@@ -21,6 +23,7 @@ public class User implements Runnable {
     private int gamesPlayed;
     private int gamesWon;
     private final LocalDate creationDate;
+    private Color color;
 
     public User(String name, String password, Server server) {
         this.name = name;
@@ -88,6 +91,10 @@ public class User implements Runnable {
         return isConnected;
     }
 
+    public void setColor(Color color) {
+        this.color = color;
+    }
+
     @Override
     public void run() {
         System.out.println("Start " + name);
@@ -147,7 +154,8 @@ public class User implements Runnable {
                         if (server.containsGameRoom(roomCode)) {
                             GameRoom room = server.getGameRooms().get(roomCode);
                             if (room.containsUser(this)) {
-                                room.move(received.substring(8));
+                                System.out.println("test roomcode GMes addDISC");
+                                addDisc(room.move(Integer.parseInt(received.substring(8))));
                             }
                         } else
                             respond("Invalid room name");
@@ -157,7 +165,7 @@ public class User implements Runnable {
                         respond(server.newChatRoom(received.substring(4)));
                         break;
                     case "CrGR":
-                        respond(server.newGameRoom(received.substring(4)));
+                        respond(server.newGameRoom(received.substring(4),this));
                         //Create game room
                         break;
                     case "GUsD":
@@ -187,6 +195,7 @@ public class User implements Runnable {
             } catch (IOException e) {
                 System.out.println("error");
                 e.printStackTrace();
+                disconnect();
             }
         }
         System.out.println("Stopped running");
@@ -204,6 +213,16 @@ public class User implements Runnable {
     private void sendGameRoomList(HashMap<String, String> gameRoomList){
         try {
             new ObjectOutputStream(socket.getOutputStream()).writeObject(gameRoomList);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void addDisc(Disc disc){
+        try {
+            System.out.println("in disc");
+            new ObjectOutputStream(socket.getOutputStream()).writeObject(disc);
+            System.out.println("out disc");
         } catch (IOException e) {
             e.printStackTrace();
         }

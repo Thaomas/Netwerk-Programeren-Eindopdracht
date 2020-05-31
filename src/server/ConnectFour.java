@@ -3,7 +3,6 @@ package server;
 import client.gamelogic.Disc;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.Optional;
 
 public class ConnectFour {
@@ -23,7 +22,6 @@ public class ConnectFour {
             if (!getDisc(column, row).isPresent())
                 break;
 
-            System.out.println("test row:" + row);
             row--;
         }
 
@@ -31,6 +29,8 @@ public class ConnectFour {
                 column * (SQUARE_SIZE + 10) + SQUARE_SIZE / 5,
                 row * (SQUARE_SIZE + 10) + SQUARE_SIZE / 5), Color.red, SQUARE_SIZE);
 
+        // TODO MAKE IT SO PERSON THAT CREATES ROOM STARTS WITH THE COLOR RED.
+        // TODO IF PLAYERS WANT TO START NEW GAME, COLOR SWITCHES.
         if (redMove) {
             disc.setColor(Color.red);
         } else {
@@ -39,18 +39,15 @@ public class ConnectFour {
 
         redMove = !redMove;
         grid[column][row] = disc;
-//        discs.add(disc);
 
+        //TODO CHANGE SO IF PLAYER WINS, GAME STOPS
         if(ConnectFour.checkWin(grid,Color.red,COLUMNS,ROWS)){
             System.out.println("GAME OVER - RED WINS");
-//            mouseDisabled = false;
         }
         if(ConnectFour.checkWin(grid,Color.yellow,COLUMNS,ROWS)){
             System.out.println("GAME OVER - YELLOW WINS");
-//            mouseDisabled = false;
         }
 
-        System.out.println("Disc column: " + column + ", row: " + row);
 
         return disc;
     }

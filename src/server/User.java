@@ -101,11 +101,11 @@ public class User implements Runnable {
 
     @Override
     public void run() {
-        System.out.println("Start " + name);
+        System.out.println("Start user: " + name);
         isConnected = true;
         while (isConnected) {
             try {
-                System.out.println("Start2 " + name);
+                System.out.println("Start2 user: " + name);
                 String received = this.in.readUTF();
                 System.out.println(received);
                 String command = received.substring(0, 4);
@@ -137,13 +137,14 @@ public class User implements Runnable {
                         break;
                     case "Disc":
                         //Disconnect from the given Room
+                        System.out.println("test full received: " + received);
                         roomCode = received.substring(4, 8);
+                        System.out.println("test roomcode: " + received);
                         if (server.containsChatRoom(roomCode)) {
                             server.disconnectChatRoom(roomCode, this);
                             respond("Disc");
                         } else if (server.containsGameRoom(roomCode)) {
                             server.disconnectGameRoom(roomCode, this);
-                            respond("Disc");
                         } else
                             respond("Invalid room name");
                         //todo make error-code and handeling client side
@@ -166,7 +167,8 @@ public class User implements Runnable {
                             GameRoom room = server.getGameRooms().get(roomCode);
                             if (room.containsUser(this)) {
                                 System.out.println("test roomcode GMes addDISC");
-                                addDisc(room.move(Integer.parseInt(received.substring(8))));
+                                respond("GMes"+roomCode);
+                                addDisc(room.move(Integer.parseInt(received.substring(8)),this));
                             }
                         } else
                             respond("Invalid room name");
@@ -194,7 +196,10 @@ public class User implements Runnable {
                     case "GLst":
                         //TODO
                         //JoinGameGUI list of public games
+                        System.out.println("server: list call before" + received);
                         sendGameRoomList(server.getGameRoomNames());
+
+                        System.out.println("server: list call after" + received);
                         break;
                     case "DelU":
                         //Deletes the user from the server
@@ -211,9 +216,6 @@ public class User implements Runnable {
                         //todo make error-code and handeling client side
                         break;
                 }
-            } catch (SocketException e) {
-//                e.printStackTrace();
-                disconnect();
             } catch (IOException e) {
                 System.out.println("error");
                 e.printStackTrace();
@@ -277,7 +279,7 @@ public class User implements Runnable {
 
 
     private void disconnect() {
-        System.out.println("Disconnect " + name);
+        System.out.println("Disconnect user: " + name);
         isConnected = false;
         try {
             socket.close();

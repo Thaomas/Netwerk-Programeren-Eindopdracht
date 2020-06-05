@@ -41,7 +41,7 @@ public class GameListener implements Runnable {
                     if (command.equals("CMes")) {
                         gameGui.messageToGameChat(input.substring(8));
                     } else if (command.equals("GMes")) {
-
+                        gameGui.placeDisc();
                     }
                 }else if (roomCode.equals("main") && command.equals("CMes")){
                     gameGui.messageToMainChat(input.substring(8));

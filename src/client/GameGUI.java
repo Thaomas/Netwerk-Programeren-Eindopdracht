@@ -35,17 +35,19 @@ public class GameGUI {
     private MainMenuGUI mainMenuGUI;
 
     private Socket socket;
+    private String roomCode;
 
     public void start(Stage primaryStage, MainMenuGUI mainMenuGUI, Socket socket, String roomCode) {
         this.mainMenuGUI = mainMenuGUI;
         this.socket = socket;
+        this.roomCode = roomCode;
 
         BorderPane borderPane = new BorderPane();
 
         ToolBar toolBar = new ToolBar();
 
         Button backButton = new Button("Back");
-        backButton.setOnAction(event -> clientGUI());
+        backButton.setOnAction(event -> backButton());
 
         Label lobbyCode = new Label("Room code: " + roomCode);
 
@@ -244,9 +246,9 @@ public class GameGUI {
         return borderPane;
     }
 
-    private void clientGUI() {
+    private void backButton() {
         try (DataOutputStream out = new DataOutputStream(socket.getOutputStream())) {
-            out.writeUTF("Disc");
+            out.writeUTF("Disc" + roomCode);
             mainMenuGUI.start();
         } catch (IOException e) {
             e.printStackTrace();

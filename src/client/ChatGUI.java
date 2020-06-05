@@ -118,7 +118,7 @@ public class ChatGUI {
             }
         });
 
-        ChatListener listener = new ChatListener(this, socket);
+        ChatListener listener = new ChatListener(this, socket, roomCode);
         listenThread = new Thread(listener);
         listenThread.start();
 
@@ -129,6 +129,7 @@ public class ChatGUI {
 
         return borderPane;
     }
+
     protected void addMessage(String message){
         Platform.runLater(()-> textFlow.getChildren().add(new Text("\n"+message)));
     }

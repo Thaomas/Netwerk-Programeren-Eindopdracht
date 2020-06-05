@@ -21,6 +21,7 @@ public class Server {
     private final HashMap<String, User> users;
     private final HashMap<String, User> connectedUsers;
     private final HashMap<String, Thread> clientThreads;
+    private final ArrayList<Thread> connectorThreads;
     private final HashMap<String, ChatRoom> chatRooms;
     private final HashMap<String, GameRoom> gameRooms;
 
@@ -38,7 +39,7 @@ public class Server {
         save();
 
         try {
-            for (Thread thread : clientThreads.values()) {
+            for (Thread thread : getClientThreads().values()) {
                 thread.join();
             }
             this.serverSocket.close();
@@ -53,6 +54,7 @@ public class Server {
         users = new HashMap<>();
         connectedUsers = new HashMap<>();
         clientThreads = new HashMap<>();
+        connectorThreads = new ArrayList<>();
         chatRooms = new HashMap<>();
         gameRooms = new HashMap<>();
         load();
@@ -168,14 +170,14 @@ public class Server {
                 System.out.println("Client connected via address: " + socket.getInetAddress().getHostAddress());
                 System.out.println("Connected clients: " + this.connectedUsers.size());
                 System.out.println("Total users: " + this.users.size());
-                System.out.println("Total threads: " + this.clientThreads.size());
+                System.out.println("Total threads: " + this.getClientThreads().size());
                 Connector connection = new Connector(socket, this);
                 Thread t = new Thread(connection);
-                connection.setThread(t);
                 t.start();
+                getConnectorThreads().add(t);
             }
 
-//            this.serverSocket.close();
+            this.serverSocket.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -185,8 +187,14 @@ public class Server {
         return gameRooms;
     }
 
-    public ArrayList<String> getChatLog(String serverName) {
-        return chatRooms.get(serverName).getChatLog();
+    public ArrayList<String> getChatLog(String roomCode) {
+        ArrayList<String> chatlog =null;
+        if (chatRooms.containsKey(roomCode)){
+            chatlog = chatRooms.get(roomCode).getChatLog();
+        }else if (gameRooms.containsKey(roomCode)){
+            chatlog = gameRooms.get(roomCode).getChatLog();
+        }
+        return chatlog;
     }
 
     public synchronized boolean connectToGameRoom(String roomCode, User user) {
@@ -213,13 +221,33 @@ public class Server {
         chatRooms.get(roomName).messageAll("<" + user.getName() + ">: " + message);
     }
 
+    private synchronized HashMap<String, Thread> getClientThreads(){
+        return clientThreads;
+    }
+
+    private synchronized ArrayList<Thread> getConnectorThreads() {
+        return connectorThreads;
+    }
+
     private void disconnectListener() {
         int i = 0;
         while (true) {
-            for (String key : clientThreads.keySet()) {
-                if (!clientThreads.get(key).isAlive()) {
+            HashMap<String, Thread> threads = getClientThreads();
+            for (String key : threads.keySet()) {
+                if (!threads.get(key).isAlive()) {
                     removeClient(users.get(key));
                     System.out.println(key + " is dead");
+                }
+            }
+            ArrayList<Thread> connectors = getConnectorThreads();
+            for (Thread thread : connectors){
+                if (!thread.isAlive()){
+                    try {
+                        thread.join();
+                        getConnectorThreads().remove(thread);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
             if (i >= 50) {
@@ -242,15 +270,15 @@ public class Server {
         for (ChatRoom room : chatRooms.values()) {
             room.removeUser(user);
         }
-        Thread t = this.clientThreads.get(nickname);
+        Thread t = getClientThreads().get(nickname);
         try {
             t.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        this.clientThreads.remove(nickname);
+        getClientThreads().remove(nickname);
 
-        System.out.println("Connected clients: " + this.users.size());
+        System.out.println("Connected clients: " + this.connectedUsers.size());
     }
 
     public void deleteClient(User user) {
@@ -318,7 +346,7 @@ public class Server {
     }
 
     public void addClientThread(String name, Thread t) {
-        this.clientThreads.put(name, t);
+        getClientThreads().put(name, t);
     }
 
 

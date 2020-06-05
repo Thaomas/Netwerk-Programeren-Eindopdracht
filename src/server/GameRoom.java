@@ -90,10 +90,10 @@ public class GameRoom {
         loser.lose();
     }
 
-    public void messageAll(String message) {
+    public synchronized void messageAll(String message) {
         chatlog.add(message);
         for (User user : users) {
-            user.writeUTF("CMes" + message);
+            user.writeUTF("CMes" + roomCode + message);
         }
     }
 }

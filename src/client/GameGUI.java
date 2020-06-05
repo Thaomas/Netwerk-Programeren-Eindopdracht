@@ -2,6 +2,7 @@ package client;
 
 import client.gamelogic.Disc;
 import client.gamelogic.Square;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -24,6 +25,7 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -33,21 +35,27 @@ import java.util.ArrayList;
 public class GameGUI {
 
     private MainMenuGUI mainMenuGUI;
+    private ArrayList<String> mainChat;
+    private ArrayList<String> gameChat;
+    private Thread listenThread;
+    private String roomCode;
 
     private Socket socket;
 
-    public void start(Stage primaryStage, MainMenuGUI mainMenuGUI, Socket socket, String roomCode) {
+    public void start(Stage primaryStage, MainMenuGUI mainMenuGUI, Socket socket, String roomCode, ArrayList<String> gameChat, ArrayList<String> mainChat) {
         this.mainMenuGUI = mainMenuGUI;
         this.socket = socket;
-
+        this.roomCode = roomCode;
+        this.mainChat = mainChat;
+        this.gameChat = gameChat;
         BorderPane borderPane = new BorderPane();
 
         ToolBar toolBar = new ToolBar();
 
         Button backButton = new Button("Back");
-        backButton.setOnAction(event -> clientGUI());
+        backButton.setOnAction(event -> backButton());
 
-        Label lobbyCode = new Label("Room code: " + roomCode);
+        Label lobbyCode = new Label("Room code: " + this.roomCode);
 
         Text opponentName = new Text("Opponent: TESTNAME");
 
@@ -74,7 +82,7 @@ public class GameGUI {
                 if (squares.get(i).getSquare().getBounds().contains(event.getX(), event.getY())) {
                     try {
                         DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
-                        dataOutputStream.writeUTF("GMes" + roomCode + i);
+                        dataOutputStream.writeUTF("GMes" + this.roomCode + i);
                         ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
                         Disc disc = (Disc) objectInputStream.readObject();
                         discs.add(disc);
@@ -110,6 +118,8 @@ public class GameGUI {
         primaryStage.setTitle("Connect 4");
         primaryStage.setScene(scene);
         primaryStage.show();
+        listenThread = new Thread(new GameListener(this, socket, this.roomCode));
+        listenThread.start();
     }
 
     private FXGraphics2D fxGraphics2D;
@@ -120,6 +130,23 @@ public class GameGUI {
 
     private ArrayList<Disc> discs;
     private ArrayList<Square> squares;
+
+
+    protected void messageToGameChat(String message) {
+        if (comboBox.getSelectionModel().getSelectedItem().equals("Game chat")) {
+            Platform.runLater(() -> textFlow.getChildren().add(new Text("\n" + message)));
+        } else {
+            gameChat.add(message);
+        }
+    }
+
+    protected void messageToMainChat(String message) {
+        if (comboBox.getSelectionModel().getSelectedItem().equals("Global chat")) {
+            Platform.runLater(() -> textFlow.getChildren().add(new Text("\n" + message)));
+        } else {
+            gameChat.add(message);
+        }
+    }
 
     private void draw(FXGraphics2D fxGraphics2D) {
         fxGraphics2D.setBackground(Color.white);
@@ -169,12 +196,15 @@ public class GameGUI {
         return squares;
     }
 
+    private ComboBox<String> comboBox;
+    private TextFlow textFlow;
+
     public BorderPane setChatPane(int width, int height) {
         BorderPane borderPane = new BorderPane();
         borderPane.setPadding(new Insets(10, 0, 0, 0));
 
         //Top item
-        ComboBox<String> comboBox = new ComboBox<>();
+        comboBox = new ComboBox<>();
 
         comboBox.getItems().add("Game chat");
         comboBox.getItems().add("Global chat");
@@ -182,11 +212,34 @@ public class GameGUI {
         comboBox.getSelectionModel().selectFirst();
         comboBox.prefWidthProperty().bind(borderPane.widthProperty().subtract(20));
         comboBox.setTranslateX(10);
+        comboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            textFlow.getChildren().clear();
+            System.out.println(comboBox.getSelectionModel().getSelectedItem());
+            if (comboBox.getSelectionModel().getSelectedItem().equals("Game chat")) {
+                System.out.println("Game chat");
+                for (String message : gameChat) {
+                    if (!textFlow.getChildren().isEmpty()) {
+                        message = "\n" + message;
+                    }
+                    textFlow.getChildren().add(new Text(message));
+                }
+            } else if (comboBox.getSelectionModel().getSelectedItem().equals("Global chat")) {
+                System.out.println("Main chat");
+                for (String message : mainChat) {
+                    if (!textFlow.getChildren().isEmpty()) {
+                        message = "\n" + message;
+                    }
+                    textFlow.getChildren().add(new Text(message));
+                    System.out.println("Added " + message);
+                }
+            }
+        });
+
 
         borderPane.setTop(comboBox);
 
         //Center items
-        TextFlow textFlow = new TextFlow();
+        textFlow = new TextFlow();
         textFlow.setLineSpacing(10);
         VBox.setVgrow(textFlow, Priority.ALWAYS);
 
@@ -216,14 +269,21 @@ public class GameGUI {
         Button button = new Button("Send");
         button.setPrefSize(80, 30);
         button.setOnAction(e -> {
-            Text text;
-            if (!textField.getText().isEmpty() || !textField.getText().equals(" ")) {
-                if (textFlow.getChildren().size() == 0) {
-                    text = new Text("You: " + textField.getText());
-                } else {
-                    text = new Text("\n" + "You: " + textField.getText());
+            if (!textField.getText().isEmpty() && !textField.getText().equals("")) {
+                try {
+                    String roomcode;
+                    if (comboBox.getSelectionModel().getSelectedItem().equals("Game chat"))
+                        roomcode = this.roomCode;
+                    else
+                        roomcode = "main";
+
+
+                    DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+                    out.writeUTF("CMes" + roomcode + textField.getText());
+                    System.out.println("CMes" + roomcode + textField.getText());
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
                 }
-                textFlow.getChildren().add(text);
                 textField.clear();
                 textField.requestFocus();
             }
@@ -244,11 +304,26 @@ public class GameGUI {
         return borderPane;
     }
 
-    private void clientGUI() {
-        try (DataOutputStream out = new DataOutputStream(socket.getOutputStream())) {
-            out.writeUTF("Disc");
+    private void backButton() {
+        try {
+            int i = 0;
+            DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+            out.writeUTF("Disc" + roomCode);
+            System.out.println(i++);
+
+            DataInputStream in = new DataInputStream(socket.getInputStream());
+            System.out.println(i++);
+
+            out.writeUTF("Discmain");
+            System.out.println(i++);
+
+            listenThread.join();
+            System.out.println(i++);
+
             mainMenuGUI.start();
-        } catch (IOException e) {
+            System.out.println(i++);
+
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
     }

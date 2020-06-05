@@ -167,7 +167,8 @@ public class User implements Runnable {
                             GameRoom room = server.getGameRooms().get(roomCode);
                             if (room.containsUser(this)) {
                                 System.out.println("test roomcode GMes addDISC");
-                                addDisc(room.move(Integer.parseInt(received.substring(8))));
+                                respond("GMes"+roomCode);
+                                addDisc(room.move(Integer.parseInt(received.substring(8)),this));
                             }
                         } else
                             respond("Invalid room name");

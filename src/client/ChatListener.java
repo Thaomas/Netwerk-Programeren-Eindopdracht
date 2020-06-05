@@ -32,13 +32,14 @@ public class ChatListener implements Runnable {
             try {
                 input = in.readUTF();
                 command = input.substring(0, 4);
-                roomCode = input.substring(4,8);
+                if (command.equals("Disc")) {
+                    connected = false;
+                    continue;
+                }
+                roomCode = input.substring(4, 8);
                 if (roomCode.equals(this.roomCode)) {
                     if (command.equals("CMes")) {
-                        chatGUI.addMessage(input.substring(4));
-
-                    } else if (command.equals("Disc")) {
-                        connected = false;
+                        chatGUI.addMessage(input.substring(8));
                     }
                 }
             } catch (IOException e) {

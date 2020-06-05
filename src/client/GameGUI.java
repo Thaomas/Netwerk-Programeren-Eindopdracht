@@ -75,7 +75,6 @@ public class GameGUI {
 
         fxGraphics2D = new FXGraphics2D(canvas.getGraphicsContext2D());
 
-
         canvas.setOnMouseClicked(event -> {
 
             for (int i = 0; i < squares.size(); i++) {
@@ -117,6 +116,7 @@ public class GameGUI {
         primaryStage.show();
         listenThread = new Thread(new GameListener(this, socket, this.roomCode));
         listenThread.start();
+        draw(fxGraphics2D);
     }
 
     private FXGraphics2D fxGraphics2D;
@@ -130,7 +130,7 @@ public class GameGUI {
 
     protected void messageToGameChat(String message) {
         if (comboBox.getSelectionModel().getSelectedItem().equals("Game chat")) {
-            Platform.runLater(() -> textFlow.getChildren().add(new Text("\n" + message)));
+            Platform.runLater(() -> textFlow.getChildren().add(new Text(message + "\n")));
         } else {
             gameChat.add(message);
         }
@@ -138,7 +138,7 @@ public class GameGUI {
 
     protected void messageToMainChat(String message) {
         if (comboBox.getSelectionModel().getSelectedItem().equals("Global chat")) {
-            Platform.runLater(() -> textFlow.getChildren().add(new Text("\n" + message)));
+            Platform.runLater(() -> textFlow.getChildren().add(new Text(message + "\n")));
         } else {
             gameChat.add(message);
         }
@@ -149,10 +149,8 @@ public class GameGUI {
         try {
             ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
             Disc disc = (Disc) objectInputStream.readObject();
-            if(disc != null) {
+            if (disc != null) {
                 discs.add(disc);
-            }else {
-                System.out.println("end game");
             }
 
         } catch (IOException | ClassNotFoundException e) {
@@ -187,16 +185,14 @@ public class GameGUI {
                 Color.blue);
         for (int y = 0; y < ROWS; y++) {
             for (int x = 0; x < COLUMNS; x++) {
-                Disc disc = new Disc(new java.awt.geom.Point2D.Double(x * (SQUARE_SIZE + 10) + SQUARE_SIZE / 5, y * (SQUARE_SIZE + 10) + SQUARE_SIZE / 5), Color.WHITE, SQUARE_SIZE);
+                Disc disc = new Disc(x, y, Color.WHITE, SQUARE_SIZE);
                 Area areaShape = new Area(shape.getSquare());
                 Area areaDisc = new Area(disc.getCircle());
                 areaShape.subtract(areaDisc);
                 shape.setSquare(areaShape);
             }
         }
-
         return shape;
-
     }
 
     private ArrayList<Square> makeColumns() {
@@ -206,7 +202,7 @@ public class GameGUI {
             Square shape = new Square(new Rectangle2D.Double(
                     x * (SQUARE_SIZE + 10) + SQUARE_SIZE / 5,
                     0, SQUARE_SIZE, (ROWS + 1) * SQUARE_SIZE),
-                    null);
+                    new Color(0, 0, 0, 0));
             squares.add(shape);
         }
 
@@ -230,25 +226,13 @@ public class GameGUI {
         comboBox.prefWidthProperty().bind(borderPane.widthProperty().subtract(20));
         comboBox.setTranslateX(10);
         comboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            textFlow.getChildren().clear();
             System.out.println(comboBox.getSelectionModel().getSelectedItem());
             if (comboBox.getSelectionModel().getSelectedItem().equals("Game chat")) {
                 System.out.println("Game chat");
-                for (String message : gameChat) {
-                    if (!textFlow.getChildren().isEmpty()) {
-                        message = "\n" + message;
-                    }
-                    textFlow.getChildren().add(new Text(message));
-                }
+                setChat(gameChat);
             } else if (comboBox.getSelectionModel().getSelectedItem().equals("Global chat")) {
                 System.out.println("Main chat");
-                for (String message : mainChat) {
-                    if (!textFlow.getChildren().isEmpty()) {
-                        message = "\n" + message;
-                    }
-                    textFlow.getChildren().add(new Text(message));
-                    System.out.println("Added " + message);
-                }
+                setChat(mainChat);
             }
         });
 
@@ -257,8 +241,10 @@ public class GameGUI {
 
         //Center items
         textFlow = new TextFlow();
-        textFlow.setLineSpacing(10);
+        textFlow.setLineSpacing(5);
         VBox.setVgrow(textFlow, Priority.ALWAYS);
+        setChat(gameChat);
+
 
         VBox vBox = new VBox();
         vBox.getChildren().addAll(textFlow);
@@ -338,6 +324,13 @@ public class GameGUI {
 
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void setChat(ArrayList<String> chatLog) {
+        textFlow.getChildren().clear();
+        for (String message : chatLog) {
+            textFlow.getChildren().add(new Text(message + "\n"));
         }
     }
 

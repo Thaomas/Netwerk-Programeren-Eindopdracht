@@ -65,6 +65,10 @@ public class User implements Runnable {
         return creationDate;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
     public void setSocket(Socket socket) {
         this.socket = socket;
         try {
@@ -105,13 +109,15 @@ public class User implements Runnable {
                 String received = this.in.readUTF();
                 System.out.println(received);
                 String command = received.substring(0, 4);
-                //Connect
+
                 String roomCode;
                 switch (command) {
                     case "quit":
+                        //Disconnect from the server
                         disconnect();
                         break;
                     case "Conn":
+                        //Connect with the server
                         System.out.println("Connect " + name + " to " + received.substring(4, 8));
                         roomCode = received.substring(4, 8);
                         if (server.containsChatRoom(roomCode)) {
@@ -128,6 +134,7 @@ public class User implements Runnable {
                         //todo make error-code and handeling client side
                         break;
                     case "Disc":
+                        //Disconnect from the given Room
                         roomCode = received.substring(4, 8);
                         if (server.containsChatRoom(roomCode)) {
                             server.disconnectChatRoom(roomCode, this);
@@ -139,6 +146,7 @@ public class User implements Runnable {
                         //todo make error-code and handeling client side
                         break;
                     case "CMes":
+                        //Chat message
                         roomCode = received.substring(4, 8);
                         if (server.containsChatRoom(roomCode)) {
                             server.writeToChatRoom(roomCode, this, received.substring(8));
@@ -182,7 +190,18 @@ public class User implements Runnable {
                         break;
                     case "GLst":
                         //TODO
+                        //JoinGameGUI list of public games
                         sendGameRoomList(server.getGameRoomNames());
+                        break;
+                    case "DelU":
+                        //Deletes the user from the server
+                        if(received.substring(4).equals(password)) {
+                            respond("Account deleted");
+                            disconnect();
+                            server.deleteClient(this);
+                        }else {
+                            respond("Invalid password");
+                        }
                         break;
                     default:
                         respond("Invalid command");
@@ -201,9 +220,9 @@ public class User implements Runnable {
         System.out.println("Stopped running");
     }
 
-    private void sendChatLog(ArrayList<String> chatlog) {
+    private void sendChatLog(ArrayList<String> chatLog) {
         try {
-            new ObjectOutputStream(socket.getOutputStream()).writeObject(chatlog);
+            new ObjectOutputStream(socket.getOutputStream()).writeObject(chatLog);
         } catch (IOException e) {
             e.printStackTrace();
         }

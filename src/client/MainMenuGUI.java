@@ -64,17 +64,6 @@ public class MainMenuGUI {
 
         stage.setTitle(TITLE);
         stage.setScene(scene);
-
-        /*
-        stage.widthProperty().addListener((observable, oldValue, newValue) -> {
-            System.out.println("Width: " + newValue);
-        });
-
-        stage.heightProperty().addListener((observable, oldValue, newValue) -> {
-            System.out.println("Height: " + newValue);
-        });
-
-         */
     }
 
     public MenuBar lobbyMenu() {
@@ -140,7 +129,7 @@ public class MainMenuGUI {
     }
 
     public void account() {
-        accountGUI.start(stage, this);
+        accountGUI.start(stage, this,administrationGUI);
     }
 
     protected Socket getSocket(){

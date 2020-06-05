@@ -19,6 +19,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class JoinGameGUI {
@@ -67,9 +68,7 @@ public class JoinGameGUI {
         Button buttonJoinGame = new Button("Join game");
         buttonJoinGame.setAlignment(Pos.CENTER);
         //TODO Make it connect to the proper game room and not create a new gameroom.
-        buttonJoinGame.setOnAction(event -> {
-            CreateGameGUI();
-        });
+        buttonJoinGame.setOnAction(event -> createGameGUI(textField.getText()));
 
         hBox.getChildren().addAll(separator, roomCodeLabel, textField, buttonJoinGame);
         hBox.setSpacing(8);
@@ -91,6 +90,7 @@ public class JoinGameGUI {
                 HBox hboxList = new HBox();
                 hboxList.setSpacing(8);
                 Button buttonJoin = new Button("Join");
+                buttonJoin.setOnAction(event -> createGameGUI(roomCode));
                 separator = new Separator();
                 separator.setOrientation(Orientation.VERTICAL);
                 Label roomName = new Label(list.get(roomCode) + " " + roomCode);
@@ -121,8 +121,19 @@ public class JoinGameGUI {
         mainMenuGUI.start();
     }
 
-    public void CreateGameGUI() {
-//        GameGUI gameGUI = new GameGUI();
-//        gameGUI.start(stage, mainMenuGUI,socket,roomCode);
+    public void createGameGUI(String roomCode) {
+        try {
+            DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+            out.writeUTF("Conn"+roomCode);
+            ObjectInputStream inObj = new ObjectInputStream(socket.getInputStream());
+            ArrayList<String> gameChat = new ArrayList<>((ArrayList<String>)inObj.readObject());
+            inObj = new ObjectInputStream(socket.getInputStream());
+            ArrayList<String> mainChat = new ArrayList<>((ArrayList<String>) inObj.readObject());
+
+            new GameGUI().start(stage, mainMenuGUI,socket,roomCode, gameChat, mainChat);
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
     }
 }

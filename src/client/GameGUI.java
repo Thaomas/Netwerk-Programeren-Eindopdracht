@@ -151,8 +151,6 @@ public class GameGUI {
             Disc disc = (Disc) objectInputStream.readObject();
             if(disc != null) {
                 discs.add(disc);
-            }else {
-                System.out.println("end game");
             }
 
         } catch (IOException | ClassNotFoundException e) {

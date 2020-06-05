@@ -70,7 +70,7 @@ public class ChatRoom {
     public void messageAll(String message) {
         chatlog.add(message);
         for (User user : users) {
-            user.writeUTF("CMes" + roomCode + message);
+            user.respond("CMes" + roomCode + message);
         }
     }
 

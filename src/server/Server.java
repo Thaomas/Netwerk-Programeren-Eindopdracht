@@ -322,16 +322,11 @@ public class Server {
 
     public HashMap<String, String> getGameRoomNames() {
         HashMap<String, String> names = new HashMap<>();
-
-        //TODO TEST DATA, DELETE AFTER TESTING
-        HashMap<String, GameRoom> gameRooms = gameRoomHashMap();
-
-        for (String code : gameRooms.keySet()) {
-            if (!gameRooms.get(code).isPrivate() && gameRooms.get(code).getUsers().size() < 2) {
-                names.put(code, gameRooms.get(code).getRoomName());
+        for (GameRoom room : this.getGameRooms().values()) {
+            if (!room.isPrivate() && room.checkSpace()) {
+                names.put(room.getRoomCode(), room.getRoomName());
             }
         }
-
         return names;
     }
 

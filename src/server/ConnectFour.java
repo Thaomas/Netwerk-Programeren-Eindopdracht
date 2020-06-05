@@ -10,14 +10,20 @@ public class ConnectFour {
     private final int SQUARE_SIZE = 100;
     private final int COLUMNS = 7;
     private final int ROWS = 6;
+    private Color starter;
 
     private Disc[][] grid = new Disc[COLUMNS][ROWS];
 
-    private Color turn = Color.red;
+    private Color turn;
+
+    public ConnectFour() {
+        starter = Color.red;
+        turn = Color.red;
+    }
 
     public Disc placeDisc(int column, Color color) {
-
-//        if (turn.equals(color)) {
+        Disc disc = null;
+        if (turn.equals(color)) {
 
             int row = ROWS - 1;
 
@@ -28,39 +34,21 @@ public class ConnectFour {
                 row--;
             }
 
-            Disc disc = new Disc(new java.awt.geom.Point2D.Double(
+            disc = new Disc(new java.awt.geom.Point2D.Double(
                     column * (SQUARE_SIZE + 10) + SQUARE_SIZE / 5,
                     row * (SQUARE_SIZE + 10) + SQUARE_SIZE / 5), Color.red, SQUARE_SIZE);
 
-            // TODO MAKE IT SO PERSON THAT CREATES ROOM STARTS WITH THE COLOR RED.
-            // TODO IF PLAYERS WANT TO START NEW GAME, COLOR SWITCHES.
-            if (turn.equals(color))
-                disc.setColor(color);
+
+            disc.setColor(color);
 
             grid[column][row] = disc;
 
-//        //TODO CHANGE SO IF PLAYER WINS, GAME STOPS
-//        if (checkWin(grid, Color.red, COLUMNS, ROWS)) {
-//            System.out.println("GAME OVER - RED WINS");
-//        }
-//        if (checkWin(grid, Color.yellow, COLUMNS, ROWS)) {
-//            System.out.println("GAME OVER - YELLOW WINS");
-//        }
-
-
-            return disc;
-//        }
-    }
-
-    public boolean checkGameState(Color color) {
-        boolean state = checkWin(grid, color, COLUMNS, ROWS);
-
-        if (state) {
-            System.out.println("GAME OVER - " + state + " WINS");
+            if (color.equals(Color.red))
+                this.turn=Color.yellow;
+            else
+                this.turn=Color.red;
         }
-
-        //TODO
-        return state;
+        return disc;
     }
 
     private Optional<Disc> getDisc(int column, int row) {
@@ -71,7 +59,7 @@ public class ConnectFour {
         return Optional.ofNullable(grid[column][row]);
     }
 
-    public boolean checkWin(Disc[][] grid, Color color, int COLUMNS, int ROWS) {
+    public boolean checkWin(Color color) {
 
         for (int i = 0; i < COLUMNS; i++) {
             for (int j = 0; j < ROWS - 3; j++) {

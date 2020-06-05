@@ -83,14 +83,6 @@ public class User implements Runnable {
         this.password = password;
     }
 
-    public void writeUTF(String text) {
-        try {
-            this.out.writeUTF(text);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     public boolean isConnected() {
         return isConnected;
     }
@@ -128,7 +120,7 @@ public class User implements Runnable {
                         } else if (server.containsGameRoom(roomCode)) {
                             if (server.connectToGameRoom(roomCode, this)) {
                                 sendChatLog(server.getChatLog(roomCode));
-                                respond("Conf");
+                                sendChatLog(server.getChatLog("main"));
                             } else
                                 respond("Full");
                         } else
@@ -168,7 +160,7 @@ public class User implements Runnable {
                             if (room.containsUser(this)) {
                                 System.out.println("test roomcode GMes addDISC");
                                 respond("GMes"+roomCode);
-                                addDisc(room.move(Integer.parseInt(received.substring(8)),this));
+                                room.move(Integer.parseInt(received.substring(8)),this);
                             }
                         } else
                             respond("Invalid room name");
@@ -218,7 +210,7 @@ public class User implements Runnable {
                 }
             } catch (IOException e) {
                 System.out.println("error");
-                e.printStackTrace();
+                e.getMessage();
                 disconnect();
             }
         }
@@ -242,7 +234,7 @@ public class User implements Runnable {
         }
     }
 
-    private void addDisc(Disc disc) {
+    public void sendDisc(Disc disc) {
         try {
             System.out.println("in disc");
             new ObjectOutputStream(socket.getOutputStream()).writeObject(disc);
@@ -288,7 +280,7 @@ public class User implements Runnable {
         }
     }
 
-    private void respond(String response) {
+    public void respond(String response) {
         System.out.println(response);
         try {
             new DataOutputStream(socket.getOutputStream()).writeUTF(response);

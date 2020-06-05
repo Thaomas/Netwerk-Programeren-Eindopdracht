@@ -6,13 +6,23 @@ import java.awt.*;
 import java.util.Optional;
 
 public class ConnectFour {
+    
+    //todo if game ends stop adding
+    //todo if game ends swap color if game ends
+    //todo game end screen
+    //todo replay vote
+    //todo join game refreshing
+    //todo show name in GameGUI
+    //todo if gameroom empty destroy
+    //todo error handling join group
+    //todo error notification
 
     private final int SQUARE_SIZE = 100;
-    private final int COLUMNS = 7;
-    private final int ROWS = 6;
+    private final int columns = 7;
+    private final int rows = 6;
     private Color starter;
 
-    private Disc[][] grid = new Disc[COLUMNS][ROWS];
+    private Disc[][] grid = new Disc[columns][rows];
 
     private Color turn;
 
@@ -20,12 +30,24 @@ public class ConnectFour {
         starter = Color.red;
         turn = Color.red;
     }
+    
+    public void restart(){
+        if (starter.equals(Color.red)){
+            starter = Color.yellow;
+            turn = Color.yellow;
+            grid = new Disc[columns][rows];
+        }else {
+            starter = Color.red;
+            turn = Color.red;
+            grid = new Disc[columns][rows];
+        }
+    }
 
     public Disc placeDisc(int column, Color color) {
         Disc disc = null;
         if (turn.equals(color)) {
 
-            int row = ROWS - 1;
+            int row = rows - 1;
 
             while (row >= 0) {
                 if (!getDisc(column, row).isPresent())
@@ -34,9 +56,7 @@ public class ConnectFour {
                 row--;
             }
 
-            disc = new Disc(new java.awt.geom.Point2D.Double(
-                    column * (SQUARE_SIZE + 10) + SQUARE_SIZE / 5,
-                    row * (SQUARE_SIZE + 10) + SQUARE_SIZE / 5), Color.red, SQUARE_SIZE);
+            disc = new Disc(column,row, Color.red, SQUARE_SIZE);
 
 
             disc.setColor(color);
@@ -52,8 +72,8 @@ public class ConnectFour {
     }
 
     private Optional<Disc> getDisc(int column, int row) {
-        if (column < 0 || column >= COLUMNS
-                || row < 0 || row >= ROWS)
+        if (column < 0 || column >= columns
+                || row < 0 || row >= rows)
             return Optional.empty();
 
         return Optional.ofNullable(grid[column][row]);
@@ -61,8 +81,8 @@ public class ConnectFour {
 
     public boolean checkWin(Color color) {
 
-        for (int i = 0; i < COLUMNS; i++) {
-            for (int j = 0; j < ROWS - 3; j++) {
+        for (int i = 0; i < columns; i++) {
+            for (int j = 0; j < rows - 3; j++) {
                 // Vertical Check
                 if (grid[i][j] != null && grid[i][j + 1] != null && grid[i][j + 2] != null && grid[i][j + 3] != null &&
                         grid[i][j].getColor().equals(color) &&
@@ -74,8 +94,8 @@ public class ConnectFour {
             }
         }
 
-        for (int i = 0; i < COLUMNS - 3; i++) {
-            for (int j = 0; j < ROWS; j++) {
+        for (int i = 0; i < columns - 3; i++) {
+            for (int j = 0; j < rows; j++) {
                 // Horizontal Check
                 if (grid[i][j] != null && grid[i + 1][j] != null && grid[i + 2][j] != null && grid[i + 3][j] != null &&
                         grid[i][j].getColor().equals(color) &&
@@ -87,8 +107,8 @@ public class ConnectFour {
             }
         }
 
-        for (int i = 3; i < COLUMNS; i++) {
-            for (int j = 0; j < ROWS - 3; j++) {
+        for (int i = 3; i < columns; i++) {
+            for (int j = 0; j < rows - 3; j++) {
                 // Ascending DiagonalCheck
                 if (grid[i][j] != null && grid[i - 1][j + 1] != null && grid[i - 2][j + 2] != null && grid[i - 3][j + 3] != null &&
                         grid[i][j].getColor().equals(color) &&
@@ -100,8 +120,8 @@ public class ConnectFour {
             }
         }
 
-        for (int i = 3; i < COLUMNS; i++) {
-            for (int j = 3; j < ROWS; j++) {
+        for (int i = 3; i < columns; i++) {
+            for (int j = 3; j < rows; j++) {
                 // Descending DiagonalCheck
                 if (grid[i][j] != null && grid[i - 1][j - 1] != null && grid[i - 2][j - 2] != null && grid[i - 3][j - 3] != null &&
                         grid[i][j].getColor().equals(color) &&

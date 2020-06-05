@@ -67,7 +67,6 @@ public class JoinGameGUI {
 
         Button buttonJoinGame = new Button("Join game");
         buttonJoinGame.setAlignment(Pos.CENTER);
-        //TODO Make it connect to the proper game room and not create a new gameroom.
         buttonJoinGame.setOnAction(event -> createGameGUI(textField.getText()));
 
         hBox.getChildren().addAll(separator, roomCodeLabel, textField, buttonJoinGame);
@@ -83,7 +82,6 @@ public class JoinGameGUI {
         try {
             DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
             dataOutputStream.writeUTF("GLst");
-            //TODO
             ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
             HashMap<String, String> list = (HashMap<String, String>) objectInputStream.readObject();
             for (String roomCode : list.keySet()) {
@@ -93,7 +91,7 @@ public class JoinGameGUI {
                 buttonJoin.setOnAction(event -> createGameGUI(roomCode));
                 separator = new Separator();
                 separator.setOrientation(Orientation.VERTICAL);
-                Label roomName = new Label(list.get(roomCode) + " " + roomCode);
+                Label roomName = new Label(list.get(roomCode));
                 roomName.setFont(Font.font("Arial", 20));
                 hboxList.getChildren().add(buttonJoin);
                 hboxList.getChildren().add(separator);
@@ -123,6 +121,7 @@ public class JoinGameGUI {
 
     public void createGameGUI(String roomCode) {
         try {
+            roomCode = roomCode.toLowerCase();
             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
             out.writeUTF("Conn"+roomCode);
             ObjectInputStream inObj = new ObjectInputStream(socket.getInputStream());

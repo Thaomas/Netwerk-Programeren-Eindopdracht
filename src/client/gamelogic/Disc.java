@@ -10,16 +10,12 @@ import java.io.Serializable;
 
 public class Disc implements Serializable {
 
-    private Shape circle;
-    private Point2D position;
+    private final Shape circle;
     private Color color;
-    double size;
 
-    public Disc(Point2D position, Color color, double size) {
-        this.circle = new Ellipse2D.Double(position.getX(), position.getY(), size, size);
-        this.position = position;
+    public Disc(int column, int row, Color color, double size) {
+        this.circle = new Ellipse2D.Double(column * 110 + 20, row * 110 + 20, size, size);
         this.color = color;
-        this.size = size;
     }
 
     public void draw(FXGraphics2D graphics2D) {

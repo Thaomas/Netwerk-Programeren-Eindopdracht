@@ -306,17 +306,23 @@ public class GameGUI {
 
     private void backButton() {
         try {
-
+            int i = 0;
             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
-            DataInputStream in = new DataInputStream(socket.getInputStream());
             out.writeUTF("Disc" + roomCode);
-            if (in.readUTF().equals("Disc")) {
-                out.writeUTF("Disc" + "main");
-                if (in.readUTF().equals("Disc")) {
-                    listenThread.join();
-                    mainMenuGUI.start();
-                }
-            }
+            System.out.println(i++);
+
+            DataInputStream in = new DataInputStream(socket.getInputStream());
+            System.out.println(i++);
+
+            out.writeUTF("Discmain");
+            System.out.println(i++);
+
+            listenThread.join();
+            System.out.println(i++);
+
+            mainMenuGUI.start();
+            System.out.println(i++);
+
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }

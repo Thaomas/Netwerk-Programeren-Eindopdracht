@@ -30,7 +30,8 @@ public class GameListener implements Runnable {
         while (connected) {
             try {
                 input = in.readUTF();
-                if (input.equals("quit")){
+                System.out.println(input);
+                if (input.equals("Disc")){
                     connected = false;
                     continue;
                 }
@@ -47,6 +48,7 @@ public class GameListener implements Runnable {
                 }
             } catch (IOException e) {
                 e.printStackTrace();
+                connected = false;
             }
         }
     }

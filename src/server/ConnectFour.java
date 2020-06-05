@@ -49,12 +49,12 @@ public class ConnectFour {
 
             int row = rows - 1;
 
-            while (row >= 0) {
-                if (!getDisc(column, row).isPresent())
-                    break;
+        while (row >= 0) {
+            if (!getDisc(column, row).isPresent())
+                break;
 
-                row--;
-            }
+            row--;
+        }
 
             disc = new Disc(column,row, Color.red, SQUARE_SIZE);
 

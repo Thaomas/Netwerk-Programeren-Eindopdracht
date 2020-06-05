@@ -122,12 +122,14 @@ public class User implements Runnable {
                         roomCode = received.substring(4, 8);
                         if (server.containsChatRoom(roomCode)) {
                             server.connectToChatRoom(roomCode, this);
-                            respond("Connected");
+                            System.out.println("Connected " + this.name + " to " + roomCode);
+                            respond("Conf");
                             sendChatLog(server.getChatLog(roomCode));
                         } else if (server.containsGameRoom(roomCode)) {
-                            if (server.connectToGameRoom(roomCode, this))
+                            if (server.connectToGameRoom(roomCode, this)) {
+                                sendChatLog(server.getChatLog(roomCode));
                                 respond("Conf");
-                            else
+                            } else
                                 respond("Full");
                         } else
                             respond("Invalid room name");
@@ -176,7 +178,7 @@ public class User implements Runnable {
                         respond(server.newChatRoom(received.substring(4)));
                         break;
                     case "CrGR":
-                        respond(server.newGameRoom(received.substring(4),this));
+                        respond(server.newGameRoom(received.substring(4), this));
                         //Create game room
                         break;
                     case "GUsD":
@@ -229,7 +231,7 @@ public class User implements Runnable {
 
     }
 
-    private void sendGameRoomList(HashMap<String, String> gameRoomList){
+    private void sendGameRoomList(HashMap<String, String> gameRoomList) {
         try {
             new ObjectOutputStream(socket.getOutputStream()).writeObject(gameRoomList);
         } catch (IOException e) {
@@ -237,7 +239,7 @@ public class User implements Runnable {
         }
     }
 
-    private void addDisc(Disc disc){
+    private void addDisc(Disc disc) {
         try {
             System.out.println("in disc");
             new ObjectOutputStream(socket.getOutputStream()).writeObject(disc);

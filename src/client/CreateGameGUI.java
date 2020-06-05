@@ -16,7 +16,9 @@ import util.RandomString;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 
 public class CreateGameGUI {
 
@@ -51,7 +53,7 @@ public class CreateGameGUI {
         ToolBar toolBar = new ToolBar();
 
         Button backButton = new Button("Back");
-        backButton.setOnAction(event -> clientGUI());
+        backButton.setOnAction(event -> mainMenuGUI.start());
 
         toolBar.getItems().add(backButton);
 
@@ -106,18 +108,16 @@ public class CreateGameGUI {
             request += roomName.getText();
             out.writeUTF(request);
             roomCode = in.readUTF();
-            gameGUI();
-        } catch (IOException e) {
+
+            out.writeUTF("Connmain");
+            in.readUTF();
+            ObjectInputStream inOb = new ObjectInputStream(socket.getInputStream());
+            ArrayList<String> mainChat = (ArrayList<String>) inOb.readObject();
+            System.out.println(mainChat);
+
+            new GameGUI().start(stage, mainMenuGUI, socket, roomCode, new ArrayList<>(), mainChat);
+        } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
-
-    private void gameGUI() {
-        new GameGUI().start(stage, mainMenuGUI, socket, roomCode);
-    }
-
-    private void clientGUI() {
-        mainMenuGUI.start();
-    }
-
 }

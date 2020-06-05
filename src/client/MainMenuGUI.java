@@ -144,7 +144,7 @@ public class MainMenuGUI {
             DataInputStream in = new DataInputStream(socket.getInputStream());
             out.writeUTF("Conn"+roomCode);
             String message = in.readUTF();
-            if (message.equals("Connected")) {
+            if (message.equals("Conf")) {
                 ObjectInputStream inOb = new ObjectInputStream(socket.getInputStream());
                 ArrayList<String> chatlog = (ArrayList<String>)inOb.readObject();
                 chatGUI.start(roomCode, stage, this, socket, chatlog);

@@ -120,7 +120,7 @@ public class JoinGameGUI {
     }
 
     public void CreateGameGUI() {
-        GameGUI gameGUI = new GameGUI();
-        gameGUI.start(stage, mainMenuGUI,socket,roomCode);
+//        GameGUI gameGUI = new GameGUI();
+//        gameGUI.start(stage, mainMenuGUI,socket,roomCode);
     }
 }

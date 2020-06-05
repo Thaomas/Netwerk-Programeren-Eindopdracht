@@ -13,11 +13,8 @@ public class Connector implements Runnable {
 
     public Connector(Socket socket, Server server) {
         this.socket = socket;
+        System.out.println(socket.getPort());
         this.server = server;
-    }
-
-    public void setThread(Thread thread) {
-        this.thread = thread;
     }
 
     @Override
@@ -102,11 +99,6 @@ public class Connector implements Runnable {
                 }
                 break;
             }
-        }
-        try {
-            thread.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         }
     }
 

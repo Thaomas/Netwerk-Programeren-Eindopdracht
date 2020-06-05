@@ -74,7 +74,7 @@ public class GameGUI {
         Canvas canvas = new Canvas(800, 700);
 
         fxGraphics2D = new FXGraphics2D(canvas.getGraphicsContext2D());
-        draw(fxGraphics2D);
+
 
         canvas.setOnMouseClicked(event -> {
 
@@ -83,12 +83,8 @@ public class GameGUI {
                     try {
                         DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
                         dataOutputStream.writeUTF("GMes" + this.roomCode + i);
-                        ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
-                        Disc disc = (Disc) objectInputStream.readObject();
-                        discs.add(disc);
-                        draw(fxGraphics2D);
 
-                    } catch (IOException | ClassNotFoundException e) {
+                    } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
@@ -110,6 +106,7 @@ public class GameGUI {
         });
 
         borderPane.setCenter(canvas);
+        draw(fxGraphics2D);
 
         //right pane
         borderPane.setRight(setChatPane(275, 620));
@@ -131,7 +128,6 @@ public class GameGUI {
     private ArrayList<Disc> discs;
     private ArrayList<Square> squares;
 
-
     protected void messageToGameChat(String message) {
         if (comboBox.getSelectionModel().getSelectedItem().equals("Game chat")) {
             Platform.runLater(() -> textFlow.getChildren().add(new Text("\n" + message)));
@@ -147,6 +143,27 @@ public class GameGUI {
             gameChat.add(message);
         }
     }
+
+    protected void placeDisc() {
+
+        try {
+            ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
+            Disc disc = (Disc) objectInputStream.readObject();
+            if(disc != null) {
+                discs.add(disc);
+            }else {
+                System.out.println("end game");
+            }
+
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        Platform.runLater(() -> {
+            draw(fxGraphics2D);
+        });
+    }
+
 
     private void draw(FXGraphics2D fxGraphics2D) {
         fxGraphics2D.setBackground(Color.white);
@@ -277,7 +294,6 @@ public class GameGUI {
                     else
                         roomcode = "main";
 
-
                     DataOutputStream out = new DataOutputStream(socket.getOutputStream());
                     out.writeUTF("CMes" + roomcode + textField.getText());
                     System.out.println("CMes" + roomcode + textField.getText());
@@ -309,9 +325,6 @@ public class GameGUI {
             int i = 0;
             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
             out.writeUTF("Disc" + roomCode);
-            System.out.println(i++);
-
-            DataInputStream in = new DataInputStream(socket.getInputStream());
             System.out.println(i++);
 
             out.writeUTF("Discmain");

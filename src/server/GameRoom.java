@@ -2,7 +2,9 @@ package server;
 
 import client.gamelogic.Disc;
 
+import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 
 public class GameRoom {
@@ -10,7 +12,7 @@ public class GameRoom {
     private final String roomName;
     private final String roomCode;
     private final ArrayList<String> chatlog;
-    private final HashSet<User> users;
+    private final HashMap<User, Color> users;
     private final ConnectFour connectFour;
 
     public GameRoom(String roomname, String roomcode, boolean isPrivate) {
@@ -18,7 +20,7 @@ public class GameRoom {
         this.roomName = roomname;
         this.roomCode = roomcode;
         this.isPrivate = isPrivate;
-        users = new HashSet<>();
+        users = new HashMap<>();
         chatlog = new ArrayList<>();
         connectFour = new ConnectFour();
 //        testChat(100);
@@ -47,39 +49,43 @@ public class GameRoom {
 
     public synchronized boolean addUser(User user) {
         if (users.size() < 2) {
-            users.add(user);
+            if (users.containsValue(Color.red)) {
+                users.put(user, Color.yellow);
+            } else {
+                users.put(user, Color.red);
+            }
             return true;
         } else
             return false;
     }
 
     public boolean containsUser(User user) {
-        return users.contains(user);
+        return users.containsKey(user);
     }
 
     public void removeUser(User user) {
-        if (users.contains(user)) {
+        if (users.containsKey(user)) {
             users.remove(user);
             lose(user);
-            for (User winner : users)
+            for (User winner : users.keySet())
                 win(winner);
         }
-    }
-
-    public boolean checkUser(User user) {
-        return users.contains(user);
     }
 
     public ArrayList<String> getChatLog() {
         return this.chatlog;
     }
 
-    public HashSet<User> getUsers() {
+    public HashMap<User, Color> getUsers() {
         return users;
     }
 
-    public Disc move(int column) {
-        return connectFour.placeDisc(column);
+    public Disc move(int column, User user) {
+        if (connectFour.checkGameState(users.get(user))) {
+            return null;
+        } else {
+            return connectFour.placeDisc(column, users.get(user));
+        }
     }
 
     private void win(User winner) {
@@ -92,7 +98,7 @@ public class GameRoom {
 
     public synchronized void messageAll(String message) {
         chatlog.add(message);
-        for (User user : users) {
+        for (User user : users.keySet()) {
             user.writeUTF("CMes" + roomCode + message);
         }
     }

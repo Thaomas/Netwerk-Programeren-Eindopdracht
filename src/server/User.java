@@ -145,7 +145,6 @@ public class User implements Runnable {
                             respond("Disc");
                         } else if (server.containsGameRoom(roomCode)) {
                             server.disconnectGameRoom(roomCode, this);
-                            respond("Disc");
                         } else
                             respond("Invalid room name");
                         //todo make error-code and handeling client side
@@ -196,7 +195,10 @@ public class User implements Runnable {
                     case "GLst":
                         //TODO
                         //JoinGameGUI list of public games
+                        System.out.println("server: list call before" + received);
                         sendGameRoomList(server.getGameRoomNames());
+
+                        System.out.println("server: list call after" + received);
                         break;
                     case "DelU":
                         //Deletes the user from the server

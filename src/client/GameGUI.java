@@ -41,7 +41,6 @@ public class GameGUI {
     private String roomCode;
 
     private Socket socket;
-    private String roomCode;
 
     public void start(Stage primaryStage, MainMenuGUI mainMenuGUI, Socket socket, String roomCode, ArrayList<String> gameChat, ArrayList<String> mainChat) {
         this.mainMenuGUI = mainMenuGUI;
@@ -310,9 +309,6 @@ public class GameGUI {
             int i = 0;
             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
             out.writeUTF("Disc" + roomCode);
-            System.out.println(i++);
-
-            DataInputStream in = new DataInputStream(socket.getInputStream());
             System.out.println(i++);
 
             out.writeUTF("Discmain");

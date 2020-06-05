@@ -239,17 +239,17 @@ public class Server {
                     System.out.println(key + " is dead");
                 }
             }
-            ArrayList<Thread> connectors = getConnectorThreads();
-            for (Thread thread : connectors){
-                if (!thread.isAlive()){
-                    try {
-                        thread.join();
-                        getConnectorThreads().remove(thread);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
+//            ArrayList<Thread> connectors = getConnectorThreads();
+//            for (Thread thread : connectors){
+//                if (!thread.isAlive()){
+//                    try {
+//                        thread.join();
+//                        getConnectorThreads().remove(thread);
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            }
             if (i >= 50) {
                 save();
                 i = 0;

@@ -76,8 +76,8 @@ public class CreateGameGUI {
         gridPane.add(roomName, 1, 0);
 
         checkBox = new CheckBox();
-//        isPrivate = false;
-//        checkBox.selectedProperty().addListener((observable, oldValue, newValue) -> isPrivate = checkBox.isSelected());
+        isPrivate = false;
+        checkBox.selectedProperty().addListener((observable, oldValue, newValue) -> isPrivate = checkBox.isSelected());
 
         gridPane.add(new Label("Private: "), 0, 1);
         gridPane.add(checkBox, 1, 1);

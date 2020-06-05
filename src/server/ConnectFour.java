@@ -27,12 +27,12 @@ public class ConnectFour {
 
             int row = ROWS - 1;
 
-            while (row >= 0) {
-                if (!getDisc(column, row).isPresent())
-                    break;
+        while (row >= 0) {
+            if (!getDisc(column, row).isPresent())
+                break;
 
-                row--;
-            }
+            row--;
+        }
 
             disc = new Disc(new java.awt.geom.Point2D.Double(
                     column * (SQUARE_SIZE + 10) + SQUARE_SIZE / 5,

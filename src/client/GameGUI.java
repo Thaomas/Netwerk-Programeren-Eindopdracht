@@ -75,7 +75,6 @@ public class GameGUI {
 
         fxGraphics2D = new FXGraphics2D(canvas.getGraphicsContext2D());
 
-
         canvas.setOnMouseClicked(event -> {
 
             for (int i = 0; i < squares.size(); i++) {

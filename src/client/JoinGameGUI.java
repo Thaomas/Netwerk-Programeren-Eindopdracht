@@ -69,7 +69,7 @@ public class JoinGameGUI {
 
         Button buttonJoinGame = new Button("Join game");
         buttonJoinGame.setAlignment(Pos.CENTER);
-        buttonJoinGame.setOnAction(event -> createGameGUI(textField.getText()));
+        buttonJoinGame.setOnAction(event -> joinGameRoom(textField.getText()));
 
         hBox.getChildren().addAll(separator, roomCodeLabel, textField, buttonJoinGame);
         hBox.setSpacing(8);
@@ -90,7 +90,7 @@ public class JoinGameGUI {
                 HBox hboxList = new HBox();
                 hboxList.setSpacing(8);
                 Button buttonJoin = new Button("Join");
-                buttonJoin.setOnAction(event -> createGameGUI(roomCode));
+                buttonJoin.setOnAction(event -> joinGameRoom(roomCode));
                 separator = new Separator();
                 separator.setOrientation(Orientation.VERTICAL);
                 Label roomName = new Label(list.get(roomCode));
@@ -121,7 +121,7 @@ public class JoinGameGUI {
         mainMenuGUI.start();
     }
 
-    public void createGameGUI(String roomCode) {
+    public void joinGameRoom(String roomCode) {
         try {
             roomCode = roomCode.toLowerCase();
             DataOutputStream out = new DataOutputStream(socket.getOutputStream());

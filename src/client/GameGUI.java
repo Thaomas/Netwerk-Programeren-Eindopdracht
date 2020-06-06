@@ -25,7 +25,6 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -39,10 +38,14 @@ public class GameGUI {
     private ArrayList<String> gameChat;
     private Thread listenThread;
     private String roomCode;
+    private Text opponentName;
 
     private Socket socket;
+    private boolean inGame = true;
+    private boolean resetSquares = true;
 
-    public void start(Stage primaryStage, MainMenuGUI mainMenuGUI, Socket socket, String roomCode, ArrayList<String> gameChat, ArrayList<String> mainChat) {
+    public void start(Stage primaryStage, MainMenuGUI mainMenuGUI, Socket socket,
+                      String roomCode, ArrayList<String> gameChat, ArrayList<String> mainChat) {
         this.mainMenuGUI = mainMenuGUI;
         this.socket = socket;
         this.roomCode = roomCode;
@@ -57,13 +60,17 @@ public class GameGUI {
 
         Label lobbyCode = new Label("Room code: " + this.roomCode);
 
-        Text opponentName = new Text("Opponent: TESTNAME");
+        opponentName = new Text("Opponent: ");
+
+        Text label = new Text("Turn: ");
 
         toolBar.getItems().add(backButton);
         toolBar.getItems().add(new Separator());
         toolBar.getItems().add(lobbyCode);
         toolBar.getItems().add(new Separator());
         toolBar.getItems().add(opponentName);
+        toolBar.getItems().add(new Separator());
+        toolBar.getItems().add(label);
 
         borderPane.setTop(toolBar);
 
@@ -76,15 +83,16 @@ public class GameGUI {
         fxGraphics2D = new FXGraphics2D(canvas.getGraphicsContext2D());
 
         canvas.setOnMouseClicked(event -> {
+            if (inGame) {
+                for (int i = 0; i < squares.size(); i++) {
+                    if (squares.get(i).getSquare().getBounds().contains(event.getX(), event.getY())) {
+                        try {
+                            DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
+                            dataOutputStream.writeUTF("GMes" + this.roomCode + i);
 
-            for (int i = 0; i < squares.size(); i++) {
-                if (squares.get(i).getSquare().getBounds().contains(event.getX(), event.getY())) {
-                    try {
-                        DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
-                        dataOutputStream.writeUTF("GMes" + this.roomCode + i);
-
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             }
@@ -94,18 +102,28 @@ public class GameGUI {
         Color transparent = new Color(255, 255, 255, 50);
         Color noColor = new Color(0, 0, 0, 0);
         canvas.setOnMouseMoved(event -> {
-            for (Square square : squares) {
-                if (square.getSquare().getBounds().contains(event.getX(), event.getY())) {
-                    square.setColor(transparent);
-                } else {
+            if (inGame) {
+                for (Square square : squares) {
+                    if (square.getSquare().getBounds().contains(event.getX(), event.getY())) {
+                        square.setColor(transparent);
+                    } else {
+                        square.setColor(noColor);
+                    }
+                }
+                draw(fxGraphics2D);
+            } else if (resetSquares) {
+                for (Square square : squares) {
                     square.setColor(noColor);
                 }
+                draw(fxGraphics2D);
+                resetSquares=false;
+            } else {
+                resetSquares=true;
+
             }
-            draw(fxGraphics2D);
         });
 
         borderPane.setCenter(canvas);
-        draw(fxGraphics2D);
 
         //right pane
         borderPane.setRight(setChatPane(275, 620));
@@ -144,6 +162,12 @@ public class GameGUI {
         }
     }
 
+    protected void setOpponentName(String name) {
+        Platform.runLater(() -> {
+            opponentName.setText("Opponent: " + name);
+        });
+    }
+
     protected void placeDisc() {
 
         try {
@@ -159,6 +183,12 @@ public class GameGUI {
 
         Platform.runLater(() -> {
             draw(fxGraphics2D);
+        });
+    }
+
+    protected void restartGame(String state) {
+        Platform.runLater(() -> {
+            restartPane(fxGraphics2D, state);
         });
     }
 
@@ -178,6 +208,19 @@ public class GameGUI {
             disc.draw(fxGraphics2D);
         }
 
+    }
+
+    //doesnt work properly
+    private void restartPane(FXGraphics2D fxGraphics2D, String state) {
+        inGame = false;
+
+        Square shape = new Square(new Rectangle((COLUMNS + 1) * SQUARE_SIZE, (ROWS + 1) * SQUARE_SIZE),
+                new Color(0, 0, 0, 0));
+        shape.drawFill(fxGraphics2D);
+
+//        vBox.getChildren().add(new Label("You " + state + "!"));
+//        vBox.getChildren().add(new Label("Click to play again!"));
+//        vBox.getChildren().add(new Label("(insert amount of players clicked)/2"));
     }
 
     public Square makeConnect4Grid() {

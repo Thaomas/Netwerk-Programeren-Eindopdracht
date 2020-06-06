@@ -22,7 +22,7 @@ public class User implements Runnable {
     private String password;
     private int gamesPlayed;
     private int gamesWon;
-    private final LocalDate creationDate;
+    private LocalDate creationDate;
     private Color color;
 
     public User(String name, String password, Server server) {
@@ -35,12 +35,10 @@ public class User implements Runnable {
     }
 
     public User(String name, String password, int gamesPlayed, int gamesWon, LocalDate creationDate, Server server) {
-        this.name = name;
-        this.password = password;
+        this(name,password,server);
         this.gamesPlayed = gamesPlayed;
         this.gamesWon = gamesWon;
         this.creationDate = creationDate;
-        this.server = server;
     }
 
     public JSONObject getJson() {
@@ -120,9 +118,11 @@ public class User implements Runnable {
                         } else if (server.containsGameRoom(roomCode)) {
                             if (server.connectToGameRoom(roomCode, this)) {
                                 respond("Conf");
+                                GameRoom room = server.getGameRooms().get(roomCode);
                                 sendChatLog(server.getChatLog(roomCode));
                                 server.connectToChatRoom("main", this);
                                 sendChatLog(server.getChatLog("main"));
+                                room.hasJoined();
                             } else
                                 respond("Full");
                         } else

@@ -12,7 +12,7 @@ public class ConnectFour {
     //todo game end screen
     //todo replay vote
     //todo join game refreshing
-    //todo show name in GameGUI
+    //todo show name in GameGUI - DONE
     //todo if gameroom empty destroy
     //todo error handling join group
     //todo error notification

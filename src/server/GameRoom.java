@@ -63,7 +63,7 @@ public class GameRoom {
     }
 
     public void removeUser(User user) {
-        if (red.equals(user) || yellow.equals(user)) {
+        if (red == user || yellow == user) {
             if (red.equals(user)) {
                 if (inProgress) {
                     win(yellow);
@@ -118,7 +118,15 @@ public class GameRoom {
         loser.respond("GMes" + roomCode + "Lose");
     }
 
-    private void moveAll(Disc disc) {
+    //TODO
+    public synchronized void hasJoined(){
+        if (red != null)
+        red.respond("GMes" + roomCode + "Conn" + yellow.getName());
+        if (yellow != null)
+        yellow.respond("GMes" + roomCode + "Conn" + red.getName());
+    }
+
+    private synchronized void moveAll(Disc disc) {
         red.respond("GMes" + roomCode + "Move");
         red.sendDisc(disc);
         yellow.respond("GMes" + roomCode + "Move");

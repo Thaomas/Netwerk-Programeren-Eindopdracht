@@ -72,16 +72,22 @@ public class GameRoom {
         if (red == user || yellow == user) {
             if (red == user) {
                 if (inProgress) {
-                    win(yellow);
-                    lose(red);
+                    System.out.println(user.getName() + "left");
+                    yellow.win();
+                    red.lose();
                     inProgress = false;
+                    connectFour.restart();
+                    yellow.respond("GMes" + roomCode + "Restart");
                 }
                 red = null;
             } else {
                 if (inProgress) {
-                    win(red);
-                    lose(yellow);
+                    System.out.println(user.getName() + "left");
+                    red.win();
+                    yellow.lose();
                     inProgress = false;
+                    connectFour.restart();
+                    red.respond("GMes" + roomCode + "Restart");
                 }
                 yellow = null;
             }
@@ -98,6 +104,9 @@ public class GameRoom {
 
     public synchronized void move(int column, User user) {
         if (red != null && yellow != null && !isFinished) {
+            if (!inProgress)
+                inProgress=true;
+
             if (user.equals(red)) {
                 moveAll(connectFour.placeDisc(column, Color.red));
                 if (connectFour.checkWin(Color.red)) {
@@ -128,7 +137,6 @@ public class GameRoom {
         loser.respond("GMes" + roomCode + "Lose");
     }
 
-    //TODO
     public synchronized void hasJoined() {
         if (red != null && yellow != null) {
             red.respond("GMes" + roomCode + "Conn" + yellow.getName());

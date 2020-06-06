@@ -6,13 +6,6 @@ import java.awt.*;
 import java.util.Optional;
 
 public class ConnectFour {
-    
-    //todo if game ends stop adding
-    //todo if game ends swap color if game ends
-    //todo game end screen
-    //todo replay vote
-    //todo join game refreshing
-    //todo if gameroom empty destroy
 
     private final int SQUARE_SIZE = 100;
     private final int columns = 7;

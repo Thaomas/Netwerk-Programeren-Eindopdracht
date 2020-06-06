@@ -211,7 +211,6 @@ public class User implements Runnable {
                         break;
                     default:
                         respond("Invalid command");
-                        //todo make error-code and handeling client side
                         break;
                 }
             } catch (IOException e) {

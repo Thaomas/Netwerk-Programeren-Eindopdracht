@@ -428,6 +428,7 @@ public class GameGUI {
             first = "R";
             turn.setText("Turn: RED");
         }
-        resetScreen();
+        System.out.println();
+        Platform.runLater(this::resetScreen);
     }
 }

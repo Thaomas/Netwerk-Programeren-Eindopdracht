@@ -24,7 +24,6 @@ import java.util.Scanner;
 public class AccountGUI {
 
     private String username;
-    private String password;
     private LocalDate accountCreated;
     private int gamesPlayed;
     private int wins;
@@ -37,15 +36,6 @@ public class AccountGUI {
     private MainMenuGUI mainMenuGUI;
     private AdministrationGUI administrationGUI;
     private Stage primaryStage;
-
-    public final void testData() {
-        this.username = "'Username'";
-        this.password = "test";
-        this.accountCreated = LocalDate.now();
-        this.gamesPlayed = 0;
-        this.wins = 0;
-        this.losses = 0;
-    }
 
     private DataOutputStream out;
     private DataInputStream in;
@@ -81,16 +71,19 @@ public class AccountGUI {
         getData();
 
         BorderPane borderPane = new BorderPane();
-        ToolBar toolBar = new ToolBar();
-        GridPane credentials = new GridPane();
-        VBox centerPane = new VBox();
-        VBox statsBox = new VBox();
 
+        //top
         Button backButton = new Button("Back");
-        backButton.setOnAction(event -> clientGUI());
+        backButton.setOnAction(event -> mainMenuGUI.start());
+
+        ToolBar toolBar = new ToolBar();
 
         toolBar.getItems().add(backButton);
 
+        borderPane.setTop(toolBar);
+
+        //center
+        GridPane credentials = new GridPane();
         credentials.setVgap(10);
         credentials.setHgap(10);
         credentials.setPadding(new Insets(10));
@@ -121,6 +114,7 @@ public class AccountGUI {
             credentials.add(newPass, 1, 1);
             credentials.add(newPassConfirm, 1, 2);
         });
+
         HBox visiblePassword = new HBox(viewBox, visible);
         credentials.add(visiblePassword, 2, 0);
 
@@ -152,10 +146,14 @@ public class AccountGUI {
         Text title = new Text(username + " Settings");
         title.setFont(Font.font("Arial", FontWeight.BOLD, 30));
         title.setTranslateX(10);
-        centerPane.getChildren().add(title);
-        centerPane.getChildren().add(credentials);
+
+        VBox centerPane = new VBox();
+        centerPane.getChildren().addAll(title,credentials);
         centerPane.setAlignment(Pos.CENTER_LEFT);
 
+        borderPane.setCenter(centerPane);
+
+        //right
         Label statistics = new Label("Stats");
         statistics.setFont(Font.font("Arial", FontPosture.ITALIC, 30));
         Label accountCreated = new Label("Account created on: " + this.accountCreated.toString());
@@ -163,88 +161,23 @@ public class AccountGUI {
         Label wins = new Label("Total wins: " + this.wins);
         Label losses = new Label("Total losses: " + this.losses);
         Button buttonDelete = new Button("Delete account");
-        buttonDelete.setOnAction(event -> {
-            Stage stage = new Stage();
-            stage.setResizable(false);
-            stage.setTitle("Delete account");
+        buttonDelete.setOnAction(event -> deleteAccount());
 
-            BorderPane borderPaneDelete = new BorderPane();
+        VBox statsBox = new VBox();
 
-            ToolBar toolBar1 = new ToolBar();
-
-            Button backButton1 = new Button("Back");
-            backButton1.setOnAction(e -> stage.close());
-
-            toolBar1.getItems().add(backButton1);
-
-            borderPaneDelete.setTop(toolBar1);
-
-            GridPane gridPane = new GridPane();
-
-            gridPane.setPadding(new Insets(10));
-            gridPane.setVgap(10);
-            gridPane.setHgap(10);
-
-            PasswordField passwordField = new PasswordField();
-            PasswordField passwordFieldConfirm = new PasswordField();
-
-            gridPane.add(new Label("Password"), 0, 0);
-            gridPane.add(passwordField, 1, 0);
-            gridPane.add(new Label("Confirm password"), 0, 1);
-            gridPane.add(passwordFieldConfirm, 1, 1);
-
-            Button buttonConfirmDelete = new Button("Confirm delete account");
-            buttonConfirmDelete.setOnAction(e -> {
-                if (passwordFieldConfirm.getText().equals(passwordField.getText())) {
-                    if (tryDeleteAccount(passwordFieldConfirm.getText())) {
-                        stage.close();
-                        administration();
-                    }
-                }
-                passwordField.clear();
-                passwordFieldConfirm.clear();
-            });
-
-            gridPane.add(buttonConfirmDelete, 1, 2);
-
-            borderPaneDelete.setCenter(gridPane);
-
-            Scene scene = new Scene(borderPaneDelete);
-            stage.setScene(scene);
-            stage.show();
-        });
-
-        statsBox.getChildren().add(statistics);
-        statsBox.getChildren().add(accountCreated);
-        statsBox.getChildren().add(gamesPlayed);
-        statsBox.getChildren().add(wins);
-        statsBox.getChildren().add(losses);
-        statsBox.getChildren().add(buttonDelete);
+        statsBox.getChildren().addAll(statistics,accountCreated,gamesPlayed,wins,losses,buttonDelete);
 
         statsBox.setAlignment(Pos.TOP_CENTER);
         statsBox.setTranslateY(30);
         statsBox.setPadding(new Insets(10));
         statsBox.setSpacing(5);
 
-        borderPane.setTop(toolBar);
-        borderPane.setCenter(centerPane);
         borderPane.setRight(statsBox);
 
         Scene scene = new Scene(borderPane, 600, 300);
 
         this.primaryStage.setTitle("Account settings");
         this.primaryStage.setScene(scene);
-
-        /*
-        stage.widthProperty().addListener((observable, oldValue, newValue) -> {
-            System.out.println("Width: " + newValue);
-        });
-
-        stage.heightProperty().addListener((observable, oldValue, newValue) -> {
-            System.out.println("Height: " + newValue);
-        });
-
-         */
     }
 
     private boolean tryDeleteAccount(String password) {
@@ -265,12 +198,56 @@ public class AccountGUI {
         }
     }
 
-    private void administration() {
-        administrationGUI.disconnect();
-        administrationGUI.start(primaryStage);
+    private void deleteAccount() {
+        Stage stage = new Stage();
+        stage.setResizable(false);
+        stage.setTitle("Delete account");
+
+        BorderPane borderPaneDelete = new BorderPane();
+
+        ToolBar toolBar = new ToolBar();
+
+        Button backButton = new Button("Back");
+        backButton.setOnAction(e -> stage.close());
+
+        toolBar.getItems().add(backButton);
+
+        borderPaneDelete.setTop(toolBar);
+
+        GridPane gridPane = new GridPane();
+
+        gridPane.setPadding(new Insets(10));
+        gridPane.setVgap(10);
+        gridPane.setHgap(10);
+
+        PasswordField passwordField = new PasswordField();
+        PasswordField passwordFieldConfirm = new PasswordField();
+
+        gridPane.add(new Label("Password"), 0, 0);
+        gridPane.add(passwordField, 1, 0);
+        gridPane.add(new Label("Confirm password"), 0, 1);
+        gridPane.add(passwordFieldConfirm, 1, 1);
+
+        Button buttonConfirmDelete = new Button("Confirm delete account");
+        buttonConfirmDelete.setOnAction(e -> {
+            if (passwordFieldConfirm.getText().equals(passwordField.getText())) {
+                if (tryDeleteAccount(passwordFieldConfirm.getText())) {
+                    stage.close();
+                    administrationGUI.disconnect();
+                    administrationGUI.start(primaryStage);
+                }
+            }
+            passwordField.clear();
+            passwordFieldConfirm.clear();
+        });
+
+        gridPane.add(buttonConfirmDelete, 1, 2);
+
+        borderPaneDelete.setCenter(gridPane);
+
+        Scene scene = new Scene(borderPaneDelete);
+        stage.setScene(scene);
+        stage.show();
     }
 
-    public void clientGUI() {
-        mainMenuGUI.start();
-    }
 }

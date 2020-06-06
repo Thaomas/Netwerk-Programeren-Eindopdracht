@@ -116,7 +116,6 @@ public class GameRoom {
         loser.respond("GMes" + roomCode + "Lose");
     }
 
-    //TODO
     public synchronized void hasJoined(){
         if (red != null && yellow != null)
         red.respond("GMes" + roomCode + "Conn" + yellow.getName());

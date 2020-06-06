@@ -73,7 +73,10 @@ public class JoinGameGUI {
         Separator separator2 = new Separator();
         separator2.setOrientation(Orientation.VERTICAL);
 
-        hBox.getChildren().addAll(separator, roomCodeLabel, textField, buttonJoinGame,separator2,new Button("Refresh games"));
+        Button buttonRefreshGames = new Button("Refresh games");
+        buttonRefreshGames.setOnAction(event -> setAvailableGames());
+
+        hBox.getChildren().addAll(separator, roomCodeLabel, textField, buttonJoinGame, separator2,buttonRefreshGames );
         hBox.setSpacing(8);
 
         borderPane.setTop(toolBar);
@@ -82,29 +85,9 @@ public class JoinGameGUI {
         joinPublicGame.setTextAlignment(TextAlignment.CENTER);
         joinPublicGame.setFont(Font.font("Arial", FontWeight.BOLD, 30));
 
-        ListView<HBox> listView = new ListView<>();
-        try {
-            DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
-            dataOutputStream.writeUTF("GLst");
-            ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
-            HashMap<String, String> list = (HashMap<String, String>) objectInputStream.readObject();
-            for (String roomCode : list.keySet()) {
-                HBox hboxList = new HBox();
-                hboxList.setSpacing(8);
-                Button buttonJoin = new Button("Join");
-                buttonJoin.setOnAction(event -> joinGameRoom(roomCode));
-                separator = new Separator();
-                separator.setOrientation(Orientation.VERTICAL);
-                Label roomName = new Label(list.get(roomCode));
-                roomName.setFont(Font.font("Arial", 20));
-                hboxList.getChildren().add(buttonJoin);
-                hboxList.getChildren().add(separator);
-                hboxList.getChildren().add(roomName);
-                listView.getItems().add(hboxList);
-            }
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+        listView = new ListView<>();
+
+        setAvailableGames();
 
         toolBar.getItems().add(hBox);
 
@@ -119,6 +102,34 @@ public class JoinGameGUI {
         stage.show();
     }
 
+    private ListView<HBox> listView;
+
+    private void setAvailableGames(){
+        try {
+            listView.getItems().clear();
+            DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
+            dataOutputStream.writeUTF("GLst");
+            ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
+            HashMap<String, String> list = (HashMap<String, String>) objectInputStream.readObject();
+            for (String roomCode : list.keySet()) {
+                HBox hboxList = new HBox();
+                hboxList.setSpacing(8);
+                Button buttonJoin = new Button("Join");
+                buttonJoin.setOnAction(event -> joinGameRoom(roomCode));
+                Separator separator = new Separator();
+                separator.setOrientation(Orientation.VERTICAL);
+                Label roomName = new Label(list.get(roomCode));
+                roomName.setFont(Font.font("Arial", 20));
+                hboxList.getChildren().add(buttonJoin);
+                hboxList.getChildren().add(separator);
+                hboxList.getChildren().add(roomName);
+                listView.getItems().add(hboxList);
+            }
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void clientGUI() {
         mainMenuGUI.start();
     }
@@ -129,22 +140,13 @@ public class JoinGameGUI {
             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
             out.writeUTF("Conn" + roomCode);
 
-//            if(!roomState.equals("full")) {
+            ObjectInputStream inObj = new ObjectInputStream(socket.getInputStream());
+            ArrayList<String> gameChat = new ArrayList<>((ArrayList<String>) inObj.readObject());
+            inObj = new ObjectInputStream(socket.getInputStream());
+            ArrayList<String> mainChat = new ArrayList<>((ArrayList<String>) inObj.readObject());
 
-                ObjectInputStream inObj = new ObjectInputStream(socket.getInputStream());
-                ArrayList<String> gameChat = new ArrayList<>((ArrayList<String>) inObj.readObject());
-                inObj = new ObjectInputStream(socket.getInputStream());
-                ArrayList<String> mainChat = new ArrayList<>((ArrayList<String>) inObj.readObject());
+            new GameGUI().start(stage, mainMenuGUI, socket, roomCode, gameChat, mainChat);
 
-                //TODO
-//            DataInputStream in = new DataInputStream(socket.getInputStream());
-//            String user = in.readUTF();
-
-                new GameGUI().start(stage, mainMenuGUI, socket, roomCode, gameChat, mainChat);
-
-//            }else {
-//               System.out.println("Can't Join room");
-//            }
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }

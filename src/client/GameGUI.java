@@ -63,9 +63,9 @@ public class GameGUI {
 
         Label lobbyCode = new Label("Room code: " + this.roomCode);
 
-        opponentName = new Text("Opponent: ");
+        opponentName = new Text("No opponent ");
 
-        Text label = new Text("Turn: ");
+        Text label = new Text("Waiting for an opponent");
 
         toolBar.getItems().add(backButton);
         toolBar.getItems().add(new Separator());
@@ -102,21 +102,19 @@ public class GameGUI {
             }
         });
 
-        Color transparent = new Color(255, 255, 255, 50);
-        Color noColor = new Color(0, 0, 0, 0);
         canvas.setOnMouseMoved(event -> {
             if (inGame) {
                 for (Square square : squares) {
                     if (square.getSquare().getBounds().contains(event.getX(), event.getY())) {
-                        square.setColor(transparent);
+                        square.setColor(new Color(255, 255, 255, 50));
                     } else {
-                        square.setColor(noColor);
+                        square.setColor(new Color(0, 0, 0, 0));
                     }
                 }
                 draw(fxGraphics2D);
             } else if (resetSquares) {
                 for (Square square : squares) {
-                    square.setColor(noColor);
+                    square.setColor(new Color(0, 0, 0, 0));
                 }
                 draw(fxGraphics2D);
                 resetSquares = false;
@@ -220,7 +218,6 @@ public class GameGUI {
 
     //doesnt work properly
     private void restartPane(FXGraphics2D fxGraphics2D, String state) {
-        inGame = false;
 
         Square shape = new Square(new Rectangle((COLUMNS + 1) * SQUARE_SIZE, (ROWS + 1) * SQUARE_SIZE),
                 new Color(255, 255, 255, 70));

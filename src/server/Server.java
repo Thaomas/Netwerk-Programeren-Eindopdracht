@@ -188,10 +188,10 @@ public class Server {
     }
 
     public ArrayList<String> getChatLog(String roomCode) {
-        ArrayList<String> chatlog =null;
-        if (chatRooms.containsKey(roomCode)){
+        ArrayList<String> chatlog = null;
+        if (chatRooms.containsKey(roomCode)) {
             chatlog = chatRooms.get(roomCode).getChatLog();
-        }else if (gameRooms.containsKey(roomCode)){
+        } else if (gameRooms.containsKey(roomCode)) {
             chatlog = gameRooms.get(roomCode).getChatLog();
         }
         return chatlog;
@@ -221,7 +221,7 @@ public class Server {
         chatRooms.get(roomName).messageAll("<" + user.getName() + ">: " + message);
     }
 
-    private synchronized HashMap<String, Thread> getClientThreads(){
+    private synchronized HashMap<String, Thread> getClientThreads() {
         return clientThreads;
     }
 
@@ -239,17 +239,14 @@ public class Server {
                     System.out.println(key + " is dead");
                 }
             }
-//            ArrayList<Thread> connectors = getConnectorThreads();
-//            for (Thread thread : connectors){
-//                if (!thread.isAlive()){
-//                    try {
-//                        thread.join();
-//                        getConnectorThreads().remove(thread);
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//            }
+
+            for (GameRoom room :
+                    gameRooms.values()) {
+                if (room.isEmpty()) {
+                    gameRooms.remove(room.getRoomCode());
+                }
+            }
+
             if (i >= 50) {
                 save();
                 i = 0;
@@ -269,6 +266,9 @@ public class Server {
 
         for (ChatRoom room : chatRooms.values()) {
             room.removeUser(user);
+        }
+        for (GameRoom gameRoom : gameRooms.values()) {
+            gameRoom.removeUser(user);
         }
         Thread t = getClientThreads().get(nickname);
         try {

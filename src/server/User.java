@@ -117,6 +117,7 @@ public class User implements Runnable {
                             sendChatLog(server.getChatLog(roomCode));
                         } else if (server.containsGameRoom(roomCode)) {
                             if (server.connectToGameRoom(roomCode, this)) {
+                                respond("Conf");
                                 sendChatLog(server.getChatLog(roomCode));
                                 server.connectToChatRoom("main", this);
                                 sendChatLog(server.getChatLog("main"));
@@ -124,8 +125,7 @@ public class User implements Runnable {
                             } else
                                 respond("Full");
                         } else
-                            respond("Invalid room name");
-                        //todo make error-code and handeling client side
+                            respond("Invalid");
                         break;
                     case "Disc":
                         //Disconnect from the given Room
@@ -139,7 +139,6 @@ public class User implements Runnable {
                             server.disconnectGameRoom(roomCode, this);
                         } else
                             respond("Invalid room name");
-                        //todo make error-code and handeling client side
                         break;
                     case "CMes":
                         //Chat message
@@ -150,7 +149,6 @@ public class User implements Runnable {
                             server.writeToGameRoom(roomCode, this, received.substring(8));
                         } else
                             respond("Invalid room name");
-                        //todo make error-code and handeling client side
                         break;
                     case "GMes":
                         //Game message
@@ -164,6 +162,15 @@ public class User implements Runnable {
                             }
                         } else
                             respond("Invalid room name");
+                        break;
+                    case "GVot":
+                        roomCode = received.substring(4, 8);
+                        if (server.containsGameRoom(roomCode)) {
+                            GameRoom room = server.getGameRooms().get(roomCode);
+                            if (room.containsUser(this)) {
+                                room.vote(this);
+                            }
+                        }
                         break;
                     case "CrCR":
                         //Create chat room
@@ -204,7 +211,6 @@ public class User implements Runnable {
                         break;
                     default:
                         respond("Invalid command");
-                        //todo make error-code and handeling client side
                         break;
                 }
             } catch (IOException e) {

@@ -6,6 +6,8 @@ import java.awt.*;
 import java.util.Optional;
 
 public class ConnectFour {
+    //TODO Fix label showing correct turn
+    //TODO Leaderboard maybe
 
     private final int SQUARE_SIZE = 100;
     private final int columns = 7;
@@ -47,8 +49,6 @@ public class ConnectFour {
         }
 
             disc = new Disc(column,row, Color.red, SQUARE_SIZE);
-
-
             disc.setColor(color);
 
             grid[column][row] = disc;

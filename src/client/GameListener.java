@@ -31,20 +31,40 @@ public class GameListener implements Runnable {
             try {
                 input = in.readUTF();
                 System.out.println(input);
-                if (input.equals("Disc")){
+                if (input.equals("Disc")) {
                     connected = false;
                     continue;
                 }
                 command = input.substring(0, 4);
                 roomCode = input.substring(4, 8);
-                if (roomCode.equals(this.roomCode)) {
-                    if (command.equals("CMes")) {
+                if (command.equals("CMes")) {
+                    if (roomCode.equals(this.roomCode))
                         gameGui.messageToGameChat(input.substring(8));
-                    } else if (command.equals("GMes")) {
-                        gameGui.placeDisc();
+                    else if (roomCode.equals("main"))
+                        gameGui.messageToMainChat(input.substring(8));
+                } else if (command.equals("GMes")) {
+                    if (roomCode.equals(this.roomCode)) {
+                        if (input.substring(8).contains("Conn")) {
+                            gameGui.setOpponentName(input.substring(12));
+                            System.out.println(input.substring(12) + " has connected");
+                        } else {
+                            switch (input.substring(8)) {
+                                case "Move":
+                                    gameGui.placeDisc();
+                                    break;
+                                case "Win":
+                                    System.out.println("Winner");
+                                    gameGui.restartGame(input.substring(8));
+                                    break;
+                                case "Lose":
+                                    System.out.println("Loser");
+                                    gameGui.restartGame(input.substring(8));
+                                    break;
+
+                            }
+                        }
+
                     }
-                }else if (roomCode.equals("main") && command.equals("CMes")){
-                    gameGui.messageToMainChat(input.substring(8));
                 }
             } catch (IOException e) {
                 e.printStackTrace();

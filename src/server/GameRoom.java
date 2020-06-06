@@ -4,15 +4,15 @@ import client.gamelogic.Disc;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 
 public class GameRoom {
     private final boolean isPrivate;
+    private boolean inProgress;
     private final String roomName;
     private final String roomCode;
     private final ArrayList<String> chatlog;
-    private final HashMap<User, Color> users;
+    private User red;
+    private User yellow;
     private final ConnectFour connectFour;
 
     public GameRoom(String roomname, String roomcode, boolean isPrivate) {
@@ -20,7 +20,6 @@ public class GameRoom {
         this.roomName = roomname;
         this.roomCode = roomcode;
         this.isPrivate = isPrivate;
-        users = new HashMap<>();
         chatlog = new ArrayList<>();
         connectFour = new ConnectFour();
 //        testChat(100);
@@ -48,11 +47,11 @@ public class GameRoom {
     }
 
     public synchronized boolean addUser(User user) {
-        if (users.size() < 2) {
-            if (users.containsValue(Color.red)) {
-                users.put(user, Color.yellow);
+        if (red == null || yellow == null) {
+            if (red == null) {
+                red = user;
             } else {
-                users.put(user, Color.red);
+                yellow = user;
             }
             return true;
         } else
@@ -60,15 +59,24 @@ public class GameRoom {
     }
 
     public boolean containsUser(User user) {
-        return users.containsKey(user);
+        return red.equals(user) || yellow.equals(user);
     }
 
     public void removeUser(User user) {
-        if (users.containsKey(user)) {
-            users.remove(user);
-            lose(user);
-            for (User winner : users.keySet())
-                win(winner);
+        if (red == user || yellow == user) {
+            if (red.equals(user)) {
+                if (inProgress) {
+                    win(yellow);
+                    lose(red);
+                }
+                red = null;
+            } else {
+                if (inProgress) {
+                    win(red);
+                    lose(yellow);
+                }
+                yellow = null;
+            }
         }
     }
 
@@ -76,30 +84,58 @@ public class GameRoom {
         return this.chatlog;
     }
 
-    public HashMap<User, Color> getUsers() {
-        return users;
+    public synchronized boolean checkSpace() {
+        return red == null || yellow == null;
     }
 
-    public Disc move(int column, User user) {
-        if (connectFour.checkGameState(users.get(user))) {
-            return null;
-        } else {
-            return connectFour.placeDisc(column, users.get(user));
+    public void move(int column, User user) {
+        if (red != null && yellow != null) {
+            if (user.equals(red)) {
+                moveAll(connectFour.placeDisc(column, Color.red));
+                if (connectFour.checkWin(Color.red)) {
+                    win(red);
+                    lose(yellow);
+                }
+            } else if (user.equals(yellow)) {
+                moveAll(connectFour.placeDisc(column, Color.yellow));
+                if (connectFour.checkWin(Color.yellow)) {
+                    win(yellow);
+                    lose(red);
+                }
+            }
         }
     }
 
     private void win(User winner) {
         winner.win();
+        winner.respond("GMes" + roomCode + "Win");
     }
 
     private void lose(User loser) {
         loser.lose();
+        loser.respond("GMes" + roomCode + "Lose");
+    }
+
+    //TODO
+    public synchronized void hasJoined(){
+        if (red != null)
+        red.respond("GMes" + roomCode + "Conn" + yellow.getName());
+        if (yellow != null)
+        yellow.respond("GMes" + roomCode + "Conn" + red.getName());
+    }
+
+    private synchronized void moveAll(Disc disc) {
+        red.respond("GMes" + roomCode + "Move");
+        red.sendDisc(disc);
+        yellow.respond("GMes" + roomCode + "Move");
+        yellow.sendDisc(disc);
     }
 
     public synchronized void messageAll(String message) {
         chatlog.add(message);
-        for (User user : users.keySet()) {
-            user.writeUTF("CMes" + roomCode + message);
-        }
+        if (red != null)
+            red.respond("CMes" + roomCode + message);
+        if (yellow != null)
+            yellow.respond("CMes" + roomCode + message);
     }
 }

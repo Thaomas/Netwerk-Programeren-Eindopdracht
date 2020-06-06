@@ -22,7 +22,7 @@ public class User implements Runnable {
     private String password;
     private int gamesPlayed;
     private int gamesWon;
-    private final LocalDate creationDate;
+    private LocalDate creationDate;
     private Color color;
 
     public User(String name, String password, Server server) {
@@ -35,12 +35,10 @@ public class User implements Runnable {
     }
 
     public User(String name, String password, int gamesPlayed, int gamesWon, LocalDate creationDate, Server server) {
-        this.name = name;
-        this.password = password;
+        this(name,password,server);
         this.gamesPlayed = gamesPlayed;
         this.gamesWon = gamesWon;
         this.creationDate = creationDate;
-        this.server = server;
     }
 
     public JSONObject getJson() {
@@ -83,14 +81,6 @@ public class User implements Runnable {
         this.password = password;
     }
 
-    public void writeUTF(String text) {
-        try {
-            this.out.writeUTF(text);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     public boolean isConnected() {
         return isConnected;
     }
@@ -127,8 +117,11 @@ public class User implements Runnable {
                             sendChatLog(server.getChatLog(roomCode));
                         } else if (server.containsGameRoom(roomCode)) {
                             if (server.connectToGameRoom(roomCode, this)) {
+                                GameRoom room = server.getGameRooms().get(roomCode);
                                 sendChatLog(server.getChatLog(roomCode));
-                                respond("Conf");
+                                server.connectToChatRoom("main", this);
+                                sendChatLog(server.getChatLog("main"));
+                                room.hasJoined();
                             } else
                                 respond("Full");
                         } else
@@ -168,7 +161,7 @@ public class User implements Runnable {
                             if (room.containsUser(this)) {
                                 System.out.println("test roomcode GMes addDISC");
                                 respond("GMes"+roomCode);
-                                addDisc(room.move(Integer.parseInt(received.substring(8)),this));
+                                room.move(Integer.parseInt(received.substring(8)),this);
                             }
                         } else
                             respond("Invalid room name");
@@ -194,7 +187,6 @@ public class User implements Runnable {
                             respond("IvPw");
                         break;
                     case "GLst":
-                        //TODO
                         //JoinGameGUI list of public games
                         System.out.println("server: list call before" + received);
                         sendGameRoomList(server.getGameRoomNames());
@@ -218,7 +210,7 @@ public class User implements Runnable {
                 }
             } catch (IOException e) {
                 System.out.println("error");
-                e.printStackTrace();
+                e.getMessage();
                 disconnect();
             }
         }
@@ -242,7 +234,7 @@ public class User implements Runnable {
         }
     }
 
-    private void addDisc(Disc disc) {
+    public void sendDisc(Disc disc) {
         try {
             System.out.println("in disc");
             new ObjectOutputStream(socket.getOutputStream()).writeObject(disc);
@@ -288,7 +280,7 @@ public class User implements Runnable {
         }
     }
 
-    private void respond(String response) {
+    public void respond(String response) {
         System.out.println(response);
         try {
             new DataOutputStream(socket.getOutputStream()).writeUTF(response);

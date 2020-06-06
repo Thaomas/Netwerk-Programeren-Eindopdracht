@@ -126,22 +126,13 @@ public class JoinGameGUI {
             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
             out.writeUTF("Conn" + roomCode);
 
-//            if(!roomState.equals("full")) {
+            ObjectInputStream inObj = new ObjectInputStream(socket.getInputStream());
+            ArrayList<String> gameChat = new ArrayList<>((ArrayList<String>) inObj.readObject());
+            inObj = new ObjectInputStream(socket.getInputStream());
+            ArrayList<String> mainChat = new ArrayList<>((ArrayList<String>) inObj.readObject());
 
-                ObjectInputStream inObj = new ObjectInputStream(socket.getInputStream());
-                ArrayList<String> gameChat = new ArrayList<>((ArrayList<String>) inObj.readObject());
-                inObj = new ObjectInputStream(socket.getInputStream());
-                ArrayList<String> mainChat = new ArrayList<>((ArrayList<String>) inObj.readObject());
+            new GameGUI().start(stage, mainMenuGUI, socket, roomCode, gameChat, mainChat);
 
-                //TODO
-//            DataInputStream in = new DataInputStream(socket.getInputStream());
-//            String user = in.readUTF();
-
-                new GameGUI().start(stage, mainMenuGUI, socket, roomCode, gameChat, mainChat);
-
-//            }else {
-//               System.out.println("Can't Join room");
-//            }
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }

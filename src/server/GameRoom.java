@@ -8,6 +8,7 @@ import java.util.ArrayList;
 public class GameRoom {
     private final boolean isPrivate;
     private boolean inProgress;
+    private boolean isFinished;
     private final String roomName;
     private final String roomCode;
     private final ArrayList<String> chatlog;
@@ -20,6 +21,7 @@ public class GameRoom {
         this.roomName = roomname;
         this.roomCode = roomcode;
         this.isPrivate = isPrivate;
+        this.isFinished = false;
         chatlog = new ArrayList<>();
         connectFour = new ConnectFour();
 //        testChat(100);
@@ -32,6 +34,10 @@ public class GameRoom {
         for (int i = 0; i < amount; i++) {
             chatlog.add("test " + i + "\n");
         }
+    }
+
+    public boolean isEmpty(){
+        return red == null && yellow == null;
     }
 
     public boolean isPrivate() {
@@ -90,19 +96,21 @@ public class GameRoom {
         return red == null || yellow == null;
     }
 
-    public void move(int column, User user) {
-        if (red != null && yellow != null) {
+    public synchronized void move(int column, User user) {
+        if (red != null && yellow != null && !isFinished) {
             if (user.equals(red)) {
                 moveAll(connectFour.placeDisc(column, Color.red));
                 if (connectFour.checkWin(Color.red)) {
                     win(red);
                     lose(yellow);
+                    isFinished = true;
                 }
             } else if (user.equals(yellow)) {
                 moveAll(connectFour.placeDisc(column, Color.yellow));
                 if (connectFour.checkWin(Color.yellow)) {
                     win(yellow);
                     lose(red);
+                    isFinished = true;
                 }
             }
         }
@@ -110,20 +118,22 @@ public class GameRoom {
 
     private void win(User winner) {
         winner.win();
+        System.out.println(winner.getName()+ " won");
         winner.respond("GMes" + roomCode + "Win");
     }
 
     private void lose(User loser) {
         loser.lose();
+        System.out.println(loser.getName() + " lost");
         loser.respond("GMes" + roomCode + "Lose");
     }
 
     //TODO
     public synchronized void hasJoined(){
-        if (red != null)
-        red.respond("GMes" + roomCode + "Conn" + yellow.getName());
-        if (yellow != null)
-        yellow.respond("GMes" + roomCode + "Conn" + red.getName());
+        if (red != null && yellow != null) {
+            red.respond("GMes" + roomCode + "Conn" + yellow.getName());
+            yellow.respond("GMes" + roomCode + "Conn" + red.getName());
+        }
     }
 
     private synchronized void moveAll(Disc disc) {

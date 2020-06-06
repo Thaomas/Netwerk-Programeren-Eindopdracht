@@ -127,7 +127,6 @@ public class User implements Runnable {
                                 respond("Full");
                         } else
                             respond("Invalid");
-                        //todo make error-code and handeling client side
                         break;
                     case "Disc":
                         //Disconnect from the given Room
@@ -141,7 +140,6 @@ public class User implements Runnable {
                             server.disconnectGameRoom(roomCode, this);
                         } else
                             respond("Invalid room name");
-                        //todo make error-code and handeling client side
                         break;
                     case "CMes":
                         //Chat message
@@ -152,7 +150,6 @@ public class User implements Runnable {
                             server.writeToGameRoom(roomCode, this, received.substring(8));
                         } else
                             respond("Invalid room name");
-                        //todo make error-code and handeling client side
                         break;
                     case "GMes":
                         //Game message

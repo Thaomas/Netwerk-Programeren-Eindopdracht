@@ -64,13 +64,16 @@ public class JoinGameGUI {
         roomCodeLabel.setFont(Font.font("Arial", FontWeight.LIGHT, 20));
 
         TextField textField = new TextField();
-        HBox.setHgrow(textField, Priority.ALWAYS);
+        textField.setPrefWidth(92);
 
         Button buttonJoinGame = new Button("Join game");
         buttonJoinGame.setAlignment(Pos.CENTER);
         buttonJoinGame.setOnAction(event -> joinGameRoom(textField.getText()));
 
-        hBox.getChildren().addAll(separator, roomCodeLabel, textField, buttonJoinGame);
+        Separator separator2 = new Separator();
+        separator2.setOrientation(Orientation.VERTICAL);
+
+        hBox.getChildren().addAll(separator, roomCodeLabel, textField, buttonJoinGame,separator2,new Button("Refresh games"));
         hBox.setSpacing(8);
 
         borderPane.setTop(toolBar);

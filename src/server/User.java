@@ -163,6 +163,15 @@ public class User implements Runnable {
                         } else
                             respond("Invalid room name");
                         break;
+                    case "GVot":
+                        roomCode = received.substring(4, 8);
+                        if (server.containsGameRoom(roomCode)) {
+                            GameRoom room = server.getGameRooms().get(roomCode);
+                            if (room.containsUser(this)) {
+                                room.vote(this);
+                            }
+                        }
+                        break;
                     case "CrCR":
                         //Create chat room
                         respond(server.newChatRoom(received.substring(4)));

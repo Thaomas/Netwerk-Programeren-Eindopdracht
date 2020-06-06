@@ -60,7 +60,12 @@ public class GameListener implements Runnable {
                                     System.out.println("Loser");
                                     gameGui.restartGame(input.substring(8));
                                     break;
-
+                                case "Vote":
+                                    gameGui.vote();
+                                    break;
+                                case "Restart":
+                                    gameGui.restart();
+                                    break;
                             }
                         }
 

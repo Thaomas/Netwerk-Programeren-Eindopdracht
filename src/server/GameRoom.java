@@ -36,7 +36,7 @@ public class GameRoom {
         }
     }
 
-    public boolean isEmpty(){
+    public boolean isEmpty() {
         return red == null && yellow == null;
     }
 
@@ -118,7 +118,7 @@ public class GameRoom {
 
     private void win(User winner) {
         winner.win();
-        System.out.println(winner.getName()+ " won");
+        System.out.println(winner.getName() + " won");
         winner.respond("GMes" + roomCode + "Win");
     }
 
@@ -129,7 +129,7 @@ public class GameRoom {
     }
 
     //TODO
-    public synchronized void hasJoined(){
+    public synchronized void hasJoined() {
         if (red != null && yellow != null) {
             red.respond("GMes" + roomCode + "Conn" + yellow.getName());
             yellow.respond("GMes" + roomCode + "Conn" + red.getName());
@@ -149,5 +149,27 @@ public class GameRoom {
             red.respond("CMes" + roomCode + message);
         if (yellow != null)
             yellow.respond("CMes" + roomCode + message);
+    }
+
+    private boolean voteRed = false;
+    private boolean voteYellow = false;
+
+    public synchronized void vote(User user) {
+        if (user == red)
+            voteRed = true;
+        if (user == yellow)
+            voteYellow = true;
+
+        if (voteRed && voteYellow) {
+            yellow.respond("GMes" + roomCode + "Restart");
+            red.respond("GMes" + roomCode + "Restart");
+            connectFour.restart();
+            voteYellow = false;
+            voteRed = false;
+            isFinished = false;
+        } else{
+            yellow.respond("GMes" + roomCode + "Vote");
+            red.respond("GMes" + roomCode + "Vote");
+        }
     }
 }

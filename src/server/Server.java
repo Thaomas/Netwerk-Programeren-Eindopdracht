@@ -246,7 +246,7 @@ public class Server {
                     gameRooms.remove(room.getRoomCode());
                 }
             }
-            
+
             if (i >= 50) {
                 save();
                 i = 0;

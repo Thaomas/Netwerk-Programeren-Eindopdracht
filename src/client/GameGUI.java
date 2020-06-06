@@ -6,6 +6,7 @@ import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -16,7 +17,9 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
 import org.jfree.fx.FXGraphics2D;
@@ -39,10 +42,13 @@ public class GameGUI {
     private Thread listenThread;
     private String roomCode;
     private Text opponentName;
+    private String first;
+    private Text turn;
+
+    private GraphicsContext context;
 
     private Socket socket;
     private boolean inGame = true;
-    private boolean resetSquares = true;
 
     public void start(Stage primaryStage, MainMenuGUI mainMenuGUI, Socket socket,
                       String roomCode, ArrayList<String> gameChat, ArrayList<String> mainChat) {
@@ -51,6 +57,7 @@ public class GameGUI {
         this.roomCode = roomCode;
         this.mainChat = mainChat;
         this.gameChat = gameChat;
+        this.first = "R";
         BorderPane borderPane = new BorderPane();
 
         ToolBar toolBar = new ToolBar();
@@ -62,7 +69,7 @@ public class GameGUI {
 
         opponentName = new Text("No opponent ");
 
-        Text label = new Text("Waiting for an opponent");
+        turn = new Text("Waiting for an opponent");
 
         toolBar.getItems().add(backButton);
         toolBar.getItems().add(new Separator());
@@ -70,7 +77,7 @@ public class GameGUI {
         toolBar.getItems().add(new Separator());
         toolBar.getItems().add(opponentName);
         toolBar.getItems().add(new Separator());
-        toolBar.getItems().add(label);
+        toolBar.getItems().add(turn);
 
         borderPane.setTop(toolBar);
 
@@ -81,20 +88,21 @@ public class GameGUI {
         Canvas canvas = new Canvas(800, 700);
 
         fxGraphics2D = new FXGraphics2D(canvas.getGraphicsContext2D());
-
+        context = canvas.getGraphicsContext2D();
         canvas.setOnMouseClicked(event -> {
-            if (inGame) {
-                for (int i = 0; i < squares.size(); i++) {
-                    if (squares.get(i).getSquare().getBounds().contains(event.getX(), event.getY())) {
-                        try {
-                            DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
-                            dataOutputStream.writeUTF("GMes" + this.roomCode + i);
-
-                        } catch (IOException e) {
-                            e.printStackTrace();
+            try {
+                DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+                if (inGame) {
+                    for (int i = 0; i < squares.size(); i++) {
+                        if (squares.get(i).getSquare().getBounds().contains(event.getX(), event.getY())) {
+                            out.writeUTF("GMes" + this.roomCode + i);
                         }
                     }
+                } else {
+                    out.writeUTF("GVot" + roomCode);
                 }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         });
 
@@ -108,18 +116,8 @@ public class GameGUI {
                     }
                 }
                 draw(fxGraphics2D);
-            } else if (resetSquares) {
-                for (Square square : squares) {
-                    square.setColor(new Color(0, 0, 0, 0));
-                }
-                draw(fxGraphics2D);
-                resetSquares = false;
-                Square shape = new Square(new Rectangle((COLUMNS + 1) * SQUARE_SIZE, (ROWS + 1) * SQUARE_SIZE),
-                        new Color(255, 255, 255, 75));
-                shape.drawFill(fxGraphics2D);
             } else {
-                resetSquares = true;
-
+                resetScreen();
             }
         });
 
@@ -134,6 +132,13 @@ public class GameGUI {
         primaryStage.show();
         listenThread = new Thread(new GameListener(this, socket, this.roomCode));
         listenThread.start();
+        draw(fxGraphics2D);
+    }
+
+    private void resetScreen() {
+        for (Square square : squares) {
+            square.setColor(new Color(0, 0, 0, 0));
+        }
         draw(fxGraphics2D);
     }
 
@@ -165,6 +170,13 @@ public class GameGUI {
     protected void setOpponentName(String name) {
         Platform.runLater(() -> {
             opponentName.setText("Opponent: " + name);
+            turn.setText("Turn: RED");
+        });
+    }
+
+    private void setTurn(String turn) {
+        Platform.runLater(() -> {
+            this.turn.setText("Turn: " + turn);
         });
     }
 
@@ -175,6 +187,11 @@ public class GameGUI {
             Disc disc = (Disc) objectInputStream.readObject();
             if (disc != null) {
                 discs.add(disc);
+                if (disc.getColor().equals(Color.red)) {
+                    setTurn("YELLOW");
+                } else {
+                    setTurn("RED");
+                }
             }
 
         } catch (IOException | ClassNotFoundException e) {
@@ -187,9 +204,17 @@ public class GameGUI {
     }
 
     protected void restartGame(String state) {
+        if (state.equals("Win")) {
+            topString = "You won!";
+        } else if (state.equals("Lose")) {
+            topString = "You lost!";
+        } else
+            topString = "Error";
+        voteString = "0/2 votes";
         Platform.runLater(() -> {
             inGame = false;
-            restartPane(fxGraphics2D, state);
+//            restartPane(fxGraphics2D, state);
+            resetScreen();
         });
     }
 
@@ -209,11 +234,24 @@ public class GameGUI {
             disc.draw(fxGraphics2D);
         }
 
+        if (!inGame) {
+            Square shape = new Square(new Rectangle((COLUMNS + 1) * SQUARE_SIZE, (ROWS + 1) * SQUARE_SIZE),
+                    new Color(255, 255, 255, 75));
+            shape.drawFill(fxGraphics2D);
+            fxGraphics2D.setColor(Color.black);
+            context.setFont(new Font(75));
+            context.setTextAlign(TextAlignment.CENTER);
+            context.fillText(topString, 400, 250);
+            context.fillText("Click to play again!", 400, 325);
+            context.fillText(voteString, 400, 400);
+        }
     }
+
+    private String topString = "TEST";
+    private String voteString = "TEST";
 
     //doesnt work properly
     private void restartPane(FXGraphics2D fxGraphics2D, String state) {
-
 
 
 //        vBox.getChildren().add(new Label("You " + state + "!"));
@@ -375,4 +413,21 @@ public class GameGUI {
         }
     }
 
+    public void vote() {
+        voteString = "1/2 votes";
+        resetScreen();
+    }
+
+    public void restart() {
+        discs.clear();
+        inGame = true;
+        if (first.equals("R")) {
+            first = "Y";
+            turn.setText("Turn: YELLOW");
+        } else {
+            first = "R";
+            turn.setText("Turn: RED");
+        }
+        resetScreen();
+    }
 }

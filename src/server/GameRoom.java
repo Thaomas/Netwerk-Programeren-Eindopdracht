@@ -68,12 +68,14 @@ public class GameRoom {
                 if (inProgress) {
                     win(yellow);
                     lose(red);
+                    inProgress = false;
                 }
                 red = null;
             } else {
                 if (inProgress) {
                     win(red);
                     lose(yellow);
+                    inProgress = false;
                 }
                 yellow = null;
             }

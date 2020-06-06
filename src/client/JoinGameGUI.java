@@ -13,8 +13,10 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
+import util.AlertHandler;
 import util.RandomString;
 
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -123,13 +125,27 @@ public class JoinGameGUI {
         try {
             roomCode = roomCode.toLowerCase();
             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
-            out.writeUTF("Conn"+roomCode);
-            ObjectInputStream inObj = new ObjectInputStream(socket.getInputStream());
-            ArrayList<String> gameChat = new ArrayList<>((ArrayList<String>)inObj.readObject());
-            inObj = new ObjectInputStream(socket.getInputStream());
-            ArrayList<String> mainChat = new ArrayList<>((ArrayList<String>) inObj.readObject());
+            DataInputStream in = new DataInputStream(socket.getInputStream());
+            out.writeUTF("Conn" + roomCode);
+            String response = in.readUTF();
 
-            new GameGUI().start(stage, mainMenuGUI,socket,roomCode, gameChat, mainChat);
+            switch (response) {
+                case "Conf":
+                    ObjectInputStream inObj = new ObjectInputStream(socket.getInputStream());
+                    ArrayList<String> gameChat = new ArrayList<>((ArrayList<String>) inObj.readObject());
+                    inObj = new ObjectInputStream(socket.getInputStream());
+                    ArrayList<String> mainChat = new ArrayList<>((ArrayList<String>) inObj.readObject());
+                    new GameGUI().start(stage, mainMenuGUI, socket, roomCode, gameChat, mainChat);
+                    break;
+                case "Full":
+                    AlertHandler.show(Alert.AlertType.ERROR,"Room Full", "Room Full", "The room you tried to join is full.");
+                    break;
+                case "Invalid":
+                    AlertHandler.show(Alert.AlertType.ERROR, "Invalid Code", "Invalid Code", "The selected room does not exist");
+                    break;
+
+            }
+
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }

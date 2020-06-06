@@ -270,6 +270,9 @@ public class Server {
         for (ChatRoom room : chatRooms.values()) {
             room.removeUser(user);
         }
+        for (GameRoom gameRoom : gameRooms.values()){
+            gameRoom.removeUser(user);
+        }
         Thread t = getClientThreads().get(nickname);
         try {
             t.join();

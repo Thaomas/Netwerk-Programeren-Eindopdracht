@@ -4,8 +4,10 @@ import client.gamelogic.Disc;
 import client.gamelogic.Square;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -16,14 +18,15 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
+import javafx.scene.text.*;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import org.jfree.fx.FXGraphics2D;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -81,6 +84,7 @@ public class GameGUI {
         Canvas canvas = new Canvas(800, 700);
 
         fxGraphics2D = new FXGraphics2D(canvas.getGraphicsContext2D());
+        graphicsContext = canvas.getGraphicsContext2D();
 
         canvas.setOnMouseClicked(event -> {
             if (inGame) {
@@ -97,7 +101,6 @@ public class GameGUI {
                 }
             }
         });
-
 
         Color transparent = new Color(255, 255, 255, 50);
         Color noColor = new Color(0, 0, 0, 0);
@@ -116,9 +119,9 @@ public class GameGUI {
                     square.setColor(noColor);
                 }
                 draw(fxGraphics2D);
-                resetSquares=false;
+                resetSquares = false;
             } else {
-                resetSquares=true;
+                resetSquares = true;
 
             }
         });
@@ -163,9 +166,7 @@ public class GameGUI {
     }
 
     protected void setOpponentName(String name) {
-        Platform.runLater(() -> {
-            opponentName.setText("Opponent: " + name);
-        });
+        Platform.runLater(() -> opponentName.setText("Opponent: " + name));
     }
 
     protected void placeDisc() {
@@ -181,22 +182,25 @@ public class GameGUI {
             e.printStackTrace();
         }
 
-        Platform.runLater(() -> {
-            draw(fxGraphics2D);
-        });
+        Platform.runLater(() -> draw(fxGraphics2D));
     }
 
     protected void restartGame(String state) {
         Platform.runLater(() -> {
-            restartPane(fxGraphics2D, state);
+            inGame = false;
+            this.state = state;
+            draw(fxGraphics2D);
         });
     }
 
+    private String state = "";
+    private GraphicsContext graphicsContext;
 
     private void draw(FXGraphics2D fxGraphics2D) {
         fxGraphics2D.setBackground(Color.white);
         fxGraphics2D.clearRect(0, 0, (COLUMNS + 1) * SQUARE_SIZE, (ROWS + 1) * SQUARE_SIZE);
         fxGraphics2D.setTransform(new AffineTransform());
+
 
         makeConnect4Grid().drawFill(fxGraphics2D);
 
@@ -208,6 +212,10 @@ public class GameGUI {
             disc.draw(fxGraphics2D);
         }
 
+        if (!inGame) {
+            restartPane(fxGraphics2D, state);
+        }
+
     }
 
     //doesnt work properly
@@ -215,12 +223,18 @@ public class GameGUI {
         inGame = false;
 
         Square shape = new Square(new Rectangle((COLUMNS + 1) * SQUARE_SIZE, (ROWS + 1) * SQUARE_SIZE),
-                new Color(0, 0, 0, 0));
+                new Color(255, 255, 255, 70));
         shape.drawFill(fxGraphics2D);
 
-//        vBox.getChildren().add(new Label("You " + state + "!"));
-//        vBox.getChildren().add(new Label("Click to play again!"));
-//        vBox.getChildren().add(new Label("(insert amount of players clicked)/2"));
+        graphicsContext.setFill(javafx.scene.paint.Color.color(0,0,0,.75));
+        graphicsContext.fillRect(160,200,480,200);
+        graphicsContext.setFill(javafx.scene.paint.Color.WHITE);
+        graphicsContext.setFont(Font.font("Arial", FontWeight.NORMAL,50));
+        graphicsContext.setTextAlign(TextAlignment.CENTER);
+        graphicsContext.fillText("You " + state + "!", 400, 270);
+        graphicsContext.fillText("Vote to play again!", 400, 320);
+        graphicsContext.fillText("0/2", 400, 370);
+
     }
 
     public Square makeConnect4Grid() {
@@ -351,19 +365,14 @@ public class GameGUI {
 
     private void backButton() {
         try {
-            int i = 0;
             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
             out.writeUTF("Disc" + roomCode);
-            System.out.println(i++);
 
             out.writeUTF("Discmain");
-            System.out.println(i++);
 
             listenThread.join();
-            System.out.println(i++);
 
             mainMenuGUI.start();
-            System.out.println(i++);
 
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();

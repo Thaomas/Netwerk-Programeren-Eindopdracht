@@ -118,11 +118,10 @@ public class User implements Runnable {
                         } else if (server.containsGameRoom(roomCode)) {
                             if (server.connectToGameRoom(roomCode, this)) {
                                 respond("Conf");
-                                GameRoom room = server.getGameRooms().get(roomCode);
                                 sendChatLog(server.getChatLog(roomCode));
                                 server.connectToChatRoom("main", this);
                                 sendChatLog(server.getChatLog("main"));
-                                room.hasJoined();
+                                server.getGameRooms().get(roomCode).hasJoined();
                             } else
                                 respond("Full");
                         } else

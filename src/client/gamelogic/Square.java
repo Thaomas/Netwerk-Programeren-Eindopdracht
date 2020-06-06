@@ -12,7 +12,7 @@ public class Square {
 
     public Square(Shape square, Color color) {
         this.square = square;
-        this.position = new Point2D.Double(0, 0);
+//        this.position = new Point2D.Double(0, 0);
         this.color = color;
     }
 
@@ -29,7 +29,7 @@ public class Square {
     }
 
     public void drawFill(FXGraphics2D graphics2D) {
-        graphics2D.translate(position.getX(), position.getY());
+//        graphics2D.translate(position.getX(), position.getY());
         graphics2D.setColor(color);
         graphics2D.fill(square);
     }

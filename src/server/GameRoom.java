@@ -70,7 +70,7 @@ public class GameRoom {
 
     public void removeUser(User user) {
         if (red == user || yellow == user) {
-            if (red.equals(user)) {
+            if (red == user) {
                 if (inProgress) {
                     win(yellow);
                     lose(red);

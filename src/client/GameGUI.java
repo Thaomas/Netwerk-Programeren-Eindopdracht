@@ -4,7 +4,6 @@ import client.gamelogic.Disc;
 import client.gamelogic.Square;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -19,13 +18,13 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.*;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import org.jfree.fx.FXGraphics2D;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
-import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -174,13 +173,10 @@ public class GameGUI {
     }
 
     private void setTurn(String turn) {
-        Platform.runLater(() -> {
-            this.turn.setText("Turn: " + turn);
-        });
+        Platform.runLater(() -> this.turn.setText("Turn: " + turn));
     }
 
     protected void placeDisc() {
-
         try {
             ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
             Disc disc = (Disc) objectInputStream.readObject();
@@ -192,7 +188,6 @@ public class GameGUI {
                     setTurn("RED");
                 }
             }
-
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -216,7 +211,6 @@ public class GameGUI {
     }
 
     private String state = "";
-    private GraphicsContext graphicsContext;
 
     private void draw(FXGraphics2D fxGraphics2D) {
         fxGraphics2D.setBackground(Color.white);
@@ -233,7 +227,6 @@ public class GameGUI {
         for (Disc disc : discs) {
             disc.draw(fxGraphics2D);
         }
-
         if (!inGame) {
             restartPane(fxGraphics2D, state);
         }
@@ -250,14 +243,14 @@ public class GameGUI {
                 new Color(255, 255, 255, 70));
         shape.drawFill(fxGraphics2D);
 
-        graphicsContext.setFill(javafx.scene.paint.Color.color(0,0,0,.75));
-        graphicsContext.fillRect(160,200,480,200);
-        graphicsContext.setFill(javafx.scene.paint.Color.WHITE);
-        graphicsContext.setFont(Font.font("Arial", FontWeight.NORMAL,50));
-        graphicsContext.setTextAlign(TextAlignment.CENTER);
-        graphicsContext.fillText("You " + state + "!", 400, 270);
-        graphicsContext.fillText("Vote to play again!", 400, 320);
-        graphicsContext.fillText("0/2", 400, 370);
+        context.setFill(javafx.scene.paint.Color.color(0,0,0,.75));
+        context.fillRect(160,200,480,200);
+        context.setFill(javafx.scene.paint.Color.WHITE);
+        context.setFont(Font.font("Arial", FontWeight.NORMAL,50));
+        context.setTextAlign(TextAlignment.CENTER);
+        context.fillText(topString, 400, 270);
+        context.fillText("Vote to play again!", 400, 320);
+        context.fillText(voteString, 400, 370);
 
     }
 

@@ -6,12 +6,8 @@ import java.awt.*;
 import java.util.Optional;
 
 public class ConnectFour {
-    
-    //todo if game ends stop adding
-    //todo if game ends swap color if game ends
-    //todo game end screen
-    //todo replay vote
-    //todo join game refreshing
+    //TODO Fix label showing correct turn
+    //TODO Leaderboard maybe
 
     private final int SQUARE_SIZE = 100;
     private final int columns = 7;
@@ -53,8 +49,6 @@ public class ConnectFour {
         }
 
             disc = new Disc(column,row, Color.red, SQUARE_SIZE);
-
-
             disc.setColor(color);
 
             grid[column][row] = disc;

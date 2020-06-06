@@ -8,6 +8,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -16,6 +17,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import util.AlertHandler;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -117,6 +119,20 @@ public class AdministrationGUI extends Application {
             }
         });
 
+        username.setOnKeyPressed(e -> {
+            // On Enter press
+            if (e.getCode() == KeyCode.ENTER) {
+                password.requestFocus();
+            }
+        });
+
+        password.setOnKeyPressed(e -> {
+            // On Enter press
+            if (e.getCode() == KeyCode.ENTER) {
+                loginButton.fire();
+            }
+        });
+
         gridPane.add(login, 0, 0);
         gridPane.add(loginButton, 1, 3);
 
@@ -140,17 +156,17 @@ public class AdministrationGUI extends Application {
                 if (response.equals("connected")) {
                     return true;
                 } else if (response.contains("error")) {
-                    if (response.charAt(5) == '2') {
-                        //Invalid Password
+                    switch (response.charAt(5)) {
+                        case '2':
+                            AlertHandler.show(Alert.AlertType.ERROR, "Invalid Password", "Invalid Password", "Entered password is incorrect.");
+                            break;
+                        case '3':
+                            AlertHandler.show(Alert.AlertType.ERROR, "Invalid Name", "Invalid Name", "No user with entered name exists.");
+                            break;
+                        case '5':
+                            AlertHandler.show(Alert.AlertType.ERROR, "User already connected", "User already connected", "User is already connected.");
+                            break;
 
-                        System.out.println("invalid password");
-                    } else if (response.charAt(5) == '3') {
-                        //invalid Username
-                        System.out.println("invalid name");
-
-                    } else if (response.charAt(5) == '5') {
-                        //User already connected
-                        System.out.println("User already connected");
                     }
                 }
                 return false;
@@ -175,6 +191,21 @@ public class AdministrationGUI extends Application {
             }
         });
 
+        username.setOnKeyPressed(e -> {
+            // On Enter press
+            if (e.getCode() == KeyCode.ENTER) {
+                password.requestFocus();
+            }
+        });
+
+        password.setOnKeyPressed(e -> {
+            // On Enter press
+            if (e.getCode() == KeyCode.ENTER) {
+                registerButton.fire();
+            }
+        });
+
+
         gridPane.add(register, 0, 0);
         gridPane.add(registerButton, 1, 3);
 
@@ -198,7 +229,7 @@ public class AdministrationGUI extends Application {
                     return true;
                 } else if (response.contains("error")) {
                     //Name already in use
-                    System.out.println("invalid name");
+                    AlertHandler.show(Alert.AlertType.ERROR, "Invalid Name", "Invalid Name", "Username is already taken.");
                 }
                 return false;
             } catch (IOException e) {

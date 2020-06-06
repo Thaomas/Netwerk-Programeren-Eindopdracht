@@ -28,6 +28,10 @@ public class Square {
         this.color = color;
     }
 
+    public void setPosition(Point2D position) {
+        this.position = position;
+    }
+
     public void drawFill(FXGraphics2D graphics2D) {
 //        graphics2D.translate(position.getX(), position.getY());
         graphics2D.setColor(color);

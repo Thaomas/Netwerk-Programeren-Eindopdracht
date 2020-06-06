@@ -4,6 +4,7 @@ import client.gamelogic.Disc;
 import client.gamelogic.Square;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -17,16 +18,14 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
-import javafx.scene.text.TextFlow;
+import javafx.scene.text.*;
 import javafx.stage.Stage;
 import org.jfree.fx.FXGraphics2D;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Area;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -198,9 +197,7 @@ public class GameGUI {
             e.printStackTrace();
         }
 
-        Platform.runLater(() -> {
-            draw(fxGraphics2D);
-        });
+        Platform.runLater(() -> draw(fxGraphics2D));
     }
 
     protected void restartGame(String state) {
@@ -218,11 +215,14 @@ public class GameGUI {
         });
     }
 
+    private String state = "";
+    private GraphicsContext graphicsContext;
 
     private void draw(FXGraphics2D fxGraphics2D) {
         fxGraphics2D.setBackground(Color.white);
         fxGraphics2D.clearRect(0, 0, (COLUMNS + 1) * SQUARE_SIZE, (ROWS + 1) * SQUARE_SIZE);
         fxGraphics2D.setTransform(new AffineTransform());
+
 
         makeConnect4Grid().drawFill(fxGraphics2D);
 
@@ -235,16 +235,9 @@ public class GameGUI {
         }
 
         if (!inGame) {
-            Square shape = new Square(new Rectangle((COLUMNS + 1) * SQUARE_SIZE, (ROWS + 1) * SQUARE_SIZE),
-                    new Color(255, 255, 255, 75));
-            shape.drawFill(fxGraphics2D);
-            fxGraphics2D.setColor(Color.black);
-            context.setFont(new Font(75));
-            context.setTextAlign(TextAlignment.CENTER);
-            context.fillText(topString, 400, 250);
-            context.fillText("Click to play again!", 400, 325);
-            context.fillText(voteString, 400, 400);
+            restartPane(fxGraphics2D, state);
         }
+
     }
 
     private String topString = "TEST";
@@ -253,10 +246,19 @@ public class GameGUI {
     //doesnt work properly
     private void restartPane(FXGraphics2D fxGraphics2D, String state) {
 
+        Square shape = new Square(new Rectangle((COLUMNS + 1) * SQUARE_SIZE, (ROWS + 1) * SQUARE_SIZE),
+                new Color(255, 255, 255, 70));
+        shape.drawFill(fxGraphics2D);
 
-//        vBox.getChildren().add(new Label("You " + state + "!"));
-//        vBox.getChildren().add(new Label("Click to play again!"));
-//        vBox.getChildren().add(new Label("(insert amount of players clicked)/2"));
+        graphicsContext.setFill(javafx.scene.paint.Color.color(0,0,0,.75));
+        graphicsContext.fillRect(160,200,480,200);
+        graphicsContext.setFill(javafx.scene.paint.Color.WHITE);
+        graphicsContext.setFont(Font.font("Arial", FontWeight.NORMAL,50));
+        graphicsContext.setTextAlign(TextAlignment.CENTER);
+        graphicsContext.fillText("You " + state + "!", 400, 270);
+        graphicsContext.fillText("Vote to play again!", 400, 320);
+        graphicsContext.fillText("0/2", 400, 370);
+
     }
 
     public Square makeConnect4Grid() {
@@ -387,19 +389,14 @@ public class GameGUI {
 
     private void backButton() {
         try {
-            int i = 0;
             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
             out.writeUTF("Disc" + roomCode);
-            System.out.println(i++);
 
             out.writeUTF("Discmain");
-            System.out.println(i++);
 
             listenThread.join();
-            System.out.println(i++);
 
             mainMenuGUI.start();
-            System.out.println(i++);
 
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();

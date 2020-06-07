@@ -345,4 +345,15 @@ public class Server {
     }
 
 
+    public HashMap<String, HashMap<String, Integer>> getLeaderboard() {
+        HashMap<String, HashMap<String, Integer>>leaderboard = new HashMap<>();
+        HashMap<String, Integer> values;
+        for (User user: users.values()) {
+            values = new HashMap<>();
+            values.put("played", user.getGamesPlayed());
+            values.put("won", user.getGamesWon());
+            leaderboard.put(user.getName(), values);
+        }
+        return leaderboard;
+    }
 }

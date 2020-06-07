@@ -10,9 +10,12 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import util.SimplePropertyConverter;
 
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 
 public class LeaderboardGUI {
 
@@ -24,6 +27,12 @@ public class LeaderboardGUI {
         stage = primaryStage;
         this.mainMenuGUI = mainMenuGUI;
         this.socket = socket;
+        try {
+            new DataOutputStream(socket.getOutputStream()).writeUTF("GLea");
+            HashMap<String, HashMap<String, Integer>> leader = new HashMap<>();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         BorderPane borderPane = new BorderPane();
 

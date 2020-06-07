@@ -194,6 +194,10 @@ public class User implements Runnable {
 
                         System.out.println("server: list call after" + received);
                         break;
+                    case "GLea":
+                        //Get leaderboard
+                        new ObjectOutputStream(socket.getOutputStream()).writeObject(server.getLeaderboard());
+                        break;
                     case "DelU":
                         //Deletes the user from the server
                         if(received.substring(4).equals(password)) {

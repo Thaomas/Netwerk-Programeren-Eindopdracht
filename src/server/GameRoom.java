@@ -6,44 +6,45 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class GameRoom {
-    private final boolean isPrivate;
-    private boolean inProgress;
-    private boolean isFinished;
-    private final String roomName;
-    private final String roomCode;
-    private final ArrayList<String> chatlog;
     private User red;
     private User yellow;
+    private boolean voteRed;
+    private boolean voteYellow;
+    private boolean inProgress;
+    private boolean isFinished;
+    private final boolean isPrivate;
+    private final String roomName;
+    private final String roomCode;
     private final ConnectFour connectFour;
-    private boolean voteRed = false;
-    private boolean voteYellow = false;
-
+    private final ArrayList<String> chatlog;
 
     public GameRoom(String roomname, String roomcode, boolean isPrivate) {
         this.roomName = roomname;
         this.roomCode = roomcode;
         this.isPrivate = isPrivate;
+        this.voteRed = false;
+        this.voteYellow = false;
         this.isFinished = false;
         chatlog = new ArrayList<>();
         connectFour = new ConnectFour();
     }
 
-    public boolean isEmpty() {
-        return red == null && yellow == null;
+    /**
+     * Check if the room contains the given User.
+     *
+     * @param user User to check.
+     * @return If the room contains the User.
+     */
+    public boolean containsUser(User user) {
+        return red.equals(user) || yellow.equals(user);
     }
 
-    public boolean isPrivate() {
-        return isPrivate;
-    }
-
-    public String getRoomCode() {
-        return roomCode;
-    }
-
-    public String getRoomName() {
-        return roomName;
-    }
-
+    /**
+     * Add an User to the GameRoom
+     *
+     * @param user User to add.
+     * @return If the User has been added.
+     */
     public synchronized boolean addUser(User user) {
         if (red == null || yellow == null) {
             if (red == null) {
@@ -56,10 +57,11 @@ public class GameRoom {
             return false;
     }
 
-    public boolean containsUser(User user) {
-        return red.equals(user) || yellow.equals(user);
-    }
-
+    /**
+     * Removes user from a GameRoom.
+     *
+     * @param user User to remove.
+     */
     public void removeUser(User user) {
         if (red == user || yellow == user) {
             if (red == user) {
@@ -90,14 +92,30 @@ public class GameRoom {
         }
     }
 
+    /**
+     * Gets the chatLog from the GameRoom.
+     *
+     * @return An Arraylist of chat messages.
+     */
     public ArrayList<String> getChatLog() {
         return this.chatlog;
     }
 
+    /**
+     * A check to see if there is space in the GameRoom.
+     *
+     * @return Boolean if there is space.
+     */
     public synchronized boolean checkSpace() {
         return red == null || yellow == null;
     }
 
+    /**
+     * A move send by a User.
+     *
+     * @param column The chosen column.
+     * @param user   The user that made the move.
+     */
     public synchronized void move(int column, User user) {
         if (red != null && yellow != null && !isFinished) {
             if (!inProgress)
@@ -121,16 +139,31 @@ public class GameRoom {
         }
     }
 
+    /**
+     * Messages the User that has won.
+     *
+     * @param winner The User that won the game.
+     */
     private void win(User winner) {
         winner.win();
         winner.respond("GMes" + roomCode + "Win");
     }
 
+    /**
+     * Messages the User that has lost.
+     *
+     * @param loser The User that lost the game.
+     */
     private void lose(User loser) {
         loser.lose();
         loser.respond("GMes" + roomCode + "Lose");
     }
 
+    /**
+     * Messages all Users that the User has joined.
+     *
+     * @param joined The joined User.
+     */
     public synchronized void hasJoined(User joined) {
         if (red != null && yellow != null) {
             red.respond("GMes" + roomCode + "Conn" + yellow.getName());
@@ -144,6 +177,11 @@ public class GameRoom {
         }
     }
 
+    /**
+     * Sends the move to all the connected users.
+     *
+     * @param disc The move.
+     */
     private synchronized void moveAll(Disc disc) {
         red.respond("GMes" + roomCode + "Move");
         red.sendDisc(disc);
@@ -151,6 +189,11 @@ public class GameRoom {
         yellow.sendDisc(disc);
     }
 
+    /**
+     * Messages all the connected users the message.
+     *
+     * @param message The send message.
+     */
     public synchronized void messageAll(String message) {
         chatlog.add(message);
         if (red != null)
@@ -159,6 +202,11 @@ public class GameRoom {
             yellow.respond("CMes" + roomCode + message);
     }
 
+    /**
+     * Vote to play another game.
+     *
+     * @param user User that voted.
+     */
     public synchronized void vote(User user) {
         if (user == red)
             voteRed = true;
@@ -178,6 +226,12 @@ public class GameRoom {
         }
     }
 
+    /**
+     * Gets which color starts first.
+     *
+     * @param user The user to send it to.
+     * @return The color which starts first.
+     */
     public String getTurn(User user) {
         if (user.equals(red)) {
             return connectFour.getStart() + "R";
@@ -185,5 +239,21 @@ public class GameRoom {
             return connectFour.getStart() + "Y";
         }
         return "";
+    }
+
+    public boolean isEmpty() {
+        return red == null && yellow == null;
+    }
+
+    public boolean isPrivate() {
+        return isPrivate;
+    }
+
+    public String getRoomCode() {
+        return roomCode;
+    }
+
+    public String getRoomName() {
+        return roomName;
     }
 }

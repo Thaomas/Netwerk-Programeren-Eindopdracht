@@ -86,13 +86,10 @@ public class User implements Runnable {
 
     @Override
     public void run() {
-        System.out.println("Start user: " + name);
         isConnected = true;
         while (isConnected) {
             try {
-                System.out.println("Start2 user: " + name);
                 String received = this.in.readUTF();
-                System.out.println(received);
                 String command = received.substring(0, 4);
 
                 String roomCode;
@@ -103,11 +100,9 @@ public class User implements Runnable {
                         break;
                     case "Conn":
                         //Connect with the server
-                        System.out.println("Connect " + name + " to " + received.substring(4, 8));
                         roomCode = received.substring(4, 8);
                         if (server.containsChatRoom(roomCode)) {
                             server.connectToChatRoom(roomCode, this);
-                            System.out.println("Connected " + this.name + " to " + roomCode);
                             respond("Conf");
                             sendChatLog(server.getChatLog(roomCode));
                         } else if (server.containsGameRoom(roomCode)) {
@@ -124,9 +119,7 @@ public class User implements Runnable {
                         break;
                     case "Disc":
                         //Disconnect from the given Room
-                        System.out.println("test full received: " + received);
                         roomCode = received.substring(4, 8);
-                        System.out.println("test roomcode: " + received);
                         if (server.containsChatRoom(roomCode)) {
                             server.disconnectChatRoom(roomCode, this);
                             respond("Disc");
@@ -151,7 +144,6 @@ public class User implements Runnable {
                         if (server.containsGameRoom(roomCode)) {
                             GameRoom room = server.getGameRooms().get(roomCode);
                             if (room.containsUser(this)) {
-                                System.out.println("test roomcode GMes addDISC");
                                 respond("GMes"+roomCode);
                                 room.move(Integer.parseInt(received.substring(8)),this);
                             }
@@ -189,10 +181,7 @@ public class User implements Runnable {
                         break;
                     case "GLst":
                         //JoinGameGUI list of public games
-                        System.out.println("server: list call before" + received);
                         sendGameRoomList(server.getGameRoomNames());
-
-                        System.out.println("server: list call after" + received);
                         break;
                     case "GLea":
                         //Get leaderboard
@@ -213,12 +202,10 @@ public class User implements Runnable {
                         break;
                 }
             } catch (IOException e) {
-                System.out.println("error");
                 e.getMessage();
                 disconnect();
             }
         }
-        System.out.println("Stopped running");
     }
 
     private void sendChatLog(ArrayList<String> chatLog) {
@@ -240,9 +227,7 @@ public class User implements Runnable {
 
     public void sendDisc(Disc disc) {
         try {
-            System.out.println("in disc");
             new ObjectOutputStream(socket.getOutputStream()).writeObject(disc);
-            System.out.println("out disc");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -285,7 +270,6 @@ public class User implements Runnable {
     }
 
     public void respond(String response) {
-        System.out.println(response);
         try {
             new DataOutputStream(socket.getOutputStream()).writeUTF(response);
         } catch (IOException e) {

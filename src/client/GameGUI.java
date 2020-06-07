@@ -300,12 +300,9 @@ public class GameGUI {
         comboBox.prefWidthProperty().bind(borderPane.widthProperty().subtract(20));
         comboBox.setTranslateX(10);
         comboBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            System.out.println(comboBox.getSelectionModel().getSelectedItem());
             if (comboBox.getSelectionModel().getSelectedItem().equals("Game chat")) {
-                System.out.println("Game chat");
                 setChat(gameChat);
             } else if (comboBox.getSelectionModel().getSelectedItem().equals("Global chat")) {
-                System.out.println("Main chat");
                 setChat(mainChat);
             }
         });
@@ -356,7 +353,6 @@ public class GameGUI {
 
                     DataOutputStream out = new DataOutputStream(socket.getOutputStream());
                     out.writeUTF("CMes" + roomcode + textField.getText());
-                    System.out.println("CMes" + roomcode + textField.getText());
                 } catch (IOException ioException) {
                     ioException.printStackTrace();
                 }
@@ -418,7 +414,6 @@ public class GameGUI {
             first = "RED";
             turn.setText("Turn: RED");
         }
-        System.out.println();
         Platform.runLater(this::resetScreen);
     }
 }

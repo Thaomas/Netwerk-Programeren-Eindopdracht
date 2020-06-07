@@ -20,7 +20,6 @@ public class GameRoom {
 
 
     public GameRoom(String roomname, String roomcode, boolean isPrivate) {
-        System.out.println(roomname + " " + isPrivate);
         this.roomName = roomname;
         this.roomCode = roomcode;
         this.isPrivate = isPrivate;
@@ -28,7 +27,7 @@ public class GameRoom {
         chatlog = new ArrayList<>();
         connectFour = new ConnectFour();
     }
-    
+
     public boolean isEmpty() {
         return red == null && yellow == null;
     }
@@ -65,7 +64,6 @@ public class GameRoom {
         if (red == user || yellow == user) {
             if (red == user) {
                 if (inProgress) {
-                    System.out.println(user.getName() + "left");
                     yellow.win();
                     red.lose();
                     inProgress = false;
@@ -75,7 +73,6 @@ public class GameRoom {
                 red = null;
             } else {
                 if (inProgress) {
-                    System.out.println(user.getName() + "left");
                     red.win();
                     yellow.lose();
                     inProgress = false;
@@ -126,13 +123,11 @@ public class GameRoom {
 
     private void win(User winner) {
         winner.win();
-        System.out.println(winner.getName() + " won");
         winner.respond("GMes" + roomCode + "Win");
     }
 
     private void lose(User loser) {
         loser.lose();
-        System.out.println(loser.getName() + " lost");
         loser.respond("GMes" + roomCode + "Lose");
     }
 
@@ -184,9 +179,9 @@ public class GameRoom {
     }
 
     public String getTurn(User user) {
-        if (user.equals(red)){
+        if (user.equals(red)) {
             return connectFour.getStart() + "R";
-        }else if (user.equals(yellow)){
+        } else if (user.equals(yellow)) {
             return connectFour.getStart() + "Y";
         }
         return "";

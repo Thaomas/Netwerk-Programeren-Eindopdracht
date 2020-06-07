@@ -114,7 +114,6 @@ public class LoginGUI extends Application {
         Button loginButton = new Button("Login");
         loginButton.setOnAction(e -> {
             if (tryLogin()) {
-                System.out.println(username.getText() + "|" + password.getText());
                 clientGUI();
             }
         });
@@ -186,7 +185,6 @@ public class LoginGUI extends Application {
         Button registerButton = new Button("Register account");
         registerButton.setOnAction(event -> {
             if (tryRegister()) {
-                System.out.println(username.getText() + "|" + password.getText());
                 clientGUI();
             }
         });

@@ -43,7 +43,7 @@ public class ChatGUI {
         Button backButton = new Button("Back");
         backButton.setOnAction(event -> {
             try {
-                out.writeUTF("Disc"+this.roomCode);
+                out.writeUTF("Disc" + this.roomCode);
                 listenThread.join();
             } catch (InterruptedException | IOException e) {
                 e.printStackTrace();
@@ -59,6 +59,7 @@ public class ChatGUI {
         primaryStage.setTitle("Global chat");
         primaryStage.show();
     }
+
     private BorderPane chatBox(Socket socket, ArrayList<String> chatlog) {
         BorderPane borderPane = new BorderPane();
 
@@ -67,8 +68,8 @@ public class ChatGUI {
         textFlow.setLineSpacing(5);
         VBox.setVgrow(textFlow, Priority.ALWAYS);
 
-        for (String message : chatlog){
-            if (textFlow.getChildren().size()>0)
+        for (String message : chatlog) {
+            if (textFlow.getChildren().size() > 0)
                 message = "\n" + message;
             textFlow.getChildren().add(new Text(message));
         }
@@ -101,8 +102,7 @@ public class ChatGUI {
         sendButton.setOnAction(e -> {
             if (!chatTextField.getText().isEmpty() && !chatTextField.getText().equals("")) {
                 try {
-                    out.writeUTF("CMes" + this.roomCode +chatTextField.getText());
-                    System.out.println("CMes" + this.roomCode +chatTextField.getText());
+                    out.writeUTF("CMes" + this.roomCode + chatTextField.getText());
                 } catch (IOException ioException) {
                     ioException.printStackTrace();
                 }
@@ -130,11 +130,11 @@ public class ChatGUI {
         return borderPane;
     }
 
-    protected void addMessage(String message){
-        Platform.runLater(()-> textFlow.getChildren().add(new Text("\n"+message)));
+    protected void addMessage(String message) {
+        Platform.runLater(() -> textFlow.getChildren().add(new Text("\n" + message)));
     }
 
-     private void clientGUI() {
+    private void clientGUI() {
         mainMenuGUI.start();
     }
 

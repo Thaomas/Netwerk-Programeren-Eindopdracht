@@ -103,7 +103,6 @@ public class CreateGameGUI {
             in.readUTF();
             ObjectInputStream inOb = new ObjectInputStream(socket.getInputStream());
             ArrayList<String> mainChat = (ArrayList<String>) inOb.readObject();
-            System.out.println(mainChat);
 
             new GameGUI().start(stage, mainMenuGUI, socket, roomCode, new ArrayList<>(), mainChat, "RED", "RED");
         } catch (IOException | ClassNotFoundException e) {

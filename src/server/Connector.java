@@ -12,7 +12,6 @@ public class Connector implements Runnable {
 
     public Connector(Socket socket, Server server) {
         this.socket = socket;
-        System.out.println(socket.getPort());
         this.server = server;
     }
 
@@ -35,7 +34,6 @@ public class Connector implements Runnable {
                     String password = input.substring(input.indexOf('|') + 1);
                     User user;
                     if (answer.equals("RegU")) {
-                        System.out.println("Register");
                         if (!server.getUsers().containsKey(nickname)) {
                             user = new User(nickname, password, server);
                             server.addUser(user);
@@ -45,7 +43,6 @@ public class Connector implements Runnable {
                             continue;
                         }
                     } else {
-                        System.out.println("Login");
                         if (server.getUsers().containsKey(nickname)) {
                             if (server.getUsers().get(nickname).checkPassword(password)) {
                                 user = server.getUsers().get(nickname);
@@ -88,7 +85,6 @@ public class Connector implements Runnable {
     public void respond(String response) {
         try {
             new DataOutputStream(socket.getOutputStream()).writeUTF(response);
-            System.out.println(response);
         } catch (IOException e) {
             e.printStackTrace();
         }

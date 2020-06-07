@@ -5,6 +5,9 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -16,6 +19,7 @@ import javafx.stage.Stage;
 import util.AlertHandler;
 import util.RandomString;
 
+import java.awt.*;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -77,7 +81,7 @@ public class JoinGameGUI {
         Button buttonRefreshGames = new Button("Refresh games");
         buttonRefreshGames.setOnAction(event -> setAvailableGames());
 
-        hBox.getChildren().addAll(separator, roomCodeLabel, textField, buttonJoinGame, separator2,buttonRefreshGames );
+        hBox.getChildren().addAll(separator, roomCodeLabel, textField, buttonJoinGame, separator2, buttonRefreshGames);
         hBox.setSpacing(8);
 
         borderPane.setTop(toolBar);
@@ -105,7 +109,7 @@ public class JoinGameGUI {
 
     private ListView<HBox> listView;
 
-    private void setAvailableGames(){
+    private void setAvailableGames() {
         try {
             listView.getItems().clear();
             DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
@@ -143,18 +147,26 @@ public class JoinGameGUI {
             out.writeUTF("Conn" + roomCode);
             String response = in.readUTF();
 
-            switch (response) {
+            switch (response.substring(0, 4)) {
                 case "Conf":
+                    String start = "YELLOW";
+                    String you = "YELLOW";
+
+                    if (response.charAt(4) == 'R')
+                        start = "RED";
+                    if (response.charAt(5) == 'R')
+                        you = "RED";
+
                     ObjectInputStream inObj = new ObjectInputStream(socket.getInputStream());
                     ArrayList<String> gameChat = new ArrayList<>((ArrayList<String>) inObj.readObject());
                     inObj = new ObjectInputStream(socket.getInputStream());
                     ArrayList<String> mainChat = new ArrayList<>((ArrayList<String>) inObj.readObject());
-                    new GameGUI().start(stage, mainMenuGUI, socket, roomCode, gameChat, mainChat);
+                    new GameGUI().start(stage, mainMenuGUI, socket, roomCode, gameChat, mainChat, start, you);
                     break;
                 case "Full":
-                    AlertHandler.show(Alert.AlertType.ERROR,"Room Full", "Room Full", "The room you tried to join is full.");
+                    AlertHandler.show(Alert.AlertType.ERROR, "Room Full", "Room Full", "The room you tried to join is full.");
                     break;
-                case "Invalid":
+                case "Invl":
                     AlertHandler.show(Alert.AlertType.ERROR, "Invalid Code", "Invalid Code", "The selected room does not exist");
                     break;
 

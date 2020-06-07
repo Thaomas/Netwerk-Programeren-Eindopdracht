@@ -76,8 +76,6 @@ public class CreateGameGUI {
         gridPane.add(roomName, 1, 0);
 
         checkBox = new CheckBox();
-        isPrivate = false;
-        checkBox.selectedProperty().addListener((observable, oldValue, newValue) -> isPrivate = checkBox.isSelected());
 
         gridPane.add(new Label("Private: "), 0, 1);
         gridPane.add(checkBox, 1, 1);
@@ -115,7 +113,7 @@ public class CreateGameGUI {
             ArrayList<String> mainChat = (ArrayList<String>) inOb.readObject();
             System.out.println(mainChat);
 
-            new GameGUI().start(stage, mainMenuGUI, socket, roomCode, new ArrayList<>(), mainChat);
+            new GameGUI().start(stage, mainMenuGUI, socket, roomCode, new ArrayList<>(), mainChat, "RED", "RED");
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }

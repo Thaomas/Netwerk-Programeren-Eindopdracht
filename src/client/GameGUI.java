@@ -48,14 +48,13 @@ public class GameGUI {
     private Socket socket;
     private boolean inGame = true;
 
-    public void start(Stage primaryStage, MainMenuGUI mainMenuGUI, Socket socket,
-                      String roomCode, ArrayList<String> gameChat, ArrayList<String> mainChat) {
+    public void start(Stage primaryStage, MainMenuGUI mainMenuGUI, Socket socket, String roomCode, ArrayList<String> gameChat, ArrayList<String> mainChat, String start, String yourColor) {
         this.mainMenuGUI = mainMenuGUI;
         this.socket = socket;
         this.roomCode = roomCode;
         this.mainChat = mainChat;
         this.gameChat = gameChat;
-        this.first = "R";
+        this.first = start;
         BorderPane borderPane = new BorderPane();
 
         ToolBar toolBar = new ToolBar();
@@ -74,6 +73,8 @@ public class GameGUI {
         toolBar.getItems().add(lobbyCode);
         toolBar.getItems().add(new Separator());
         toolBar.getItems().add(opponentName);
+        toolBar.getItems().add(new Separator());
+        toolBar.getItems().add(new Text("Your color is " + yourColor));
         toolBar.getItems().add(new Separator());
         toolBar.getItems().add(turn);
 
@@ -161,14 +162,14 @@ public class GameGUI {
         if (comboBox.getSelectionModel().getSelectedItem().equals("Global chat")) {
             Platform.runLater(() -> textFlow.getChildren().add(new Text(message + "\n")));
         } else {
-            gameChat.add(message);
+            mainChat.add(message);
         }
     }
 
     protected void setOpponentName(String name) {
         Platform.runLater(() -> {
             opponentName.setText("Opponent: " + name);
-            turn.setText("Turn: RED");
+            turn.setText("Turn: " + first);
         });
     }
 
@@ -230,7 +231,6 @@ public class GameGUI {
         if (!inGame) {
             restartPane(fxGraphics2D, state);
         }
-
     }
 
     private String topString = "TEST";
@@ -243,10 +243,10 @@ public class GameGUI {
                 new Color(255, 255, 255, 70));
         shape.drawFill(fxGraphics2D);
 
-        context.setFill(javafx.scene.paint.Color.color(0,0,0,.75));
-        context.fillRect(160,200,480,200);
+        context.setFill(javafx.scene.paint.Color.color(0, 0, 0, .75));
+        context.fillRect(160, 200, 480, 200);
         context.setFill(javafx.scene.paint.Color.WHITE);
-        context.setFont(Font.font("Arial", FontWeight.NORMAL,50));
+        context.setFont(Font.font("Arial", FontWeight.NORMAL, 50));
         context.setTextAlign(TextAlignment.CENTER);
         context.fillText(topString, 400, 270);
         context.fillText("Vote to play again!", 400, 320);
@@ -411,11 +411,11 @@ public class GameGUI {
     public void restart() {
         discs.clear();
         inGame = true;
-        if (first.equals("R")) {
-            first = "Y";
+        if (first.equals("RED")) {
+            first = "YELLOW";
             turn.setText("Turn: YELLOW");
         } else {
-            first = "R";
+            first = "RED";
             turn.setText("Turn: RED");
         }
         System.out.println();

@@ -6,7 +6,6 @@ import java.awt.*;
 import java.util.Optional;
 
 public class ConnectFour {
-    //TODO Fix label showing correct turn
     //TODO Leaderboard maybe
 
     private final int SQUARE_SIZE = 100;
@@ -124,5 +123,12 @@ public class ConnectFour {
         }
 
         return false;
+    }
+
+    public String getStart() {
+        if (starter.equals(Color.red)){
+            return "R";
+        }else
+            return "Y";
     }
 }

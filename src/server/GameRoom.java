@@ -92,6 +92,12 @@ public class GameRoom {
                 yellow = null;
             }
         }
+        if (red != null) {
+            red.respond("CMes" + roomCode + user.getName() + " has disconnected!");
+        }
+        if (yellow != null) {
+            yellow.respond("CMes" + roomCode + user.getName() + " has disconnected!");
+        }
     }
 
     public ArrayList<String> getChatLog() {
@@ -105,7 +111,7 @@ public class GameRoom {
     public synchronized void move(int column, User user) {
         if (red != null && yellow != null && !isFinished) {
             if (!inProgress)
-                inProgress=true;
+                inProgress = true;
 
             if (user.equals(red)) {
                 moveAll(connectFour.placeDisc(column, Color.red));
@@ -137,10 +143,16 @@ public class GameRoom {
         loser.respond("GMes" + roomCode + "Lose");
     }
 
-    public synchronized void hasJoined() {
+    public synchronized void hasJoined(User joined) {
         if (red != null && yellow != null) {
             red.respond("GMes" + roomCode + "Conn" + yellow.getName());
             yellow.respond("GMes" + roomCode + "Conn" + red.getName());
+        }
+        if (red != null) {
+            red.respond("CMes" + roomCode + joined.getName() + " has joined!");
+        }
+        if (yellow != null) {
+            yellow.respond("CMes" + roomCode + joined.getName() + " has joined!");
         }
     }
 
@@ -175,9 +187,18 @@ public class GameRoom {
             voteYellow = false;
             voteRed = false;
             isFinished = false;
-        } else{
+        } else {
             yellow.respond("GMes" + roomCode + "Vote");
             red.respond("GMes" + roomCode + "Vote");
         }
+    }
+
+    public String getTurn(User user) {
+        if (user.equals(red)){
+            return connectFour.getStart() + "R";
+        }else if (user.equals(yellow)){
+            return connectFour.getStart() + "Y";
+        }
+        return "";
     }
 }

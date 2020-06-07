@@ -117,15 +117,15 @@ public class User implements Runnable {
                             sendChatLog(server.getChatLog(roomCode));
                         } else if (server.containsGameRoom(roomCode)) {
                             if (server.connectToGameRoom(roomCode, this)) {
-                                respond("Conf");
+                                respond("Conf" + server.getGameRooms().get(roomCode).getTurn(this));
                                 sendChatLog(server.getChatLog(roomCode));
                                 server.connectToChatRoom("main", this);
                                 sendChatLog(server.getChatLog("main"));
-                                server.getGameRooms().get(roomCode).hasJoined();
+                                server.getGameRooms().get(roomCode).hasJoined(this);
                             } else
                                 respond("Full");
                         } else
-                            respond("Invalid");
+                            respond("Invl");
                         break;
                     case "Disc":
                         //Disconnect from the given Room

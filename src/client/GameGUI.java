@@ -2,6 +2,7 @@ package client;
 
 import client.gamelogic.Disc;
 import client.gamelogic.Square;
+import client.listener.GameListener;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -63,6 +64,18 @@ public class GameGUI {
     private ArrayList<Disc> discs;
     private ArrayList<Square> squares;
 
+    /**
+     * Start method which sets the scene.
+     *
+     * @param primaryStage The class which is used to change the scene settings.
+     * @param mainMenuGUI  Required for the back button. Calls upon the method start to change the scene.
+     * @param socket       The class required to make connection to the server.
+     * @param roomCode     The room code of the lobby.
+     * @param gameChat     The messages of the current game room.
+     * @param mainChat     The messages of the chat "global chat".
+     * @param start        The starting color of the game.
+     * @param yourColor    The current color of the user.
+     */
     public void start(Stage primaryStage, MainMenuGUI mainMenuGUI, Socket socket,
                       String roomCode, ArrayList<String> gameChat, ArrayList<String> mainChat, String start, String yourColor) {
         this.mainMenuGUI = mainMenuGUI;
@@ -163,6 +176,11 @@ public class GameGUI {
         draw(fxGraphics2D);
     }
 
+    /**
+     * Draws all the objects within the game.
+     *
+     * @param fxGraphics2D Context where the objects will be drawn upon.
+     */
     private void draw(FXGraphics2D fxGraphics2D) {
         fxGraphics2D.setBackground(Color.white);
         fxGraphics2D.clearRect(0, 0, (COLUMNS + 1) * SQUARE_SIZE, (ROWS + 1) * SQUARE_SIZE);
@@ -184,6 +202,11 @@ public class GameGUI {
 
     }
 
+    /**
+     * Method which draws over the grid and asks the user if they want to play again and whether they won or lost.
+     *
+     * @param fxGraphics2D Context where the objects will be drawn upon.
+     */
     private void restartPane(FXGraphics2D fxGraphics2D) {
 
         Square shape = new Square(new Rectangle((COLUMNS + 1) * SQUARE_SIZE, (ROWS + 1) * SQUARE_SIZE),
@@ -200,7 +223,11 @@ public class GameGUI {
         context.fillText(voteString, 400, 370);
     }
 
-    protected void placeDisc() {
+    /**
+     * Method used to add a disc according to where the user has clicked on the screen. Sends message to the server
+     * which responds with the disc object.
+     */
+    public void placeDisc() {
         try {
             ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
             Disc disc = (Disc) objectInputStream.readObject();
@@ -219,10 +246,18 @@ public class GameGUI {
         Platform.runLater(() -> draw(fxGraphics2D));
     }
 
+    /**
+     * Sets the text of which color/player's turn it is.
+     *
+     * @param turn Whose turn it is
+     */
     private void setTurn(String turn) {
         Platform.runLater(() -> this.turn.setText("Turn: " + turn));
     }
 
+    /**
+     * Resets the column highlight after the game is over.
+     */
     private void resetScreen() {
         for (Square square : squares) {
             square.setColor(new Color(0, 0, 0, 0));
@@ -230,7 +265,12 @@ public class GameGUI {
         draw(fxGraphics2D);
     }
 
-    protected void restartGame(String state) {
+    /**
+     * Sets the message of who won and lost. Sets the screen ans asks whether the user wants to play again.
+     *
+     * @param state String indicating if the user won or lost.
+     */
+    public void restartGame(String state) {
         if (state.equals("Win")) {
             topString = "You won!";
         } else if (state.equals("Lose")) {
@@ -244,7 +284,12 @@ public class GameGUI {
         });
     }
 
-    protected void messageToGameChat(String message) {
+    /**
+     * Sends a message to the server if the chat is the current game chat room.
+     *
+     * @param message The message of the user.
+     */
+    public void messageToGameChat(String message) {
         if (comboBox.getSelectionModel().getSelectedItem().equals("Game chat")) {
             Platform.runLater(() -> textFlow.getChildren().add(new Text(message + "\n")));
         } else {
@@ -252,7 +297,12 @@ public class GameGUI {
         }
     }
 
-    protected void messageToMainChat(String message) {
+    /**
+     * Sends a message to the server if the chat is "global chat" room.
+     *
+     * @param message The message of the user.
+     */
+    public void messageToMainChat(String message) {
         if (comboBox.getSelectionModel().getSelectedItem().equals("Global chat")) {
             Platform.runLater(() -> textFlow.getChildren().add(new Text(message + "\n")));
         } else {
@@ -260,14 +310,23 @@ public class GameGUI {
         }
     }
 
-    protected void setOpponentName(String name) {
+    /**
+     * Sets the text of the opponents name when they join the game room.
+     *
+     * @param name Name of the opponent.
+     */
+    public void setOpponentName(String name) {
         Platform.runLater(() -> {
             opponentName.setText("Opponent: " + name);
             turn.setText("Turn: RED");
         });
     }
 
-
+    /**
+     * Initializes the board and draws the playing field grid.
+     *
+     * @return A square shape with circular holes in a 6 by 7 grid.
+     */
     public Square makeConnect4Grid() {
         Square shape = new Square(new Rectangle((COLUMNS + 1) * SQUARE_SIZE, (ROWS + 1) * SQUARE_SIZE),
                 Color.blue);
@@ -283,6 +342,11 @@ public class GameGUI {
         return shape;
     }
 
+    /**
+     * Makes shapes which will indicate which column the mouse is hovering over.
+     *
+     * @return An arraylist of rectangle shapes with the height of the grid.
+     */
     private ArrayList<Square> makeColumns() {
         ArrayList<Square> squares = new ArrayList<>();
 
@@ -297,6 +361,13 @@ public class GameGUI {
         return squares;
     }
 
+    /**
+     * Creates the chat box and places it in a BorderPane.
+     *
+     * @param width  The width of the chatbox.
+     * @param height The height of the chatbox.
+     * @return The borderpane containing a box to send messages to the opponent or "global chat".
+     */
     public BorderPane setChatPane(int width, int height) {
         BorderPane borderPane = new BorderPane();
         borderPane.setPadding(new Insets(10, 0, 0, 0));
@@ -385,6 +456,11 @@ public class GameGUI {
         return borderPane;
     }
 
+    /**
+     * Sets the data of the chat with the an arraylist of all the previous messages sent such as in "global chat".
+     *
+     * @param chatLog All chat messages sent by all users within a specific chat room.
+     */
     private void setChat(ArrayList<String> chatLog) {
         textFlow.getChildren().clear();
         for (String message : chatLog) {
@@ -392,11 +468,17 @@ public class GameGUI {
         }
     }
 
+    /**
+     * Method used to display the restart screen.
+     */
     public void vote() {
         voteString = "1/2 votes";
         resetScreen();
     }
 
+    /**
+     * Method used to restart the game if both players click to restart.
+     */
     public void restart() {
         discs.clear();
         inGame = true;

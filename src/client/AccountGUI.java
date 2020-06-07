@@ -33,16 +33,17 @@ public class AccountGUI {
     private TextField oldPass;
     private TextField newPass;
     private TextField newPassConfirm;
-    private MainMenuGUI mainMenuGUI;
     private LoginGUI loginGUI;
     private Stage primaryStage;
 
     private DataOutputStream out;
     private DataInputStream in;
 
+    /**
+     * Method to get the user data from the server.
+     */
     private void getData() {
         try {
-            socket = mainMenuGUI.getSocket();
             out = new DataOutputStream(socket.getOutputStream());
             in = new DataInputStream(socket.getInputStream());
 
@@ -63,10 +64,18 @@ public class AccountGUI {
         }
     }
 
-    public void start(Stage primaryStage, MainMenuGUI mainMenuGUI, LoginGUI loginGUI) {
+    /**
+     * Start method which sets the stage of the screen.
+     *
+     * @param primaryStage The class which is used to change the scene settings.
+     * @param mainMenuGUI  Required for the back button. Calls upon the method start to change the scene.
+     * @param loginGUI     Required for the sign out button. Calls upon the method start to change the scene.
+     * @param socket       The class required to make connection to the server.
+     */
+    public void start(Stage primaryStage, MainMenuGUI mainMenuGUI, LoginGUI loginGUI, Socket socket) {
         this.primaryStage = primaryStage;
-        this.mainMenuGUI = mainMenuGUI;
         this.loginGUI = loginGUI;
+        this.socket = socket;
 
         getData();
 
@@ -142,13 +151,12 @@ public class AccountGUI {
             }
         });
 
-
         Text title = new Text(username + " Settings");
         title.setFont(Font.font("Arial", FontWeight.BOLD, 30));
         title.setTranslateX(10);
 
         VBox centerPane = new VBox();
-        centerPane.getChildren().addAll(title,credentials);
+        centerPane.getChildren().addAll(title, credentials);
         centerPane.setAlignment(Pos.CENTER_LEFT);
 
         borderPane.setCenter(centerPane);
@@ -165,7 +173,7 @@ public class AccountGUI {
 
         VBox statsBox = new VBox();
 
-        statsBox.getChildren().addAll(statistics,accountCreated,gamesPlayed,wins,losses,buttonDelete);
+        statsBox.getChildren().addAll(statistics, accountCreated, gamesPlayed, wins, losses, buttonDelete);
 
         statsBox.setAlignment(Pos.TOP_CENTER);
         statsBox.setTranslateY(30);
@@ -180,6 +188,13 @@ public class AccountGUI {
         this.primaryStage.setScene(scene);
     }
 
+    /**
+     * Method that checks if it's possible to delete the account. Sends a message to the server asking to delete the
+     * account. Responds with a confirmation that the account had been deleted.
+     *
+     * @param password A string that contains the password of the user.
+     * @return A boolean with which the server has confirmed whether or not the account had been deleted.
+     */
     private boolean tryDeleteAccount(String password) {
         try {
             DataInputStream in = new DataInputStream(socket.getInputStream());
@@ -194,6 +209,10 @@ public class AccountGUI {
         }
     }
 
+    /**
+     * Method to create a popup in which the user is asked to put their username twice to delete the account with which
+     * they logged in with.
+     */
     private void deleteAccount() {
         Stage stage = new Stage();
         stage.setResizable(false);

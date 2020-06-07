@@ -17,6 +17,11 @@ public class Disc implements Serializable {
         this.color = color;
     }
 
+    /**
+     * Draws the created circle with the given color.
+     *
+     * @param graphics2D The context on which the circle is drawn on.
+     */
     public void draw(FXGraphics2D graphics2D) {
         graphics2D.setColor(color);
         graphics2D.fill(circle);
@@ -24,14 +29,29 @@ public class Disc implements Serializable {
         graphics2D.draw(circle);
     }
 
+    /**
+     * Getter for the shape Circle.
+     *
+     * @return the shape Circle.
+     */
     public Shape getCircle() {
         return circle;
     }
 
+    /**
+     * Setter for the color of the cicle.
+     *
+     * @param color Sets the color.
+     */
     public void setColor(Color color) {
         this.color = color;
     }
 
+    /**
+     * Getter for the color of the circle.
+     *
+     * @return The color of the circle.
+     */
     public Color getColor() {
         return color;
     }

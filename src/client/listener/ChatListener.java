@@ -1,4 +1,6 @@
-package client;
+package client.listener;
+
+import client.ChatGUI;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -15,6 +17,9 @@ public class ChatListener implements Runnable {
         this.roomCode = roomCode;
     }
 
+    /**
+     * Method used to listen to the incoming messages from the server. Only used for the chat "global chat".
+     */
     @Override
     public void run() {
         boolean connected = true;

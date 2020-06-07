@@ -19,18 +19,19 @@ import java.util.HashMap;
 
 public class LeaderboardGUI {
 
-    private Stage stage;
-    private MainMenuGUI mainMenuGUI;
-    private Socket socket;
     private HashMap<String, HashMap<String, Integer>> leaderboard;
 
+    /**
+     * Start method which sets the scene.
+     *
+     * @param primaryStage The class which is used to change the scene settings.
+     * @param mainMenuGUI  Required for the back button. Calls upon the method start to change the scene.
+     * @param socket       The class required to make connection to the server.
+     */
     public void start(Stage primaryStage, MainMenuGUI mainMenuGUI, Socket socket) {
-        stage = primaryStage;
-        this.mainMenuGUI = mainMenuGUI;
-        this.socket = socket;
         try {
             new DataOutputStream(socket.getOutputStream()).writeUTF("GLea");
-            leaderboard = new HashMap<>((HashMap<String, HashMap<String, Integer>>)new ObjectInputStream(socket.getInputStream()).readObject());
+            leaderboard = new HashMap<>((HashMap<String, HashMap<String, Integer>>) new ObjectInputStream(socket.getInputStream()).readObject());
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -46,7 +47,7 @@ public class LeaderboardGUI {
 
         borderPane.setTop(toolBar);
 
-        borderPane.setCenter(getDefaultView());
+        borderPane.setCenter(getTable());
 
         Scene scene = new Scene(borderPane, 640, 480);
         primaryStage.setTitle("Leaderboard");
@@ -54,7 +55,13 @@ public class LeaderboardGUI {
         primaryStage.show();
     }
 
-    private TableView<SimplePropertyConverter> getDefaultView() {
+    /**
+     * Method used to set the table with data of all the registerd players on the basis of their their total games
+     * played, won and lost.
+     *
+     * @return TableView with data of each individual player and their achievements.
+     */
+    private TableView<SimplePropertyConverter> getTable() {
         TableView<SimplePropertyConverter> tableView = new TableView<>();
 
         tableView.getStylesheets().add(this.getClass().getResource("/util/Focus.css").toExternalForm());
@@ -92,10 +99,15 @@ public class LeaderboardGUI {
         return tableView;
     }
 
-    private ObservableList<SimplePropertyConverter> loadData(){
+    /**
+     * Loads the data from the server into the TableView.
+     *
+     * @return List full of data.
+     */
+    private ObservableList<SimplePropertyConverter> loadData() {
         ObservableList<SimplePropertyConverter> data = FXCollections.observableArrayList();
 
-        for (String key : leaderboard.keySet()){
+        for (String key : leaderboard.keySet()) {
             data.add(new SimplePropertyConverter(key, leaderboard.get(key).get("played"), leaderboard.get(key).get("won")));
         }
 

@@ -6,9 +6,7 @@ import java.awt.*;
 import java.util.Optional;
 
 public class ConnectFour {
-    //TODO Leaderboard maybe
 
-    private final int SQUARE_SIZE = 100;
     private final int columns = 7;
     private final int rows = 6;
     private Color starter;
@@ -24,7 +22,7 @@ public class ConnectFour {
 
     /**
      * Returns the color which starts the round
-     * @return
+     * @return The abbreviation of the color red or yellow.
      */
     public String getStart() {
         if (starter.equals(Color.red)) {
@@ -34,7 +32,7 @@ public class ConnectFour {
     }
 
     /**
-     * Restarts the game and switches the starting player
+     * Restarts the game and switches the color of the starting player.
      */
     public void restart() {
         if (starter.equals(Color.red)) {
@@ -48,6 +46,12 @@ public class ConnectFour {
         }
     }
 
+    /**
+     * Method used to check if a disc object is present in that position in the grid
+     * @param column The column of the grid.
+     * @param row The row of the grid.
+     * @return An optional object which can contain either a disc object or null/empty.
+     */
     private Optional<Disc> getDisc(int column, int row) {
         if (column < 0 || column >= columns
                 || row < 0 || row >= rows)
@@ -56,6 +60,12 @@ public class ConnectFour {
         return Optional.ofNullable(grid[column][row]);
     }
 
+    /**
+     * Method used create a disc object which will be placed in the grid on the client side.
+     * @param column Which column the grid will be placed in.
+     * @param color The color of the disc.
+     * @return The created disc object which will be sent to both players in the game room lobby.
+     */
     public Disc placeDisc(int column, Color color) {
         Disc disc = null;
         if (turn.equals(color)) {
@@ -65,7 +75,7 @@ public class ConnectFour {
                     break;
                 row--;
             }
-            disc = new Disc(column, row, Color.red, SQUARE_SIZE);
+            disc = new Disc(column, row, Color.red, 100);
             disc.setColor(color);
             grid[column][row] = disc;
 

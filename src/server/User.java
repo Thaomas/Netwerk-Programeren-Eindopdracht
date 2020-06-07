@@ -23,7 +23,6 @@ public class User implements Runnable {
     private int gamesPlayed;
     private int gamesWon;
     private LocalDate creationDate;
-    private Color color;
 
     public User(String name, String password, Server server) {
         this.name = name;
@@ -83,10 +82,6 @@ public class User implements Runnable {
 
     public boolean isConnected() {
         return isConnected;
-    }
-
-    public void setColor(Color color) {
-        this.color = color;
     }
 
     @Override

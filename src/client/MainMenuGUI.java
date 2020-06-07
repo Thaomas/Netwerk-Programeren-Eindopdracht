@@ -25,7 +25,7 @@ public class MainMenuGUI {
     private final int buttonHEIGHT = 100;
     private final String TITLE = "Connect 4";
 
-    private AdministrationGUI administrationGUI;
+    private LoginGUI loginGUI;
 
     private AccountGUI accountGUI;
     private ChatGUI chatGUI;
@@ -35,15 +35,15 @@ public class MainMenuGUI {
     private Stage stage;
     private Socket socket;
 
-    public MainMenuGUI(Stage primaryStage, AdministrationGUI administrationGUI, Socket socket) {
+    public MainMenuGUI(Stage primaryStage, LoginGUI loginGUI, Socket socket) {
         this.stage = primaryStage;
-        this.administrationGUI = administrationGUI;
+        this.loginGUI = loginGUI;
         this.accountGUI = new AccountGUI();
         this.chatGUI = new ChatGUI();
 
         joinGameGUI = new JoinGameGUI();
         this.socket = socket;
-        Runtime.getRuntime().addShutdownHook(new Thread(administrationGUI::disconnect));
+        Runtime.getRuntime().addShutdownHook(new Thread(loginGUI::disconnect));
     }
 
     public void start() {
@@ -89,7 +89,7 @@ public class MainMenuGUI {
         Button createButton;
         Button joinButton;
         Button chatButton;
-        Button optionButton;
+        Button leaderboardButton;
 
         gridPane.setAlignment(Pos.CENTER);
         gridPane.setVgap(10);
@@ -111,42 +111,43 @@ public class MainMenuGUI {
         chatButton.setPrefSize(buttonWIDTH, buttonHEIGHT);
         chatButton.setOnAction(event -> ChatGUI());
 
-        optionButton = new Button("Options");
-        optionButton.setAlignment(Pos.CENTER);
-        optionButton.setPrefSize(buttonWIDTH, buttonHEIGHT);
+        leaderboardButton = new Button("Leaderboard");
+        leaderboardButton.setAlignment(Pos.CENTER);
+        leaderboardButton.setPrefSize(buttonWIDTH, buttonHEIGHT);
+        leaderboardButton.setOnAction(event -> leaderboardGUI());
 
         gridPane.add(createButton, 0, 0);
         gridPane.add(joinButton, 1, 0);
         gridPane.add(chatButton, 2, 0);
-        gridPane.add(optionButton, 1, 1);
+        gridPane.add(leaderboardButton, 1, 1);
 
         return gridPane;
     }
 
     public void administration() {
-        administrationGUI.disconnect();
-        administrationGUI.start(stage);
+        loginGUI.disconnect();
+        loginGUI.start(stage);
     }
 
     public void account() {
-        accountGUI.start(stage, this,administrationGUI);
+        accountGUI.start(stage, this, loginGUI);
     }
 
-    protected Socket getSocket(){
+    protected Socket getSocket() {
         return this.socket;
     }
 
     public void ChatGUI() {
         try {
             String roomCode = "main";
-            System.out.println("Conn"+roomCode);
+            System.out.println("Conn" + roomCode);
             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
             DataInputStream in = new DataInputStream(socket.getInputStream());
-            out.writeUTF("Conn"+roomCode);
+            out.writeUTF("Conn" + roomCode);
             String message = in.readUTF();
             if (message.equals("Conf")) {
                 ObjectInputStream inOb = new ObjectInputStream(socket.getInputStream());
-                ArrayList<String> chatlog = (ArrayList<String>)inOb.readObject();
+                ArrayList<String> chatlog = (ArrayList<String>) inOb.readObject();
                 chatGUI.start(roomCode, stage, this, socket, chatlog);
             }
         } catch (IOException | ClassNotFoundException e) {
@@ -161,5 +162,10 @@ public class MainMenuGUI {
 
     public void JoinGameGUI() {
         joinGameGUI.start(stage, this, socket);
+    }
+
+    public void leaderboardGUI() {
+        LeaderboardGUI leaderboardGUI = new LeaderboardGUI();
+        leaderboardGUI.start(stage, this, socket);
     }
 }

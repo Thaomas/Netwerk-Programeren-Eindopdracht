@@ -24,7 +24,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
-public class AdministrationGUI extends Application {
+public class LoginGUI extends Application {
 
     private Stage stage;
     private GridPane gridPane;

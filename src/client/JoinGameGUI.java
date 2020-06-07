@@ -10,14 +10,12 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import util.AlertHandler;
-import util.RandomString;
 
 import java.awt.*;
 import java.io.DataInputStream;
@@ -30,28 +28,21 @@ import java.util.HashMap;
 
 public class JoinGameGUI {
 
-    //needs to be server side
-    private final RandomString randomString = new RandomString(4);
-
     private Stage stage;
     private MainMenuGUI mainMenuGUI;
     private Socket socket;
-    private String roomCode;
-
-    //Has to ask server if room is full.
 
     public void start(Stage primaryStage, MainMenuGUI mainMenuGUI, Socket socket) {
         stage = primaryStage;
         this.mainMenuGUI = mainMenuGUI;
         this.socket = socket;
-        roomCode = randomString.nextString();
 
         BorderPane borderPane = new BorderPane();
 
         ToolBar toolBar = new ToolBar();
 
         Button backButton = new Button("Back");
-        backButton.setOnAction(event -> clientGUI());
+        backButton.setOnAction(event -> mainMenuGUI.start());
 
         toolBar.getItems().add(backButton);
 
@@ -133,10 +124,6 @@ public class JoinGameGUI {
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
-    }
-
-    private void clientGUI() {
-        mainMenuGUI.start();
     }
 
     public void joinGameRoom(String roomCode) {

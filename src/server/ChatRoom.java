@@ -1,6 +1,7 @@
 package server;
 
 import org.json.simple.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -23,8 +24,10 @@ public class ChatRoom {
         this.chatlog = chatlog;
         this.users = new HashSet<>();
     }
+
     /**
      * Get the Json object to save.
+     *
      * @return Json Object
      */
     public JSONObject getJSON() {
@@ -37,6 +40,7 @@ public class ChatRoom {
 
     /**
      * Gets the code of the ChatRoom.
+     *
      * @return The code of the ChatRoom.
      */
     public String getRoomCode() {
@@ -45,6 +49,7 @@ public class ChatRoom {
 
     /**
      * Adds an User to the ChatRoom.
+     *
      * @param user User to be added.
      */
     public void addUser(User user) {
@@ -53,6 +58,7 @@ public class ChatRoom {
 
     /**
      * Removes a User from the ChatRoom.
+     *
      * @param user User to be removed.
      */
     public void removeUser(User user) {
@@ -61,6 +67,7 @@ public class ChatRoom {
 
     /**
      * Get the chatLog of the room.
+     *
      * @return An Arraylist of messages.
      */
     public ArrayList<String> getChatLog() {
@@ -69,6 +76,7 @@ public class ChatRoom {
 
     /**
      * Messages all connected Users the message.
+     *
      * @param message Message to send to all connected Users.
      */
     public void messageAll(String message) {

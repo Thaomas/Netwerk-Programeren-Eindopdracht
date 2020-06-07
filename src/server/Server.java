@@ -5,8 +5,10 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import java.io.*;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Reader;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.time.LocalDate;
@@ -119,7 +121,7 @@ public class Server {
      * Check if the given GameRoom exists.
      *
      * @param room The code for the GameRoom.
-     * @return true or false if game room contains room,
+     * @return If GameRoom exists
      */
     public boolean containsGameRoom(String room) {
         return gameRooms.containsKey(room);
@@ -129,7 +131,7 @@ public class Server {
      * Check if the given ChatRoom exists.
      *
      * @param room The code for the ChatRoom.
-     * @return true or false if chat room contains room,
+     * @return If ChatRoom exists
      */
     public boolean containsChatRoom(String room) {
         return chatRooms.containsKey(room);

@@ -22,6 +22,7 @@ public class ConnectFour {
 
     /**
      * Returns the color which starts the round
+     *
      * @return The abbreviation of the color red or yellow.
      */
     public String getStart() {
@@ -48,8 +49,9 @@ public class ConnectFour {
 
     /**
      * Method used to check if a disc object is present in that position in the grid
+     *
      * @param column The column of the grid.
-     * @param row The row of the grid.
+     * @param row    The row of the grid.
      * @return An optional object which can contain either a disc object or null/empty.
      */
     private Optional<Disc> getDisc(int column, int row) {
@@ -62,8 +64,9 @@ public class ConnectFour {
 
     /**
      * Method used create a disc object which will be placed in the grid on the client side.
+     *
      * @param column Which column the grid will be placed in.
-     * @param color The color of the disc.
+     * @param color  The color of the disc.
      * @return The created disc object which will be sent to both players in the game room lobby.
      */
     public Disc placeDisc(int column, Color color) {

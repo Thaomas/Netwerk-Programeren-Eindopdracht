@@ -1,7 +1,6 @@
 package client;
 
 import com.sun.javafx.scene.control.skin.TableHeaderRow;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.SortedList;
@@ -13,7 +12,6 @@ import javafx.stage.Stage;
 import util.SimplePropertyConverter;
 
 import java.net.Socket;
-import java.util.ArrayList;
 
 public class LeaderboardGUI {
 
@@ -48,7 +46,7 @@ public class LeaderboardGUI {
     private TableView<SimplePropertyConverter> getDefaultView() {
         TableView<SimplePropertyConverter> tableView = new TableView<>();
 
-        tableView.getStylesheets().add(this.getClass().getResource("/util/focus.css").toExternalForm());
+        tableView.getStylesheets().add(this.getClass().getResource("/util/Focus.css").toExternalForm());
 
         TableColumn<SimplePropertyConverter, String> name = new TableColumn<>("Name");
         name.setCellValueFactory(new PropertyValueFactory<>("name"));

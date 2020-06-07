@@ -48,7 +48,23 @@ public class GameGUI {
     private Socket socket;
     private boolean inGame = true;
 
-    public void start(Stage primaryStage, MainMenuGUI mainMenuGUI, Socket socket, String roomCode, ArrayList<String> gameChat, ArrayList<String> mainChat, String start, String yourColor) {
+    private String topString;
+    private String voteString;
+
+    private ComboBox<String> comboBox;
+    private TextFlow textFlow;
+
+    private FXGraphics2D fxGraphics2D;
+
+    private final int SQUARE_SIZE = 100;
+    private final int COLUMNS = 7;
+    private final int ROWS = 6;
+
+    private ArrayList<Disc> discs;
+    private ArrayList<Square> squares;
+
+    public void start(Stage primaryStage, MainMenuGUI mainMenuGUI, Socket socket,
+                      String roomCode, ArrayList<String> gameChat, ArrayList<String> mainChat) {
         this.mainMenuGUI = mainMenuGUI;
         this.socket = socket;
         this.roomCode = roomCode;
@@ -57,10 +73,22 @@ public class GameGUI {
         this.first = start;
         BorderPane borderPane = new BorderPane();
 
+        //Top items
         ToolBar toolBar = new ToolBar();
 
         Button backButton = new Button("Back");
-        backButton.setOnAction(event -> backButton());
+        backButton.setOnAction(event -> {
+            try {
+                DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+                out.writeUTF("Disc" + roomCode);
+                out.writeUTF("Discmain");
+                listenThread.join();
+                mainMenuGUI.start();
+
+            } catch (IOException | InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
 
         Label lobbyCode = new Label("Room code: " + this.roomCode);
 
@@ -80,7 +108,7 @@ public class GameGUI {
 
         borderPane.setTop(toolBar);
 
-        //center pane
+        //Center items
         discs = new ArrayList<>();
         squares = makeColumns();
 
@@ -122,59 +150,54 @@ public class GameGUI {
 
         borderPane.setCenter(canvas);
 
-        //right pane
+        //Right items
         borderPane.setRight(setChatPane(275, 620));
 
         Scene scene = new Scene(borderPane, 1200, 835);
         primaryStage.setTitle("Connect 4");
         primaryStage.setScene(scene);
         primaryStage.show();
+
         listenThread = new Thread(new GameListener(this, socket, this.roomCode));
         listenThread.start();
         draw(fxGraphics2D);
     }
 
-    private void resetScreen() {
+    private void draw(FXGraphics2D fxGraphics2D) {
+        fxGraphics2D.setBackground(Color.white);
+        fxGraphics2D.clearRect(0, 0, (COLUMNS + 1) * SQUARE_SIZE, (ROWS + 1) * SQUARE_SIZE);
+        fxGraphics2D.setTransform(new AffineTransform());
+
+
+        makeConnect4Grid().drawFill(fxGraphics2D);
+
         for (Square square : squares) {
-            square.setColor(new Color(0, 0, 0, 0));
+            square.drawFill(fxGraphics2D);
         }
-        draw(fxGraphics2D);
-    }
 
-    private FXGraphics2D fxGraphics2D;
-
-    private final int SQUARE_SIZE = 100;
-    private final int COLUMNS = 7;
-    private final int ROWS = 6;
-
-    private ArrayList<Disc> discs;
-    private ArrayList<Square> squares;
-
-    protected void messageToGameChat(String message) {
-        if (comboBox.getSelectionModel().getSelectedItem().equals("Game chat")) {
-            Platform.runLater(() -> textFlow.getChildren().add(new Text(message + "\n")));
-        } else {
-            gameChat.add(message);
+        for (Disc disc : discs) {
+            disc.draw(fxGraphics2D);
         }
-    }
-
-    protected void messageToMainChat(String message) {
-        if (comboBox.getSelectionModel().getSelectedItem().equals("Global chat")) {
-            Platform.runLater(() -> textFlow.getChildren().add(new Text(message + "\n")));
-        } else {
-            mainChat.add(message);
+        if (!inGame) {
+            restartPane(fxGraphics2D);
         }
+
     }
 
-    protected void setOpponentName(String name) {
-        Platform.runLater(() -> {
-            opponentName.setText("Opponent: " + name);
-            turn.setText("Turn: " + first);
-        });
-    }
+    private void restartPane(FXGraphics2D fxGraphics2D) {
 
-    private void setTurn(String turn) {
-        Platform.runLater(() -> this.turn.setText("Turn: " + turn));
+        Square shape = new Square(new Rectangle((COLUMNS + 1) * SQUARE_SIZE, (ROWS + 1) * SQUARE_SIZE),
+                new Color(255, 255, 255, 70));
+        shape.drawFill(fxGraphics2D);
+
+        context.setFill(javafx.scene.paint.Color.color(0, 0, 0, .75));
+        context.fillRect(160, 200, 480, 200);
+        context.setFill(javafx.scene.paint.Color.WHITE);
+        context.setFont(Font.font("Arial", FontWeight.NORMAL, 50));
+        context.setTextAlign(TextAlignment.CENTER);
+        context.fillText(topString, 400, 270);
+        context.fillText("Vote to play again!", 400, 320);
+        context.fillText(voteString, 400, 370);
     }
 
     protected void placeDisc() {
@@ -196,6 +219,17 @@ public class GameGUI {
         Platform.runLater(() -> draw(fxGraphics2D));
     }
 
+    private void setTurn(String turn) {
+        Platform.runLater(() -> this.turn.setText("Turn: " + turn));
+    }
+
+    private void resetScreen() {
+        for (Square square : squares) {
+            square.setColor(new Color(0, 0, 0, 0));
+        }
+        draw(fxGraphics2D);
+    }
+
     protected void restartGame(String state) {
         if (state.equals("Win")) {
             topString = "You won!";
@@ -206,53 +240,33 @@ public class GameGUI {
         voteString = "0/2 votes";
         Platform.runLater(() -> {
             inGame = false;
-//            restartPane(fxGraphics2D, state);
             resetScreen();
         });
     }
 
-    private String state = "";
-
-    private void draw(FXGraphics2D fxGraphics2D) {
-        fxGraphics2D.setBackground(Color.white);
-        fxGraphics2D.clearRect(0, 0, (COLUMNS + 1) * SQUARE_SIZE, (ROWS + 1) * SQUARE_SIZE);
-        fxGraphics2D.setTransform(new AffineTransform());
-
-
-        makeConnect4Grid().drawFill(fxGraphics2D);
-
-        for (Square square : squares) {
-            square.drawFill(fxGraphics2D);
-        }
-
-        for (Disc disc : discs) {
-            disc.draw(fxGraphics2D);
-        }
-        if (!inGame) {
-            restartPane(fxGraphics2D, state);
+    protected void messageToGameChat(String message) {
+        if (comboBox.getSelectionModel().getSelectedItem().equals("Game chat")) {
+            Platform.runLater(() -> textFlow.getChildren().add(new Text(message + "\n")));
+        } else {
+            gameChat.add(message);
         }
     }
 
-    private String topString = "TEST";
-    private String voteString = "TEST";
-
-    //doesnt work properly
-    private void restartPane(FXGraphics2D fxGraphics2D, String state) {
-
-        Square shape = new Square(new Rectangle((COLUMNS + 1) * SQUARE_SIZE, (ROWS + 1) * SQUARE_SIZE),
-                new Color(255, 255, 255, 70));
-        shape.drawFill(fxGraphics2D);
-
-        context.setFill(javafx.scene.paint.Color.color(0, 0, 0, .75));
-        context.fillRect(160, 200, 480, 200);
-        context.setFill(javafx.scene.paint.Color.WHITE);
-        context.setFont(Font.font("Arial", FontWeight.NORMAL, 50));
-        context.setTextAlign(TextAlignment.CENTER);
-        context.fillText(topString, 400, 270);
-        context.fillText("Vote to play again!", 400, 320);
-        context.fillText(voteString, 400, 370);
-
+    protected void messageToMainChat(String message) {
+        if (comboBox.getSelectionModel().getSelectedItem().equals("Global chat")) {
+            Platform.runLater(() -> textFlow.getChildren().add(new Text(message + "\n")));
+        } else {
+            gameChat.add(message);
+        }
     }
+
+    protected void setOpponentName(String name) {
+        Platform.runLater(() -> {
+            opponentName.setText("Opponent: " + name);
+            turn.setText("Turn: RED");
+        });
+    }
+
 
     public Square makeConnect4Grid() {
         Square shape = new Square(new Rectangle((COLUMNS + 1) * SQUARE_SIZE, (ROWS + 1) * SQUARE_SIZE),
@@ -283,14 +297,11 @@ public class GameGUI {
         return squares;
     }
 
-    private ComboBox<String> comboBox;
-    private TextFlow textFlow;
-
     public BorderPane setChatPane(int width, int height) {
         BorderPane borderPane = new BorderPane();
         borderPane.setPadding(new Insets(10, 0, 0, 0));
 
-        //Top item
+        //Top items
         comboBox = new ComboBox<>();
 
         comboBox.getItems().add("Game chat");
@@ -307,7 +318,6 @@ public class GameGUI {
             }
         });
 
-
         borderPane.setTop(comboBox);
 
         //Center items
@@ -315,7 +325,6 @@ public class GameGUI {
         textFlow.setLineSpacing(5);
         VBox.setVgrow(textFlow, Priority.ALWAYS);
         setChat(gameChat);
-
 
         VBox vBox = new VBox();
         vBox.getChildren().addAll(textFlow);
@@ -374,22 +383,6 @@ public class GameGUI {
         borderPane.setBottom(inputBox);
 
         return borderPane;
-    }
-
-    private void backButton() {
-        try {
-            DataOutputStream out = new DataOutputStream(socket.getOutputStream());
-            out.writeUTF("Disc" + roomCode);
-
-            out.writeUTF("Discmain");
-
-            listenThread.join();
-
-            mainMenuGUI.start();
-
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
     private void setChat(ArrayList<String> chatLog) {

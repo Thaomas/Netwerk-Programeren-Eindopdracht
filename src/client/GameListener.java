@@ -24,18 +24,15 @@ public class GameListener implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        String input;
-        String command;
-        String roomCode;
         while (connected) {
             try {
-                input = in.readUTF();
+                String input = in.readUTF();
                 if (input.equals("Disc")) {
                     connected = false;
                     continue;
                 }
-                command = input.substring(0, 4);
-                roomCode = input.substring(4, 8);
+                String command = input.substring(0, 4);
+                String roomCode = input.substring(4, 8);
                 if (command.equals("CMes")) {
                     if (roomCode.equals(this.roomCode))
                         gameGui.messageToGameChat(input.substring(8));
@@ -64,7 +61,6 @@ public class GameListener implements Runnable {
                                     break;
                             }
                         }
-
                     }
                 }
             } catch (IOException e) {

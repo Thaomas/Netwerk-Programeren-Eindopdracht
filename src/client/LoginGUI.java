@@ -41,7 +41,7 @@ public class LoginGUI extends Application {
                 socket = new Socket("localhost", 10000);
                 isConnected = true;
             } catch (IOException e) {
-                System.out.println("No connection to server");
+                e.printStackTrace();
             }
         }
     }
@@ -74,7 +74,6 @@ public class LoginGUI extends Application {
         Scene scene = new Scene(borderPane, 400, 300);
 
         stage.setResizable(false);
-
         stage.setScene(scene);
         stage.show();
 
@@ -114,7 +113,7 @@ public class LoginGUI extends Application {
         Button loginButton = new Button("Login");
         loginButton.setOnAction(e -> {
             if (tryLogin()) {
-                clientGUI();
+                new MainMenuGUI(stage,this,socket).start();
             }
         });
 
@@ -185,7 +184,7 @@ public class LoginGUI extends Application {
         Button registerButton = new Button("Register account");
         registerButton.setOnAction(event -> {
             if (tryRegister()) {
-                clientGUI();
+                new MainMenuGUI(stage,this,socket).start();
             }
         });
 
@@ -209,7 +208,6 @@ public class LoginGUI extends Application {
 
         centerPane.getChildren().add(register);
         centerPane.getChildren().add(gridPane);
-
 
         stage.setTitle(register.getText());
     }
@@ -266,19 +264,15 @@ public class LoginGUI extends Application {
         gridPane.add(visiblePassword, 3, 2);
     }
 
-    protected void disconnect() {
+    public void disconnect() {
         try {
             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
             out.writeUTF("quit");
+            out.close();
             socket.close();
             isConnected = false;
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    private void clientGUI() {
-        MainMenuGUI gui = new MainMenuGUI(stage, this, socket);
-        gui.start();
     }
 }

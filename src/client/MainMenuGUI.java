@@ -165,6 +165,6 @@ public class MainMenuGUI {
 
     public void leaderboardGUI() {
         LeaderboardGUI leaderboardGUI = new LeaderboardGUI();
-        leaderboardGUI.start(stage, this, socket);
+        leaderboardGUI.start(stage, this);
     }
 }

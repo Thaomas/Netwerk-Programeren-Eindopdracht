@@ -36,8 +36,16 @@ public class ChatGUI {
             e.printStackTrace();
         }
 
-        BorderPane borderPane = chatBox(socket, chatLog);
+        Scene scene = new Scene(chatBox(socket, chatLog), 600, 600);
+        primaryStage.setScene(scene);
+        primaryStage.setTitle("Global chat");
+        primaryStage.show();
+    }
 
+    private BorderPane chatBox(Socket socket, ArrayList<String> chatLog) {
+        BorderPane borderPane = new BorderPane();
+
+        //Top items
         ToolBar toolBar = new ToolBar();
 
         Button backButton = new Button("Back");
@@ -48,27 +56,18 @@ public class ChatGUI {
             } catch (InterruptedException | IOException e) {
                 e.printStackTrace();
             }
-            clientGUI();
+            mainMenuGUI.start();
         });
 
         toolBar.getItems().add(backButton);
         borderPane.setTop(toolBar);
-
-        Scene scene = new Scene(borderPane, 600, 600);
-        primaryStage.setScene(scene);
-        primaryStage.setTitle("Global chat");
-        primaryStage.show();
-    }
-
-    private BorderPane chatBox(Socket socket, ArrayList<String> chatlog) {
-        BorderPane borderPane = new BorderPane();
 
         //Center items
         textFlow = new TextFlow();
         textFlow.setLineSpacing(5);
         VBox.setVgrow(textFlow, Priority.ALWAYS);
 
-        for (String message : chatlog) {
+        for (String message : chatLog) {
             if (textFlow.getChildren().size() > 0)
                 message = "\n" + message;
             textFlow.getChildren().add(new Text(message));
@@ -132,10 +131,6 @@ public class ChatGUI {
 
     protected void addMessage(String message) {
         Platform.runLater(() -> textFlow.getChildren().add(new Text("\n" + message)));
-    }
-
-    private void clientGUI() {
-        mainMenuGUI.start();
     }
 
 }

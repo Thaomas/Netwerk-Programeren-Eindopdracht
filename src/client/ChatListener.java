@@ -7,7 +7,7 @@ import java.net.Socket;
 public class ChatListener implements Runnable {
     private final ChatGUI chatGUI;
     private final Socket socket;
-    private String roomCode;
+    private final String roomCode;
 
     public ChatListener(ChatGUI gui, Socket socket, String roomCode) {
         this.chatGUI = gui;
@@ -24,18 +24,15 @@ public class ChatListener implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        String input;
-        String command;
-        String roomCode;
         while (connected) {
             try {
-                input = in.readUTF();
-                command = input.substring(0, 4);
+                String input = in.readUTF();
+                String command = input.substring(0, 4);
                 if (command.equals("Disc")) {
                     connected = false;
                     continue;
                 }
-                roomCode = input.substring(4, 8);
+                String roomCode = input.substring(4, 8);
                 if (roomCode.equals(this.roomCode)) {
                     if (command.equals("CMes")) {
                         chatGUI.addMessage(input.substring(8));

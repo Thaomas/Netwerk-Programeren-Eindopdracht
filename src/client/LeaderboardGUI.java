@@ -49,9 +49,9 @@ public class LeaderboardGUI {
         borderPane.setCenter(getDefaultView());
 
         Scene scene = new Scene(borderPane, 640, 480);
-        stage.setTitle("Leaderboard");
-        stage.setScene(scene);
-        stage.show();
+        primaryStage.setTitle("Leaderboard");
+        primaryStage.setScene(scene);
+        primaryStage.show();
     }
 
     private TableView<SimplePropertyConverter> getDefaultView() {
@@ -67,7 +67,7 @@ public class LeaderboardGUI {
         gamesWon.setCellValueFactory(new PropertyValueFactory<>("gamesWon"));
         TableColumn<SimplePropertyConverter, String> gamesLost = new TableColumn<>("Losses");
         gamesLost.setCellValueFactory(new PropertyValueFactory<>("gamesLost"));
-        tableView.getColumns().addAll(name,gamesPlayed,gamesWon,gamesLost);
+        tableView.getColumns().addAll(name, gamesPlayed, gamesWon, gamesLost);
 
         name.prefWidthProperty().bind(tableView.widthProperty().divide(2));
         gamesPlayed.prefWidthProperty().bind(tableView.widthProperty().divide(4).subtract(42));

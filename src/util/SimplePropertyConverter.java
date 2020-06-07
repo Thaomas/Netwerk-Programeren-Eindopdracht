@@ -5,10 +5,10 @@ import javafx.beans.property.SimpleStringProperty;
 
 public class SimplePropertyConverter {
 
-    private SimpleStringProperty name;
-    private SimpleIntegerProperty gamesPlayed;
-    private SimpleIntegerProperty gamesWon;
-    private SimpleIntegerProperty gamesLost;
+    private final SimpleStringProperty name;
+    private final SimpleIntegerProperty gamesPlayed;
+    private final SimpleIntegerProperty gamesWon;
+    private final SimpleIntegerProperty gamesLost;
 
     public SimplePropertyConverter(String name, int gamesPlayed, int gamesWon) {
         this.name = new SimpleStringProperty(name);

@@ -1,5 +1,6 @@
 package client;
 
+import client.listener.ChatListener;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -149,7 +150,7 @@ public class ChatGUI {
      *
      * @param message A string with the message that the user wants to send to other users within "global chat".
      */
-    protected void addMessage(String message) {
+    public void addMessage(String message) {
         Platform.runLater(() -> textFlow.getChildren().add(new Text("\n" + message)));
     }
 

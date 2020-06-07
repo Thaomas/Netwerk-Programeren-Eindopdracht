@@ -2,6 +2,7 @@ package client;
 
 import client.gamelogic.Disc;
 import client.gamelogic.Square;
+import client.listener.GameListener;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -226,7 +227,7 @@ public class GameGUI {
      * Method used to add a disc according to where the user has clicked on the screen. Sends message to the server
      * which responds with the disc object.
      */
-    protected void placeDisc() {
+    public void placeDisc() {
         try {
             ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
             Disc disc = (Disc) objectInputStream.readObject();
@@ -269,7 +270,7 @@ public class GameGUI {
      *
      * @param state String indicating if the user won or lost.
      */
-    protected void restartGame(String state) {
+    public void restartGame(String state) {
         if (state.equals("Win")) {
             topString = "You won!";
         } else if (state.equals("Lose")) {
@@ -288,7 +289,7 @@ public class GameGUI {
      *
      * @param message The message of the user.
      */
-    protected void messageToGameChat(String message) {
+    public void messageToGameChat(String message) {
         if (comboBox.getSelectionModel().getSelectedItem().equals("Game chat")) {
             Platform.runLater(() -> textFlow.getChildren().add(new Text(message + "\n")));
         } else {
@@ -301,7 +302,7 @@ public class GameGUI {
      *
      * @param message The message of the user.
      */
-    protected void messageToMainChat(String message) {
+    public void messageToMainChat(String message) {
         if (comboBox.getSelectionModel().getSelectedItem().equals("Global chat")) {
             Platform.runLater(() -> textFlow.getChildren().add(new Text(message + "\n")));
         } else {
@@ -314,7 +315,7 @@ public class GameGUI {
      *
      * @param name Name of the opponent.
      */
-    protected void setOpponentName(String name) {
+    public void setOpponentName(String name) {
         Platform.runLater(() -> {
             opponentName.setText("Opponent: " + name);
             turn.setText("Turn: RED");

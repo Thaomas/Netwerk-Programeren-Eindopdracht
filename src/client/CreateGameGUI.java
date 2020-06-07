@@ -28,6 +28,13 @@ public class CreateGameGUI {
     private TextField roomName;
     private CheckBox checkBox;
 
+    /**
+     * Start method which sets the scene.
+     *
+     * @param primaryStage The class which is used to change the scene settings.
+     * @param mainMenuGUI  Required for the back button. Calls upon the method start to change the scene.
+     * @param socket       The class required to make connection to the server.
+     */
     public void start(Stage primaryStage, MainMenuGUI mainMenuGUI, Socket socket) {
         this.stage = primaryStage;
         this.mainMenuGUI = mainMenuGUI;
@@ -88,6 +95,9 @@ public class CreateGameGUI {
         stage.show();
     }
 
+    /**
+     * Creates the scene in which the player will play the game connect 4. Calls upon the method start in GameGUI.
+     */
     private void createGame() {
         try {
             String request = "CrGR";

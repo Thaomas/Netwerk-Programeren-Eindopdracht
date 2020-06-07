@@ -31,7 +31,15 @@ public class JoinGameGUI {
     private Stage stage;
     private MainMenuGUI mainMenuGUI;
     private Socket socket;
+    private ListView<HBox> listView;
 
+    /**
+     * Start method which sets the scene.
+     *
+     * @param primaryStage The class which is used to change the scene settings.
+     * @param mainMenuGUI  Required for the back button. Calls upon the method start to change the scene.
+     * @param socket       The class required to make connection to the server.
+     */
     public void start(Stage primaryStage, MainMenuGUI mainMenuGUI, Socket socket) {
         stage = primaryStage;
         this.mainMenuGUI = mainMenuGUI;
@@ -98,8 +106,9 @@ public class JoinGameGUI {
         stage.show();
     }
 
-    private ListView<HBox> listView;
-
+    /**
+     * Sets the list of available public games.
+     */
     private void setAvailableGames() {
         try {
             listView.getItems().clear();
@@ -126,6 +135,12 @@ public class JoinGameGUI {
         }
     }
 
+    /**
+     * Used to join a game room on the basis of the room code. For public games their is no need to type a room code
+     * since the 'join' button is already bound to the button.
+     *
+     * @param roomCode String which contains the code to join the lobby.
+     */
     public void joinGameRoom(String roomCode) {
         try {
             roomCode = roomCode.toLowerCase();

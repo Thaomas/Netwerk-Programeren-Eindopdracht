@@ -34,7 +34,11 @@ public class LoginGUI extends Application {
     private TextField password;
     private VBox centerPane;
     private Socket socket;
+    private boolean isConnected = false;
 
+    /**
+     * Method used to connect to the server.
+     */
     private void connect() {
         if (!isConnected) {
             try {
@@ -46,6 +50,11 @@ public class LoginGUI extends Application {
         }
     }
 
+    /**
+     * Method used to start the first stage of the application.
+     *
+     * @param primaryStage The class used to start the scene.
+     */
     @Override
     public void start(Stage primaryStage) {
         stage = primaryStage;
@@ -79,6 +88,9 @@ public class LoginGUI extends Application {
 
     }
 
+    /**
+     * Sets the initial settings of the scene.
+     */
     public void startScene() {
         borderPane.setTop(null);
         gridPane.getChildren().clear();
@@ -104,6 +116,9 @@ public class LoginGUI extends Application {
         stage.setTitle("Connect 4");
     }
 
+    /**
+     * Login scene which asks only for the username and password to login to an existing account on the server.
+     */
     private void login() {
         credential();
 
@@ -113,7 +128,7 @@ public class LoginGUI extends Application {
         Button loginButton = new Button("Login");
         loginButton.setOnAction(e -> {
             if (tryLogin()) {
-                new MainMenuGUI(stage,this,socket).start();
+                new MainMenuGUI(stage, this, socket).start();
             }
         });
 
@@ -140,8 +155,11 @@ public class LoginGUI extends Application {
         stage.setTitle(login.getText());
     }
 
-    private boolean isConnected = false;
-
+    /**
+     * A check which sends a message to the server to see if its possible to login.
+     *
+     * @return Whether the login is successful or not.
+     */
     private boolean tryLogin() {
         connect();
         if (isConnected && !username.getText().isEmpty() && !password.getText().isEmpty()) {
@@ -175,6 +193,9 @@ public class LoginGUI extends Application {
         } else return false;
     }
 
+    /**
+     * Register which asks for the username and password of the password to create an account.
+     */
     private void register() {
         credential();
 
@@ -184,7 +205,7 @@ public class LoginGUI extends Application {
         Button registerButton = new Button("Register account");
         registerButton.setOnAction(event -> {
             if (tryRegister()) {
-                new MainMenuGUI(stage,this,socket).start();
+                new MainMenuGUI(stage, this, socket).start();
             }
         });
 
@@ -202,7 +223,6 @@ public class LoginGUI extends Application {
             }
         });
 
-
         gridPane.add(register, 0, 0);
         gridPane.add(registerButton, 1, 3);
 
@@ -212,6 +232,11 @@ public class LoginGUI extends Application {
         stage.setTitle(register.getText());
     }
 
+    /**
+     * Sends a message to the server to check if its possible to create an account with the given credentials.
+     *
+     * @return Whether the creation of the account successful was or not.
+     */
     private boolean tryRegister() {
         connect();
         if (isConnected && !username.getText().isEmpty() && !password.getText().isEmpty()) {
@@ -235,6 +260,10 @@ public class LoginGUI extends Application {
         } else return false;
     }
 
+    /**
+     * A method used in both login and register where part of the scene such as the button and fields where the
+     * user credentials are typed into are initialized and added to the scene.
+     */
     private void credential() {
         borderPane.setTop(toolBar);
         gridPane.getChildren().clear();
@@ -264,11 +293,13 @@ public class LoginGUI extends Application {
         gridPane.add(visiblePassword, 3, 2);
     }
 
+    /**
+     * Method used to logout and disconnect the user that is connected to the server.
+     */
     public void disconnect() {
         try {
             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
             out.writeUTF("quit");
-            out.close();
             socket.close();
             isConnected = false;
         } catch (IOException e) {

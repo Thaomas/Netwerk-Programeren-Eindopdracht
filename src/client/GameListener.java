@@ -15,6 +15,9 @@ public class GameListener implements Runnable {
         this.roomCode = roomCode;
     }
 
+    /**
+     * Method used to listen to the incoming messages from the server. Used for all game rooms.
+     */
     @Override
     public void run() {
         boolean connected = true;

@@ -26,9 +26,17 @@ public class ChatGUI {
     private TextFlow textFlow;
     private Thread listenThread;
 
-    public void start(String roomCode, Stage primaryStage, MainMenuGUI mainMenuGUI, Socket socket, ArrayList<String> chatLog) {
+    /**
+     * Start method which sets the stage of the screen.
+     *
+     * @param primaryStage The class which is used to change the scene settings.
+     * @param mainMenuGUI  Required for the back button. Calls upon the method start to change the scene.
+     * @param socket       The class required to make connection to the server.
+     * @param chatLog      Chat log of all the messages sent between the users in the chat "global chat".
+     */
+    public void start(Stage primaryStage, MainMenuGUI mainMenuGUI, Socket socket, ArrayList<String> chatLog) {
         this.mainMenuGUI = mainMenuGUI;
-        this.roomCode = roomCode;
+        this.roomCode = "main";
 
         try {
             this.out = new DataOutputStream(socket.getOutputStream());
@@ -42,6 +50,13 @@ public class ChatGUI {
         primaryStage.show();
     }
 
+    /**
+     * Sets a BorderPane in the scene with a chat.
+     *
+     * @param socket  The class required to make connection to the server.
+     * @param chatLog Chat log of all the messages sent between the users in the chat "global chat".
+     * @return A BorderPane with the relevant nodes and data.
+     */
     private BorderPane chatBox(Socket socket, ArrayList<String> chatLog) {
         BorderPane borderPane = new BorderPane();
 
@@ -129,6 +144,11 @@ public class ChatGUI {
         return borderPane;
     }
 
+    /**
+     * Method used to send a message to the "global chat".
+     *
+     * @param message A string with the message that the user wants to send to other users within "global chat".
+     */
     protected void addMessage(String message) {
         Platform.runLater(() -> textFlow.getChildren().add(new Text("\n" + message)));
     }

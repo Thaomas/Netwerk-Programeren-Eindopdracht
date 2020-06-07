@@ -5,6 +5,9 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
+/**
+ * Connects a socket to a User object.
+ */
 public class Connector implements Runnable {
 
     private final Socket socket;
@@ -15,6 +18,9 @@ public class Connector implements Runnable {
         this.server = server;
     }
 
+    /**
+     * Logs the connected socket into the correct User Object.
+     */
     @Override
     public void run() {
 
@@ -82,6 +88,10 @@ public class Connector implements Runnable {
         }
     }
 
+    /**
+     * Writes back to the socket
+     * @param response Message to write back.
+     */
     public void respond(String response) {
         try {
             new DataOutputStream(socket.getOutputStream()).writeUTF(response);

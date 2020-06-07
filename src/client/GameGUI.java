@@ -64,7 +64,7 @@ public class GameGUI {
     private ArrayList<Square> squares;
 
     public void start(Stage primaryStage, MainMenuGUI mainMenuGUI, Socket socket,
-                      String roomCode, ArrayList<String> gameChat, ArrayList<String> mainChat) {
+                      String roomCode, ArrayList<String> gameChat, ArrayList<String> mainChat, String start, String yourColor) {
         this.mainMenuGUI = mainMenuGUI;
         this.socket = socket;
         this.roomCode = roomCode;

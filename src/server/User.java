@@ -139,7 +139,7 @@ public class User implements Runnable {
 
     /**
      * @param roomCode Code of the room the message is send to.
-     * @param message  The mo
+     * @param message  The message to Send.
      */
     private void gameMessage(String roomCode, String message) {
         if (server.containsGameRoom(roomCode)) {

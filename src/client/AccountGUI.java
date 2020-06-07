@@ -34,7 +34,7 @@ public class AccountGUI {
     private TextField newPass;
     private TextField newPassConfirm;
     private MainMenuGUI mainMenuGUI;
-    private AdministrationGUI administrationGUI;
+    private LoginGUI loginGUI;
     private Stage primaryStage;
 
     private DataOutputStream out;
@@ -63,10 +63,10 @@ public class AccountGUI {
         }
     }
 
-    public void start(Stage primaryStage, MainMenuGUI mainMenuGUI, AdministrationGUI administrationGUI) {
+    public void start(Stage primaryStage, MainMenuGUI mainMenuGUI, LoginGUI loginGUI) {
         this.primaryStage = primaryStage;
         this.mainMenuGUI = mainMenuGUI;
-        this.administrationGUI = administrationGUI;
+        this.loginGUI = loginGUI;
 
         getData();
 
@@ -233,8 +233,8 @@ public class AccountGUI {
             if (passwordFieldConfirm.getText().equals(passwordField.getText())) {
                 if (tryDeleteAccount(passwordFieldConfirm.getText())) {
                     stage.close();
-                    administrationGUI.disconnect();
-                    administrationGUI.start(primaryStage);
+                    loginGUI.disconnect();
+                    loginGUI.start(primaryStage);
                 }
             }
             passwordField.clear();

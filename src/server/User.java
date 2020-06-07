@@ -110,6 +110,7 @@ public class User implements Runnable {
 
     /**
      * Get the Json object to save.
+     *
      * @return Json Object
      */
     public JSONObject getJson() {
@@ -139,7 +140,7 @@ public class User implements Runnable {
 
     /**
      * @param roomCode Code of the room the message is send to.
-     * @param message  The mo
+     * @param message  The message.
      */
     private void gameMessage(String roomCode, String message) {
         if (server.containsGameRoom(roomCode)) {
@@ -152,6 +153,11 @@ public class User implements Runnable {
             respond("Invalid room name");
     }
 
+    /**
+     * Adds user to the total votes in the room. With 2 votes, the game will restart.
+     *
+     * @param roomCode The room code.
+     */
     private void gameVote(String roomCode) {
         if (server.containsGameRoom(roomCode)) {
             GameRoom room = server.getGameRooms().get(roomCode);
@@ -161,6 +167,11 @@ public class User implements Runnable {
         }
     }
 
+    /**
+     * Method used to send the Chat Log of a room.
+     *
+     * @param chatLog The chat log in the form of a Arraylist.
+     */
     private void sendChatLog(ArrayList<String> chatLog) {
         try {
             new ObjectOutputStream(socket.getOutputStream()).writeObject(chatLog);
@@ -170,6 +181,11 @@ public class User implements Runnable {
 
     }
 
+    /**
+     * Method used to send the list of game rooms to the client.
+     *
+     * @param gameRoomList The list of game rooms in the form of a HashMap.
+     */
     private void sendGameRoomList(HashMap<String, String> gameRoomList) {
         try {
             new ObjectOutputStream(socket.getOutputStream()).writeObject(gameRoomList);
@@ -342,6 +358,7 @@ public class User implements Runnable {
 
     /**
      * Checks whether user is connected.
+     *
      * @return is connected
      */
     public boolean isConnected() {
@@ -350,6 +367,7 @@ public class User implements Runnable {
 
     /**
      * Returns the name of the user.
+     *
      * @return Name of the user.
      */
     public String getName() {

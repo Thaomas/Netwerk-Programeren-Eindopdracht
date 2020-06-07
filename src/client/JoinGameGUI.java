@@ -8,6 +8,8 @@ import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -17,7 +19,7 @@ import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import util.AlertHandler;
 
-import java.awt.*;
+//import java.awt.*;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -77,7 +79,7 @@ public class JoinGameGUI {
         Separator separator2 = new Separator();
         separator2.setOrientation(Orientation.VERTICAL);
 
-        Button buttonRefreshGames = new Button("Refresh games");
+        Button buttonRefreshGames = new Button("Refresh games ");
         buttonRefreshGames.setOnAction(event -> setAvailableGames());
 
         hBox.getChildren().addAll(separator, roomCodeLabel, textField, buttonJoinGame, separator2, buttonRefreshGames);

@@ -17,34 +17,34 @@ public class SimplePropertyConverter {
         this.gamesLost = new SimpleIntegerProperty(gamesPlayed - gamesWon);
     }
 
-    public String getName() {
-        return name.get();
-    }
-
+    /**
+     * Getter for the nameProperty.
+     * @return SimpleStringProperty for the column name.
+     */
     public SimpleStringProperty nameProperty() {
         return name;
     }
 
-    public int getGamesPlayed() {
-        return gamesPlayed.get();
-    }
-
+    /**
+     * Getter for the gamesPlayedProperty.
+     * @return SimpleStringProperty for the column gamesPlayed.
+     */
     public SimpleIntegerProperty gamesPlayedProperty() {
         return gamesPlayed;
     }
 
-    public int getGamesWon() {
-        return gamesWon.get();
-    }
-
+    /**
+     * Getter for the gamesWonProperty.
+     * @return SimpleStringProperty for the column gamesWon.
+     */
     public SimpleIntegerProperty gamesWonProperty() {
         return gamesWon;
     }
 
-    public int getGamesLost() {
-        return gamesLost.get();
-    }
-
+    /**
+     * Getter for the gamesLostProperty.
+     * @return SimpleStringProperty for the column gamesLost.
+     */
     public SimpleIntegerProperty gamesLostProperty() {
         return gamesLost;
     }

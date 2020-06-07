@@ -18,8 +18,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.*;
 import javafx.scene.text.Font;
+import javafx.scene.text.*;
 import javafx.stage.Stage;
 import org.jfree.fx.FXGraphics2D;
 
@@ -35,7 +35,6 @@ import java.util.ArrayList;
 
 public class GameGUI {
 
-    private MainMenuGUI mainMenuGUI;
     private ArrayList<String> mainChat;
     private ArrayList<String> gameChat;
     private Thread listenThread;
@@ -68,7 +67,6 @@ public class GameGUI {
      * Start method which sets the scene.
      *
      * @param primaryStage The class which is used to change the scene settings.
-     * @param mainMenuGUI  Required for the back button. Calls upon the method start to change the scene.
      * @param socket       The class required to make connection to the server.
      * @param roomCode     The room code of the lobby.
      * @param gameChat     The messages of the current game room.
@@ -78,7 +76,6 @@ public class GameGUI {
      */
     public void start(Stage primaryStage, MainMenuGUI mainMenuGUI, Socket socket,
                       String roomCode, ArrayList<String> gameChat, ArrayList<String> mainChat, String start, String yourColor) {
-        this.mainMenuGUI = mainMenuGUI;
         this.socket = socket;
         this.roomCode = roomCode;
         this.mainChat = mainChat;

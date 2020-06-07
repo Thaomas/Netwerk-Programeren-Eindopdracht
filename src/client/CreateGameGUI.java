@@ -1,6 +1,5 @@
 package client;
 
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -11,7 +10,6 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import util.RandomString;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -22,16 +20,11 @@ import java.util.ArrayList;
 
 public class CreateGameGUI {
 
-    //needs to be server side
-    private final RandomString randomString = new RandomString(4);
-
     private Stage stage;
     private MainMenuGUI mainMenuGUI;
     private Socket socket;
-    private String roomCode;
     private DataInputStream in;
     private DataOutputStream out;
-    private boolean isPrivate;
     private TextField roomName;
     private CheckBox checkBox;
 
@@ -39,7 +32,6 @@ public class CreateGameGUI {
         this.stage = primaryStage;
         this.mainMenuGUI = mainMenuGUI;
         this.socket = socket;
-        this.roomCode = randomString.nextString();
 
         try {
             this.out = new DataOutputStream(socket.getOutputStream());
@@ -76,8 +68,6 @@ public class CreateGameGUI {
         gridPane.add(roomName, 1, 0);
 
         checkBox = new CheckBox();
-        isPrivate = false;
-        checkBox.selectedProperty().addListener((observable, oldValue, newValue) -> isPrivate = checkBox.isSelected());
 
         gridPane.add(new Label("Private: "), 0, 1);
         gridPane.add(checkBox, 1, 1);
@@ -107,7 +97,7 @@ public class CreateGameGUI {
                 request += "o";
             request += roomName.getText();
             out.writeUTF(request);
-            roomCode = in.readUTF();
+            String roomCode = in.readUTF();
 
             out.writeUTF("Connmain");
             in.readUTF();

@@ -15,6 +15,9 @@ public class GameRoom {
     private User red;
     private User yellow;
     private final ConnectFour connectFour;
+    private boolean voteRed = false;
+    private boolean voteYellow = false;
+
 
     public GameRoom(String roomname, String roomcode, boolean isPrivate) {
         System.out.println(roomname + " " + isPrivate);
@@ -24,18 +27,8 @@ public class GameRoom {
         this.isFinished = false;
         chatlog = new ArrayList<>();
         connectFour = new ConnectFour();
-//        testChat(100);
     }
-
-    private void testChat(int amount) {
-        System.out.println(this.roomName);
-        System.out.println(this.roomCode);
-        System.out.println(this.chatlog);
-        for (int i = 0; i < amount; i++) {
-            chatlog.add("test " + i + "\n");
-        }
-    }
-
+    
     public boolean isEmpty() {
         return red == null && yellow == null;
     }
@@ -170,9 +163,6 @@ public class GameRoom {
         if (yellow != null)
             yellow.respond("CMes" + roomCode + message);
     }
-
-    private boolean voteRed = false;
-    private boolean voteYellow = false;
 
     public synchronized void vote(User user) {
         if (user == red)

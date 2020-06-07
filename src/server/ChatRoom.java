@@ -1,7 +1,6 @@
 package server;
 
 import org.json.simple.JSONObject;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -14,7 +13,6 @@ public class ChatRoom {
     public ChatRoom(String roomname, String roomcode) {
         this.roomName = roomname;
         this.roomCode = roomcode;
-        testChat(100);
         users = new HashSet<>();
         chatlog = new ArrayList<>();
     }
@@ -24,15 +22,6 @@ public class ChatRoom {
         this.roomCode = roomCode;
         this.chatlog = chatlog;
         this.users = new HashSet<>();
-    }
-
-    private void testChat(int amount) {
-        System.out.println(this.roomName);
-        System.out.println(this.roomCode);
-        System.out.println(this.chatlog);
-        for (int i = 0; i < amount; i++) {
-            chatlog.add("test " + i + "\n");
-        }
     }
 
     public JSONObject getJSON() {
@@ -73,5 +62,4 @@ public class ChatRoom {
             user.respond("CMes" + roomCode + message);
         }
     }
-
 }

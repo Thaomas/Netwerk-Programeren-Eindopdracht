@@ -9,7 +9,6 @@ public class Connector implements Runnable {
 
     private final Socket socket;
     private final Server server;
-    private Thread thread;
 
     public Connector(Socket socket, Server server) {
         this.socket = socket;
@@ -35,16 +34,6 @@ public class Connector implements Runnable {
                     String nickname = input.substring(4, input.indexOf('|'));
                     String password = input.substring(input.indexOf('|') + 1);
                     User user;
-
-                    /*
-                    error1 = name already in use
-                    error2 = invalid Password
-                    error3 = invalid Username
-                    error4 = invalid command
-                    error5 = user is already connected
-                    connected = Registered/Logged in without errors
-                     */
-
                     if (answer.equals("RegU")) {
                         System.out.println("Register");
                         if (!server.getUsers().containsKey(nickname)) {
@@ -91,13 +80,7 @@ public class Connector implements Runnable {
                 }
             } catch (IOException e) {
                 System.out.println("Unexpected connection loss " + socket.getRemoteSocketAddress().toString());
-                try {
-                    System.out.println("Disconnected");
-                    thread.join();
-                } catch (InterruptedException interruptedException) {
-                    interruptedException.printStackTrace();
-                }
-                break;
+                return;
             }
         }
     }

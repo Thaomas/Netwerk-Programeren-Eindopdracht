@@ -21,43 +21,31 @@ public class ConnectFour {
         starter = Color.red;
         turn = Color.red;
     }
-    
-    public void restart(){
-        if (starter.equals(Color.red)){
+
+    /**
+     * Returns the color which starts the round
+     * @return
+     */
+    public String getStart() {
+        if (starter.equals(Color.red)) {
+            return "R";
+        } else
+            return "Y";
+    }
+
+    /**
+     * Restarts the game and switches the starting player
+     */
+    public void restart() {
+        if (starter.equals(Color.red)) {
             starter = Color.yellow;
             turn = Color.yellow;
             grid = new Disc[columns][rows];
-        }else {
+        } else {
             starter = Color.red;
             turn = Color.red;
             grid = new Disc[columns][rows];
         }
-    }
-
-    public Disc placeDisc(int column, Color color) {
-        Disc disc = null;
-        if (turn.equals(color)) {
-
-            int row = rows - 1;
-
-        while (row >= 0) {
-            if (!getDisc(column, row).isPresent())
-                break;
-
-            row--;
-        }
-
-            disc = new Disc(column,row, Color.red, SQUARE_SIZE);
-            disc.setColor(color);
-
-            grid[column][row] = disc;
-
-            if (color.equals(Color.red))
-                this.turn=Color.yellow;
-            else
-                this.turn=Color.red;
-        }
-        return disc;
     }
 
     private Optional<Disc> getDisc(int column, int row) {
@@ -68,8 +56,28 @@ public class ConnectFour {
         return Optional.ofNullable(grid[column][row]);
     }
 
-    public boolean checkWin(Color color) {
+    public Disc placeDisc(int column, Color color) {
+        Disc disc = null;
+        if (turn.equals(color)) {
+            int row = rows - 1;
+            while (row >= 0) {
+                if (!getDisc(column, row).isPresent())
+                    break;
+                row--;
+            }
+            disc = new Disc(column, row, Color.red, SQUARE_SIZE);
+            disc.setColor(color);
+            grid[column][row] = disc;
 
+            if (color.equals(Color.red))
+                this.turn = Color.yellow;
+            else
+                this.turn = Color.red;
+        }
+        return disc;
+    }
+
+    public boolean checkWin(Color color) {
         for (int i = 0; i < columns; i++) {
             for (int j = 0; j < rows - 3; j++) {
                 // Vertical Check
@@ -123,12 +131,5 @@ public class ConnectFour {
         }
 
         return false;
-    }
-
-    public String getStart() {
-        if (starter.equals(Color.red)){
-            return "R";
-        }else
-            return "Y";
     }
 }

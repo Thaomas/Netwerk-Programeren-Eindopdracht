@@ -35,7 +35,6 @@ import java.util.ArrayList;
 
 public class GameGUI {
 
-    private MainMenuGUI mainMenuGUI;
     private ArrayList<String> mainChat;
     private ArrayList<String> gameChat;
     private Thread listenThread;
@@ -78,7 +77,6 @@ public class GameGUI {
      */
     public void start(Stage primaryStage, MainMenuGUI mainMenuGUI, Socket socket,
                       String roomCode, ArrayList<String> gameChat, ArrayList<String> mainChat, String start, String yourColor) {
-        this.mainMenuGUI = mainMenuGUI;
         this.socket = socket;
         this.roomCode = roomCode;
         this.mainChat = mainChat;

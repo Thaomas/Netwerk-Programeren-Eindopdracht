@@ -16,7 +16,6 @@ import java.util.Random;
 
 public class Server {
     private final int port = 10000;
-    private ServerSocket serverSocket;
 
     private final HashMap<String, User> users;
     private final HashMap<String, User> connectedUsers;
@@ -96,12 +95,11 @@ public class Server {
         Thread disconnectListener = new Thread(this::disconnectListener);
         disconnectListener.start();
         try {
-            this.serverSocket = new ServerSocket(port);
+            ServerSocket serverSocket = new ServerSocket(port);
 
-            boolean isRunning = true;
-            while (isRunning) {
+            while (true) {
                 System.out.println("Waiting for clients...");
-                Socket socket = this.serverSocket.accept();
+                Socket socket = serverSocket.accept();
                 System.out.println("Client connected via address: " + socket.getInetAddress().getHostAddress());
                 System.out.println("Connected clients: " + this.connectedUsers.size());
                 System.out.println("Total users: " + this.users.size());
@@ -112,7 +110,6 @@ public class Server {
                 getConnectorThreads().add(t);
             }
 
-            this.serverSocket.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -120,8 +117,9 @@ public class Server {
 
     /**
      * Check if the given GameRoom exists.
+     *
      * @param room The code for the GameRoom.
-     * @return
+     * @return true or false if game room contains room,
      */
     public boolean containsGameRoom(String room) {
         return gameRooms.containsKey(room);
@@ -129,8 +127,9 @@ public class Server {
 
     /**
      * Check if the given ChatRoom exists.
+     *
      * @param room The code for the ChatRoom.
-     * @return
+     * @return true or false if chat room contains room,
      */
     public boolean containsChatRoom(String room) {
         return chatRooms.containsKey(room);
@@ -138,6 +137,7 @@ public class Server {
 
     /**
      * Add an User to the connected Users.
+     *
      * @param user The User to be added.
      */
     protected void connectUser(User user) {
@@ -146,6 +146,7 @@ public class Server {
 
     /**
      * Creates a new ChatRoom.
+     *
      * @param roomName The name of the ChatRoom.
      * @return The code for the ChatRoom.
      */
@@ -157,6 +158,7 @@ public class Server {
 
     /**
      * Generate a new 4 letter code that hasn't been used before.
+     *
      * @return The 4 letter code.
      */
     private synchronized String generateCode() {
@@ -177,8 +179,9 @@ public class Server {
 
     /**
      * Creates a new GameRoom.
+     *
      * @param response The message from the User.
-     * @param user The User that send the message.
+     * @param user     The User that send the message.
      * @return The code for the new GameRoom
      */
     public String newGameRoom(String response, User user) {

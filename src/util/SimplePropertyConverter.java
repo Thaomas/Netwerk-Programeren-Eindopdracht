@@ -25,20 +25,12 @@ public class SimplePropertyConverter {
         return name;
     }
 
-    public void setName(String name) {
-        this.name.set(name);
-    }
-
     public int getGamesPlayed() {
         return gamesPlayed.get();
     }
 
     public SimpleIntegerProperty gamesPlayedProperty() {
         return gamesPlayed;
-    }
-
-    public void setGamesPlayed(int gamesPlayed) {
-        this.gamesPlayed.set(gamesPlayed);
     }
 
     public int getGamesWon() {
@@ -49,19 +41,11 @@ public class SimplePropertyConverter {
         return gamesWon;
     }
 
-    public void setGamesWon(int gamesWon) {
-        this.gamesWon.set(gamesWon);
-    }
-
     public int getGamesLost() {
         return gamesLost.get();
     }
 
     public SimpleIntegerProperty gamesLostProperty() {
         return gamesLost;
-    }
-
-    public void setGamesLost(int gamesLost) {
-        this.gamesLost.set(gamesLost);
     }
 }

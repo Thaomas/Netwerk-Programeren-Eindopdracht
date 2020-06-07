@@ -140,7 +140,6 @@ public class MainMenuGUI {
     public void ChatGUI() {
         try {
             String roomCode = "main";
-            System.out.println("Conn" + roomCode);
             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
             DataInputStream in = new DataInputStream(socket.getInputStream());
             out.writeUTF("Conn" + roomCode);

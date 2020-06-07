@@ -24,7 +24,6 @@ public class ChatListener implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println("Start");
         String input;
         String command;
         String roomCode;
@@ -47,6 +46,5 @@ public class ChatListener implements Runnable {
                 connected = false;
             }
         }
-        System.out.println("Chat listener stopped");
     }
 }

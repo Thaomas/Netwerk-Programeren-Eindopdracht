@@ -15,25 +15,17 @@ public class GameRoom {
     private User red;
     private User yellow;
     private final ConnectFour connectFour;
+    private boolean voteRed = false;
+    private boolean voteYellow = false;
+
 
     public GameRoom(String roomname, String roomcode, boolean isPrivate) {
-        System.out.println(roomname + " " + isPrivate);
         this.roomName = roomname;
         this.roomCode = roomcode;
         this.isPrivate = isPrivate;
         this.isFinished = false;
         chatlog = new ArrayList<>();
         connectFour = new ConnectFour();
-//        testChat(100);
-    }
-
-    private void testChat(int amount) {
-        System.out.println(this.roomName);
-        System.out.println(this.roomCode);
-        System.out.println(this.chatlog);
-        for (int i = 0; i < amount; i++) {
-            chatlog.add("test " + i + "\n");
-        }
     }
 
     public boolean isEmpty() {
@@ -72,7 +64,6 @@ public class GameRoom {
         if (red == user || yellow == user) {
             if (red == user) {
                 if (inProgress) {
-                    System.out.println(user.getName() + "left");
                     yellow.win();
                     red.lose();
                     inProgress = false;
@@ -82,7 +73,6 @@ public class GameRoom {
                 red = null;
             } else {
                 if (inProgress) {
-                    System.out.println(user.getName() + "left");
                     red.win();
                     yellow.lose();
                     inProgress = false;
@@ -91,6 +81,12 @@ public class GameRoom {
                 }
                 yellow = null;
             }
+        }
+        if (red != null) {
+            red.respond("CMes" + roomCode + user.getName() + " has disconnected!");
+        }
+        if (yellow != null) {
+            yellow.respond("CMes" + roomCode + user.getName() + " has disconnected!");
         }
     }
 
@@ -105,7 +101,7 @@ public class GameRoom {
     public synchronized void move(int column, User user) {
         if (red != null && yellow != null && !isFinished) {
             if (!inProgress)
-                inProgress=true;
+                inProgress = true;
 
             if (user.equals(red)) {
                 moveAll(connectFour.placeDisc(column, Color.red));
@@ -127,20 +123,24 @@ public class GameRoom {
 
     private void win(User winner) {
         winner.win();
-        System.out.println(winner.getName() + " won");
         winner.respond("GMes" + roomCode + "Win");
     }
 
     private void lose(User loser) {
         loser.lose();
-        System.out.println(loser.getName() + " lost");
         loser.respond("GMes" + roomCode + "Lose");
     }
 
-    public synchronized void hasJoined() {
+    public synchronized void hasJoined(User joined) {
         if (red != null && yellow != null) {
             red.respond("GMes" + roomCode + "Conn" + yellow.getName());
             yellow.respond("GMes" + roomCode + "Conn" + red.getName());
+        }
+        if (red != null) {
+            red.respond("CMes" + roomCode + joined.getName() + " has joined!");
+        }
+        if (yellow != null) {
+            yellow.respond("CMes" + roomCode + joined.getName() + " has joined!");
         }
     }
 
@@ -159,9 +159,6 @@ public class GameRoom {
             yellow.respond("CMes" + roomCode + message);
     }
 
-    private boolean voteRed = false;
-    private boolean voteYellow = false;
-
     public synchronized void vote(User user) {
         if (user == red)
             voteRed = true;
@@ -175,9 +172,18 @@ public class GameRoom {
             voteYellow = false;
             voteRed = false;
             isFinished = false;
-        } else{
+        } else {
             yellow.respond("GMes" + roomCode + "Vote");
             red.respond("GMes" + roomCode + "Vote");
         }
+    }
+
+    public String getTurn(User user) {
+        if (user.equals(red)) {
+            return connectFour.getStart() + "R";
+        } else if (user.equals(yellow)) {
+            return connectFour.getStart() + "Y";
+        }
+        return "";
     }
 }

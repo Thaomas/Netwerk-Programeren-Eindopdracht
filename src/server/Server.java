@@ -26,31 +26,11 @@ public class Server {
     private final HashMap<String, GameRoom> gameRooms;
 
     public static void main(String[] args) {
-
-        System.out.println("Loading server");
-
         Server server = new Server();
         server.connect();
     }
 
-    private void shutdown() {
-        System.out.println("save");
-        System.out.println();
-        save();
-
-        try {
-            for (Thread thread : getClientThreads().values()) {
-                thread.join();
-            }
-            this.serverSocket.close();
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
-        }
-
-    }
-
     Server() {
-//        Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown));
         users = new HashMap<>();
         connectedUsers = new HashMap<>();
         clientThreads = new HashMap<>();
@@ -98,7 +78,6 @@ public class Server {
         try (FileWriter fileWriter = new FileWriter("saves/save.json")) {
             fileWriter.write(object.toJSONString());
             fileWriter.flush();
-//            System.out.println("Save");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -149,7 +128,6 @@ public class Server {
     }
 
     private void addGameRoom(String roomName, String roomCode, boolean isPrivate) {
-        System.out.println(chatRooms.keySet());
         if (!chatRooms.containsKey(roomCode)) {
             gameRooms.put(roomCode, new GameRoom(roomName, roomCode, isPrivate));
         }
@@ -292,12 +270,10 @@ public class Server {
 
     public synchronized void addUser(User user) {
         this.users.put(user.getName(), user);
-        System.out.println("add user");
         save();
     }
 
     private void addChatRoom(String roomName, String roomCode) {
-        System.out.println("Chatroom " + roomName + " has been added under code " + roomCode);
         if (!chatRooms.containsKey(roomCode)) {
             chatRooms.put(roomCode, new ChatRoom(roomName, roomCode));
             save();
@@ -345,4 +321,15 @@ public class Server {
     }
 
 
+    public HashMap<String, HashMap<String, Integer>> getLeaderboard() {
+        HashMap<String, HashMap<String, Integer>>leaderboard = new HashMap<>();
+        HashMap<String, Integer> values;
+        for (User user: users.values()) {
+            values = new HashMap<>();
+            values.put("played", user.getGamesPlayed());
+            values.put("won", user.getGamesWon());
+            leaderboard.put(user.getName(), values);
+        }
+        return leaderboard;
+    }
 }

@@ -188,7 +188,6 @@ public class AccountGUI {
             out.writeUTF("DelU" + password);
             String response = in.readUTF();
             if (response.equals("Account deleted")) {
-                System.out.println("Account deleted from server");
                 return true;
             }
             return false;

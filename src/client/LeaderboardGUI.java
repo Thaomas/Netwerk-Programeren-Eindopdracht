@@ -11,18 +11,29 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import util.SimplePropertyConverter;
 
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.net.Socket;
+import java.util.HashMap;
 
 public class LeaderboardGUI {
 
     private Stage stage;
     private MainMenuGUI mainMenuGUI;
     private Socket socket;
+    private HashMap<String, HashMap<String, Integer>> leaderboard;
 
     public void start(Stage primaryStage, MainMenuGUI mainMenuGUI, Socket socket) {
         stage = primaryStage;
         this.mainMenuGUI = mainMenuGUI;
         this.socket = socket;
+        try {
+            new DataOutputStream(socket.getOutputStream()).writeUTF("GLea");
+            leaderboard = new HashMap<>((HashMap<String, HashMap<String, Integer>>)new ObjectInputStream(socket.getInputStream()).readObject());
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
 
         BorderPane borderPane = new BorderPane();
 
@@ -63,7 +74,7 @@ public class LeaderboardGUI {
         gamesWon.prefWidthProperty().bind(tableView.widthProperty().divide(4).subtract(60));
         gamesLost.prefWidthProperty().bind(tableView.widthProperty().divide(4).subtract(60));
 
-        SortedList<SimplePropertyConverter> sortedList = new SortedList<>(testData());
+        SortedList<SimplePropertyConverter> sortedList = new SortedList<>(loadData());
 
         sortedList.comparatorProperty().bind(tableView.comparatorProperty());
 
@@ -81,13 +92,12 @@ public class LeaderboardGUI {
         return tableView;
     }
 
-    private ObservableList<SimplePropertyConverter> testData(){
+    private ObservableList<SimplePropertyConverter> loadData(){
         ObservableList<SimplePropertyConverter> data = FXCollections.observableArrayList();
 
-        data.add(new SimplePropertyConverter("test 1", 20, 5));
-        data.add(new SimplePropertyConverter("test 2", 20, 10));
-        data.add(new SimplePropertyConverter("test 3", 42, 35));
-        data.add(new SimplePropertyConverter("test 4", 5, 5));
+        for (String key : leaderboard.keySet()){
+            data.add(new SimplePropertyConverter(key, leaderboard.get(key).get("played"), leaderboard.get(key).get("won")));
+        }
 
         return data;
     }
